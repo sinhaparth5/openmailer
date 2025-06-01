@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - develop
-      - main
+      - master
   pull_request:
     branches:
       - develop
-      - main
+      - master
 
 permissions:
   contents: write
@@ -16,31 +16,63 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    environment: Testing
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.3'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
 
-      - name: Add Flux Credentials Loaded From ENV
-        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-
 
-      - name: Install Dependencies
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run Laravel Pint (Code Style Fixer)
+        run: vendor/bin/pint --test
+
+      - name: Run PHP CS Fixer (Alternative if Pint fails)
+        if: failure()
         run: |
-          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm install
+          composer require friendsofphp/php-cs-fixer --dev
+          vendor/bin/php-cs-fixer fix --dry-run --diff
 
-      - name: Run Pint
-        run: vendor/bin/pint
+      - name: Run PHPStan (Static Analysis)
+        run: |
+          composer require nunomaduro/larastan --dev
+          vendor/bin/phpstan analyse --memory-limit=2G
 
-      # - name: Commit Changes
+      # Uncomment to auto-fix code style issues
+      # - name: Fix code style with Pint
+      #   run: vendor/bin/pint
+      
+      # - name: Commit code style fixes
       #   uses: stefanzweifel/git-auto-commit-action@v5
       #   with:
-      #     commit_message: fix code style
+      #     commit_message: 'fix: code style (automated)'
       #     commit_options: '--no-verify'
       #     file_pattern: |
-      #       **/*
-      #       !.github/workflows/*
+      #       **/*.php
+      #       !vendor/**
+      #       !node_modules/**
