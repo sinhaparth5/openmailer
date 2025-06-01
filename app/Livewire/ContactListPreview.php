@@ -35,15 +35,12 @@ class ContactListPreview extends Component
 
         if ($this->listId) {
             $list = ContactList::with(['user'])->find($this->listId);
-            
             if ($list) {
-                // Get recent contacts
                 $contacts = $list->subscribedContacts()
                     ->latest()
                     ->limit(10)
                     ->get();
 
-                // Get recent activities for this list's contacts
                 $contactIds = $list->contacts()->pluck('contacts.id');
                 $recentActivities = \App\Models\ContactActivity::whereIn('contact_id', $contactIds)
                     ->with(['contact'])
