@@ -19,4 +19,18 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/contact/lists', function () {
+        return view('contacts.lists');
+    })->name('contacts.lists');
+});
+
+Route::get('/debug-lists', function () {
+    $lists = \App\Models\ContactList::all();
+    return response()->json([
+        'count' => $lists->count(),
+        'lists' => $lists->toArray()
+    ]);
+});
+
 require __DIR__.'/auth.php';
