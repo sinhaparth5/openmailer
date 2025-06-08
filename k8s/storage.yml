@@ -1,4 +1,20 @@
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: openmailer-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:
+    path: /tmp/openmailer-data
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: openmailer-storage
@@ -9,3 +25,4 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: local-storage
