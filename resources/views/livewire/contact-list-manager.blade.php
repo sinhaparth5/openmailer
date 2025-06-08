@@ -15,7 +15,7 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Contact Lists</h1>
+            <h1 class="text-2xl font-bold text-gray-900 font-switzer">Contact Lists</h1>
             <p class="text-gray-600 dark:text-gray-400">Manage your email marketing lists and segments</p>
         </div>
         <button wire:click="createList" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
