@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: openmailer-service
+  namespace: openmailer
+spec:
+  selector:
+    app: openmailer
+  ports:
+  - port: 80
+    targetPort: 8000
+  type: ClusterIP

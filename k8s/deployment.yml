@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openmailer
+  namespace: openmailer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openmailer
+  template:
+    metadata:
+      labels:
+        app: openmailer
+    spec:
+      containers:
+      - name: openmailer
+        image: parthsinha90/openmailer:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openmailer-secret
+              key: APP_KEY
+        - name: RUN_MIGRATIONS
+          value: "true"
+        volumeMounts:
+        - name: storage
+          mountPath: /var/www/html/storage
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: openmailer-storage
