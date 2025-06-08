@@ -22,7 +22,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: openmailer
-        image: parthsinha90/openmailer:latest
+        image: parthsinha90/openmailer:arm64
         ports:
         - containerPort: 8000
         env:
@@ -33,16 +33,29 @@ spec:
               key: APP_KEY
         - name: RUN_MIGRATIONS
           value: "true"
+        - name: APP_ENV
+          value: "production"
+        - name: APP_DEBUG
+          value: "true"
         volumeMounts:
         - name: storage
           mountPath: /var/www/html/storage
         resources:
           requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
             memory: "256Mi"
             cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+        # Add startup probe to give more time for initialization
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 10
       volumes:
       - name: storage
         persistentVolumeClaim:

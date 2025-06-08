@@ -209,13 +209,20 @@ RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo 'chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache' >> /entrypoint.sh && \
     echo 'chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache' >> /entrypoint.sh && \
     echo '' >> /entrypoint.sh && \
-    echo '# Create SQLite database' >> /entrypoint.sh && \
+    echo '# Create SQLite database with proper permissions' >> /entrypoint.sh && \
+    echo 'log "Setting up SQLite database..."' >> /entrypoint.sh && \
+    echo 'mkdir -p /var/www/html/storage/database' >> /entrypoint.sh && \
     echo 'if [ ! -f /var/www/html/storage/database/database.sqlite ]; then' >> /entrypoint.sh && \
     echo '    log "Creating SQLite database..."' >> /entrypoint.sh && \
     echo '    touch /var/www/html/storage/database/database.sqlite' >> /entrypoint.sh && \
     echo 'fi' >> /entrypoint.sh && \
-    echo 'chown www-data:www-data /var/www/html/storage/database/database.sqlite' >> /entrypoint.sh && \
+    echo '# Set proper ownership and permissions for database' >> /entrypoint.sh && \
+    echo 'chown -R www-data:www-data /var/www/html/storage/database' >> /entrypoint.sh && \
+    echo 'chmod 775 /var/www/html/storage/database' >> /entrypoint.sh && \
     echo 'chmod 664 /var/www/html/storage/database/database.sqlite' >> /entrypoint.sh && \
+    echo '# Verify database permissions' >> /entrypoint.sh && \
+    echo 'log "Database permissions: $(ls -la /var/www/html/storage/database/database.sqlite)"' >> /entrypoint.sh && \
+    echo 'log "Directory permissions: $(ls -lad /var/www/html/storage/database/)"' >> /entrypoint.sh && \
     echo '' >> /entrypoint.sh && \
     echo '# Create .env file' >> /entrypoint.sh && \
     echo 'if [ ! -f /var/www/html/.env ]; then' >> /entrypoint.sh && \
@@ -238,7 +245,7 @@ RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo 'log "Testing PHP-FPM configuration..."' >> /entrypoint.sh && \
     echo 'php-fpm -t' >> /entrypoint.sh && \
     echo '' >> /entrypoint.sh && \
-    echo '# Laravel setup' >> /entrypoint.sh && \
+    echo '# Laravel setup with database permissions' >> /entrypoint.sh && \
     echo 'if [ -f /var/www/html/artisan ]; then' >> /entrypoint.sh && \
     echo '    log "Running Laravel setup..."' >> /entrypoint.sh && \
     echo '    if ! grep -q "APP_KEY=base64:" /var/www/html/.env; then' >> /entrypoint.sh && \
@@ -249,6 +256,19 @@ RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo '    php artisan route:clear' >> /entrypoint.sh && \
     echo '    php artisan view:clear' >> /entrypoint.sh && \
     echo '    php artisan cache:clear' >> /entrypoint.sh && \
+    echo '    # Run migrations if needed' >> /entrypoint.sh && \
+    echo '    if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then' >> /entrypoint.sh && \
+    echo '        log "Running database migrations..."' >> /entrypoint.sh && \
+    echo '        php artisan migrate --force' >> /entrypoint.sh && \
+    echo '    fi' >> /entrypoint.sh && \
+    echo '    # Test database write permissions' >> /entrypoint.sh && \
+    echo '    log "Testing database write permissions..."' >> /entrypoint.sh && \
+    echo '    php -r "' >> /entrypoint.sh && \
+    echo '        \$pdo = new PDO(\"sqlite:/var/www/html/storage/database/database.sqlite\");' >> /entrypoint.sh && \
+    echo '        \$pdo->exec(\"CREATE TABLE IF NOT EXISTS test_table (id INTEGER)\");' >> /entrypoint.sh && \
+    echo '        \$pdo->exec(\"DROP TABLE test_table\");' >> /entrypoint.sh && \
+    echo '        echo \"Database write test: SUCCESS\n\";' >> /entrypoint.sh && \
+    echo '    " || { log "Database write test: FAILED"; exit 1; }' >> /entrypoint.sh && \
     echo 'fi' >> /entrypoint.sh && \
     echo '' >> /entrypoint.sh && \
     echo 'log "Container initialization completed!"' >> /entrypoint.sh && \
