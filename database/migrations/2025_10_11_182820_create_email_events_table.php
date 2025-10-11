@@ -12,8 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('email_events', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('campaign_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('contact_id')->constrained()->onDelete('cascade');
+            $table->string('tracking_id', 100);
+            $table->enum('event_type', ['sent', 'delivered', 'opened', 'clicked', 'bounced', 'complained', 'unsubscribed']);
+            $table->text('link_url')->nullable();
+            $table->string('user_agent', 500)->nullable();
+            $table->string('ip_address', 45)->nullable();
             $table->timestamps();
+
+            $table->index('tracking_id');
+            $table->index('event_type');
+            $table->index('created_at');
         });
     }
 
