@@ -12,8 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('suppression_list', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            $table->string('email');
+            $table->enum('reason', ['unsubscribed', 'bounced', 'complained', 'manual']);
+            $table->string('source', 100)->nullable();
             $table->timestamps();
+
+            $table->unique(['user_id', 'email']);
+            $table->index('email');
         });
     }
 
