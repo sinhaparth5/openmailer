@@ -13,7 +13,20 @@ return new class extends Migration
     {
         Schema::create('domains', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id')->const
+            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            $table->string('domain')->unique();
+            $table->string('verification_token');
+            $table->boolean('is_verified')->default(false);
+            $table->string('dkim_selector', 100)->default('mail');
+            $table->text('dkim_private_key')->nullable();
+            $table->text('dkim_public_key')->nullable();
+            $table->text('spf_record')->nullable();
+            $table->text('dmarc_record')->nullable();
+            $table->enum('status', ['pending', 'verified', 'failed'])->default('pending');
+            $table->timestamps();
+
+            $table->index('user_id');
+            $table->index('status');
         });
     }
 
