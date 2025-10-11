@@ -12,8 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('smtp_settings', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('domain_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('host');
+            $table->integer('port')->default(587);
+            $table->enum('encryption', ['tls', 'ssl', 'none'])->default('tls');
+            $table->string('username')->nullable();
+            $table->string('password')->nullable();
+            $table->boolean('is_default')->default(false);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->index('user_id');
         });
     }
 
