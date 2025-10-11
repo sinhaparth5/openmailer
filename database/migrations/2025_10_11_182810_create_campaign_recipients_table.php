@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('campaign_recipients', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('campaign_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('contact_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('contact_list_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
+
+            $table->unique(['campaign_id', 'contact_id']);
         });
     }
 
