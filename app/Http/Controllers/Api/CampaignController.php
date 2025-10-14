@@ -26,7 +26,8 @@ class CampaignController extends Controller
         return response()->json($campaigns);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
@@ -52,5 +53,103 @@ class CampaignController extends Controller
         ], 201);
     }
 
-    
+    public function show(Request $request, Campaign $campaign)
+    {
+        if ($campaign->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        return response()->json($campaign->load(['domain', 'template', 'contacts']));
+    }
+
+    public function update(Request $request, Campaign $campaign)
+    {
+        if ($campaign->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'subject' => 'sometimes|string|max:255',
+            'from_name' => 'sometimes|string|max:255',
+            'from_email' => 'sometimes|email',
+            'reply_to' => 'nullable|email',
+            'html_content' => 'sometimes|string',
+        ]);
+
+        $campaign->update($validated);
+
+        return response()->json([
+            'message' => 'Campaign updated successfully.',
+            'campaign' => $campaign
+        ]);
+    }
+
+    public function destroy(Request $request, Campaign $campaign)
+    {
+        if ($campaign->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $campaign->delete();
+        return response()->json(['message' => 'Campaign deleted successfully.']);
+    }
+
+    public function send(Request $request, Campaign $campaign)
+    {
+        if ($campaign->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $validated = $request->validate([
+            'scheduled_at' => 'nullable|date|after:now',
+        ]);
+
+        $scheduledAt = isset($validated['scheduled_at']) ? new \DateTime($validated['scheduled_at']) : null;
+
+        $this->campaignService->scheduleCampaign($campaign, $scheduledAt);
+
+        return response()->json([
+            'message' => $scheduledAt ? 'Campaign scheduled successfully.' : 'Campaign is being sent',
+            'campaign' => $campaign->fresh()
+        ]);
+    }
+
+    public function pause(Request $request, Campaign $campaign)
+    {
+        if ($campaign->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $this->campaignService->pauseCampaign($campaign);
+
+        return response()->json([
+            'message' => 'Campaign pause successfully.',
+            'campaign' => $campaign->fresh(),
+        ]);
+    }
+
+    public function resume(Request $request, Campaign $campaign)
+    {
+        if ($campaign->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $this->campaignService->resumeCampaign($campaign);
+
+        return response()->json([
+            'message' => 'Campaign resumed successfully.',
+            'campaign' => $campaign->fresh(),
+        ]);
+    }
+
+    public function stats(Request $request, Campaign $campaign) {
+        if  ($campaign->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $stats = $this->campaignService->getCampaignStats($campaign);
+
+        return response()->json($stats);
+    }
 }
