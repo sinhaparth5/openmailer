@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class CampaignRecipient extends Model {
+class CampaignRecipient extends Model
+{
     use HasFactory, HasUuid;
 
     protected $fillable = [
@@ -16,15 +17,18 @@ class CampaignRecipient extends Model {
         'contact_list_id',
     ];
 
-    public function campaign(): BelongsTo {
+    public function campaign(): BelongsTo
+    {
         return $this->belongsTo(Campaign::class);
     }
 
-    public function contact(): BelongsTo {
+    public function contact(): BelongsTo
+    {
         return $this->belongsTo(Contact::class);
     }
 
-    public function contactList(): BelongsTo {
+    public function contactList(): BelongsTo
+    {
         return $this->belongsTo(ContactList::class);
     }
 }

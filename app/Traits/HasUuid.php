@@ -4,8 +4,10 @@ namespace App\Traits;
 
 use Illuminate\Support\Str;
 
-trait HasUuid {
-    protected static function bootHasUuid(): void {
+trait HasUuid
+{
+    protected static function bootHasUuid(): void
+    {
         static::creating(function ($model) {
             if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string) Str::uuid();
@@ -13,11 +15,13 @@ trait HasUuid {
         });
     }
 
-    public function getIncrementing(): bool {
+    public function getIncrementing(): bool
+    {
         return false;
     }
 
-    public function getKeyType(): string {
+    public function getKeyType(): string
+    {
         return 'string';
     }
 }

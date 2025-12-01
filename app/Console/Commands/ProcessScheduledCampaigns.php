@@ -37,6 +37,7 @@ class ProcessScheduledCampaigns extends Command
         }
 
         $this->info('Processed {$campaigns->count()} scheduled campaigns');
+
         return 0;
     }
 }

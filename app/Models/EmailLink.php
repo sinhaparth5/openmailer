@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class EmailLink extends Model {
+class EmailLink extends Model
+{
     use HasFactory, HasUuid;
 
     protected $fillable = [
@@ -23,7 +24,8 @@ class EmailLink extends Model {
         'unique_clicks' => 'integer',
     ];
 
-    public function campaign(): BelongsTo {
+    public function campaign(): BelongsTo
+    {
         return $this->belongsTo(Campaign::class);
     }
 }

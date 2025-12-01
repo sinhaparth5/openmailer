@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('from_email');
             $table->string('reply_to')->nullable();
             $table->longText('html_content')->nullable();
-            $table->enum('status', [ 'draft', 'scheduled', 'sending', 'sent', 'paused', 'failed'])->default('draft');
+            $table->enum('status', ['draft', 'scheduled', 'sending', 'sent', 'paused', 'failed'])->default('draft');
             $table->integer('total_recipients')->default(0);
             $table->integer('total_sent')->default(0);
             $table->integer('total_delivered')->default(0);

@@ -12,17 +12,17 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
-   Route::prefix('campaigns')->group(function () {
-       Route::get('/', [CampaignController::class, 'index']);
-       Route::post('/', [CampaignController::class, 'store']);
-       Route::get('/{campaign}', [CampaignController::class, 'show']);
-       Route::put('/{campaign}', [CampaignController::class, 'update']);
-       Route::delete('/{campaign}', [CampaignController::class, 'destroy']);
-       Route::post('/{campaign}/send', [CampaignController::class, 'send']);
-       Route::post('/{campaign}/pause', [CampaignController::class, 'pause']);
-       Route::post('/{campaign}/resume', [CampaignController::class, 'resume']);
-       Route::get('/{campaign}/stats', [CampaignController::class, 'stats']);
-   });
+    Route::prefix('campaigns')->group(function () {
+        Route::get('/', [CampaignController::class, 'index']);
+        Route::post('/', [CampaignController::class, 'store']);
+        Route::get('/{campaign}', [CampaignController::class, 'show']);
+        Route::put('/{campaign}', [CampaignController::class, 'update']);
+        Route::delete('/{campaign}', [CampaignController::class, 'destroy']);
+        Route::post('/{campaign}/send', [CampaignController::class, 'send']);
+        Route::post('/{campaign}/pause', [CampaignController::class, 'pause']);
+        Route::post('/{campaign}/resume', [CampaignController::class, 'resume']);
+        Route::get('/{campaign}/stats', [CampaignController::class, 'stats']);
+    });
 
     // Contact Lists
     Route::prefix('contact-lists')->group(function () {

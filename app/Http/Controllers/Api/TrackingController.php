@@ -8,7 +8,8 @@ use App\Models\EmailLink;
 use App\Models\EmailQueue;
 use Illuminate\Http\Request;
 
-class TrackingController extends Controller{
+class TrackingController extends Controller
+{
     public function trackOpen(Request $request, string $trackingId)
     {
         $emailQueue = EmailQueue::where('tracking_id', $trackingId)->first();
@@ -19,7 +20,7 @@ class TrackingController extends Controller{
                 ->where('event_type', 'opened')
                 ->exists();
 
-            if (!$alreadyTracked) {
+            if (! $alreadyTracked) {
                 // Create event
                 EmailEvent::create([
                     'campaign_id' => $emailQueue->campaign_id,
@@ -37,6 +38,7 @@ class TrackingController extends Controller{
 
         // Return 1x1 transparent pixel
         $pixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+
         return response($pixel)->header('Content-Type', 'image/gif');
     }
 
@@ -46,7 +48,7 @@ class TrackingController extends Controller{
 
         $link = EmailLink::where('short_code', $shortCode)->first();
 
-        if (!$link) {
+        if (! $link) {
             abort(404);
         }
 
@@ -69,7 +71,7 @@ class TrackingController extends Controller{
                 $link->increment('total_clicks');
 
                 // Check if unique click
-                $uniqueClick = !EmailEvent::where('tracking_id', $trackingId)
+                $uniqueClick = ! EmailEvent::where('tracking_id', $trackingId)
                     ->where('event_type', 'clicked')
                     ->where('link_url', $link->original_url)
                     ->exists();
@@ -92,7 +94,7 @@ class TrackingController extends Controller{
             ->where('used', false)
             ->first();
 
-        if (!$unsubscribeToken || $unsubscribeToken->expires_at < now()) {
+        if (! $unsubscribeToken || $unsubscribeToken->expires_at < now()) {
             return view('unsubscribe.expired');
         }
 
@@ -133,7 +135,7 @@ class TrackingController extends Controller{
 
         return view('unsubscribe.confirm', [
             'token' => $token,
-            'contact' => $unsubscribeToken->contact
+            'contact' => $unsubscribeToken->contact,
         ]);
     }
 }

@@ -49,7 +49,7 @@ class CampaignController extends Controller
 
         return response()->json([
             'message' => 'Campaign created successfully.',
-            'campaign' => $campaign->load(['domain', 'template'])
+            'campaign' => $campaign->load(['domain', 'template']),
         ], 201);
     }
 
@@ -81,7 +81,7 @@ class CampaignController extends Controller
 
         return response()->json([
             'message' => 'Campaign updated successfully.',
-            'campaign' => $campaign
+            'campaign' => $campaign,
         ]);
     }
 
@@ -92,6 +92,7 @@ class CampaignController extends Controller
         }
 
         $campaign->delete();
+
         return response()->json(['message' => 'Campaign deleted successfully.']);
     }
 
@@ -111,7 +112,7 @@ class CampaignController extends Controller
 
         return response()->json([
             'message' => $scheduledAt ? 'Campaign scheduled successfully.' : 'Campaign is being sent',
-            'campaign' => $campaign->fresh()
+            'campaign' => $campaign->fresh(),
         ]);
     }
 
@@ -143,8 +144,9 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function stats(Request $request, Campaign $campaign) {
-        if  ($campaign->user_id !== $request->user()->id) {
+    public function stats(Request $request, Campaign $campaign)
+    {
+        if ($campaign->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 

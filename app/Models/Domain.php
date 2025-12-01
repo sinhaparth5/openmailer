@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Domain extends Model {
+class Domain extends Model
+{
     use HasFactory, HasUuid;
 
     protected $fillable = [
@@ -28,15 +29,18 @@ class Domain extends Model {
         'is_verified' => 'boolean',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function campaigns(): HasMany {
+    public function campaigns(): HasMany
+    {
         return $this->hasMany(Campaign::class);
     }
 
-    public function smtpSettings(): HasMany {
+    public function smtpSettings(): HasMany
+    {
         return $this->hasMany(SmtpSetting::class);
     }
 }

@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class EmailQueue extends Model {
+class EmailQueue extends Model
+{
     use HasFactory, HasUuid;
 
     protected $table = 'email_queue';
@@ -28,11 +29,13 @@ class EmailQueue extends Model {
         'send_at' => 'datetime',
     ];
 
-    public function campaign(): BelongsTo {
+    public function campaign(): BelongsTo
+    {
         return $this->belongsTo(Campaign::class);
     }
 
-    public function contact(): BelongsTo {
+    public function contact(): BelongsTo
+    {
         return $this->belongsTo(Contact::class);
     }
 }

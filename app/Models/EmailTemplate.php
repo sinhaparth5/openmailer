@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class EmailTemplate extends Model {
+class EmailTemplate extends Model
+{
     use HasFactory, HasUuid;
 
     protected $fillable = [
@@ -18,7 +19,7 @@ class EmailTemplate extends Model {
         'html_content',
         'json_design',
         'thumbnail',
-        'is_favorite'
+        'is_favorite',
     ];
 
     protected $casts = [
@@ -26,11 +27,13 @@ class EmailTemplate extends Model {
         'is_favorite' => 'boolean',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function campaigns(): HasMany {
+    public function campaigns(): HasMany
+    {
         return $this->hasMany(Campaign::class, 'template_id');
     }
 }

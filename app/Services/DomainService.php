@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Models\Domain;
 use Illuminate\Support\Str;
 
-class DomainService {
-    public function addDomain(int $userId, string $domainName): Domain {
+class DomainService
+{
+    public function addDomain(int $userId, string $domainName): Domain
+    {
         // Generate DKIM keys
         $dkimKeys = $this->generateDKIMKeys();
 
@@ -25,28 +27,31 @@ class DomainService {
 
         // Generate DNS records
         $this->generateDNSRecords($domain);
+
         return $domain;
     }
 
-    public function verifyDomain(Domain $domain): bool {
+    public function verifyDomain(Domain $domain): bool
+    {
         // Check TXT records for verification
         $txtRecords = dns_get_record($domain->domain, DNS_TXT);
 
         foreach ($txtRecords as $record) {
-            if (isset($record['txt']) && $record['txt'] === 'openmailer-verification=' . $domain->verification_token) {
+            if (isset($record['txt']) && $record['txt'] === 'openmailer-verification='.$domain->verification_token) {
                 $domain->update([
                     'is_verified' => true,
                     'status' => 'verified',
                 ]);
+
                 return true;
             }
         }
 
         // Check DKIM record
-        $dkimRecord = dns_get_record($domain->dkim_selector . '._domainkey.' .  $domain->domain, DNS_TXT);
+        $dkimRecord = dns_get_record($domain->dkim_selector.'._domainkey.'.$domain->domain, DNS_TXT);
 
         $dkimValid = false;
-        if (!empty($dkimRecord)) {
+        if (! empty($dkimRecord)) {
             foreach ($dkimRecord as $record) {
                 if (isset($record['txt']) && strpos($record['txt'], $domain->dkim_public_key) !== false) {
                     $dkimValid = true;
@@ -64,15 +69,17 @@ class DomainService {
             }
         }
 
-        if (!$dkimValid || !$spfValid) {
+        if (! $dkimValid || ! $spfValid) {
             $domain->update(['status' => 'failed']);
+
             return false;
         }
 
         return false;
     }
 
-    private function generateDKIMKeys(): array {
+    private function generateDKIMKeys(): array
+    {
         $config = [
             'private_key_bits' => 2048,
             'private_key_type' => OPENSSL_KEYTYPE_RSA,
@@ -94,7 +101,8 @@ class DomainService {
         ];
     }
 
-    private function generateDNSRecords(Domain $domain): void {
+    private function generateDNSRecords(Domain $domain): void
+    {
         // SPF Record
         $serverIP = gethostbyname(gethostname());
         $spfRecord = "v=spf1 ip4:{$serverIP} ~all";
@@ -108,12 +116,13 @@ class DomainService {
         ]);
     }
 
-    public function getDNSInstructions(Domain $domain): array {
+    public function getDNSInstructions(Domain $domain): array
+    {
         return [
             'verification' => [
                 'type' => 'TXT',
                 'name' => '@',
-                'value' => 'openmailer-verification' . $domain->verification_token,
+                'value' => 'openmailer-verification'.$domain->verification_token,
             ],
             'spf' => [
                 'type' => 'TXT',
@@ -122,8 +131,8 @@ class DomainService {
             ],
             'dkim' => [
                 'type' => 'TXT',
-                'name' => $domain->dkim_selector . '._domainkey',
-                'value' => 'v=DKIM1; k=rsa; p=' . $domain->dkim_public_key,
+                'name' => $domain->dkim_selector.'._domainkey',
+                'value' => 'v=DKIM1; k=rsa; p='.$domain->dkim_public_key,
             ],
             'dmarc' => [
                 'type' => 'TXT',

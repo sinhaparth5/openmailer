@@ -9,8 +9,10 @@ use App\Models\EmailQueue;
 use App\Models\SuppressionList;
 use Illuminate\Support\Str;
 
-class CampaignService {
-    public function createCampaign(array $data): Campaign {
+class CampaignService
+{
+    public function createCampaign(array $data): Campaign
+    {
         return Campaign::create([
             'user_id' => $data['user_id'],
             'domain_id' => $data['domain_id'],
@@ -25,8 +27,9 @@ class CampaignService {
         ]);
     }
 
-    public function addRecipients(Campaign $campaign, array $contactListIds): void {
-        $contacts = Contact::whereHas('contactLists', function ($query) use ($contactListIds){
+    public function addRecipients(Campaign $campaign, array $contactListIds): void
+    {
+        $contacts = Contact::whereHas('contactLists', function ($query) use ($contactListIds) {
             $query->whereIn('contact_list_id', $contactListIds);
         })
             ->where('user_id', $campaign->user_id)
@@ -38,20 +41,21 @@ class CampaignService {
             ->toArray();
 
         foreach ($contacts as $contact) {
-            if (!in_array($contact->email, $suppressedEmails)) {
+            if (! in_array($contact->email, $suppressedEmails)) {
                 $campaign->contacts()->syncWithoutDetaching([
-                    $contact->id => ['contact_list_id' => $contactListIds[0]]
+                    $contact->id => ['contact_list_id' => $contactListIds[0]],
                 ]);
             }
         }
 
         // Update total recipients
         $campaign->update([
-            'total_recipients' => $campaign->contacts()->count()
+            'total_recipients' => $campaign->contacts()->count(),
         ]);
     }
 
-    public function scheduleCampaign(Campaign $campaign, ?\DateTime $scheduledAt = null): void {
+    public function scheduleCampaign(Campaign $campaign, ?\DateTime $scheduledAt = null): void
+    {
         if ($scheduledAt) {
             $campaign->update([
                 'status' => 'scheduled',
@@ -62,10 +66,11 @@ class CampaignService {
         }
     }
 
-    public function sendCampaign(Campaign $campaign): void {
+    public function sendCampaign(Campaign $campaign): void
+    {
         $campaign->update([
             'status' => 'sending',
-            'started_at' => now()
+            'started_at' => now(),
         ]);
 
         // Get all recipients
@@ -85,11 +90,13 @@ class CampaignService {
         }
     }
 
-    public function pauseCampaign(Campaign $campaign): void {
+    public function pauseCampaign(Campaign $campaign): void
+    {
         $campaign->update(['status' => 'paused']);
     }
 
-    public function resumeCampaign(Campaign $campaign): void {
+    public function resumeCampaign(Campaign $campaign): void
+    {
         $campaign->update(['status' => 'sending']);
 
         // Get pending emails
@@ -102,7 +109,8 @@ class CampaignService {
         }
     }
 
-    public function getCampaignStats(Campaign $campaign): array {
+    public function getCampaignStats(Campaign $campaign): array
+    {
         return [
             'total_recipients' => $campaign->total_recipients,
             'total_sent' => $campaign->total_sent,

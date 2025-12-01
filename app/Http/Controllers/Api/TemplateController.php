@@ -7,12 +7,13 @@ use App\Models\EmailTemplate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class TemplateController extends Controller {
+class TemplateController extends Controller
+{
     public function index(Request $request): JsonResponse
     {
         $templates = EmailTemplate::where('user_id', $request->user()->id)
             ->when($request->has('search'), function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->search . '%');
+                $query->where('name', 'like', '%'.$request->search.'%');
             })
             ->when($request->has('favorite'), function ($query) {
                 $query->where('is_favorite', true);
@@ -46,7 +47,7 @@ class TemplateController extends Controller {
 
         return response()->json([
             'message' => 'Template created successfully',
-            'template' => $template
+            'template' => $template,
         ], 201);
     }
 
@@ -78,7 +79,7 @@ class TemplateController extends Controller {
 
         return response()->json([
             'message' => 'Template updated successfully',
-            'template' => $template->fresh()
+            'template' => $template->fresh(),
         ]);
     }
 
@@ -93,14 +94,14 @@ class TemplateController extends Controller {
 
         if ($campaignCount > 0) {
             return response()->json([
-                'message' => 'Cannot delete template. It is being used by ' . $campaignCount . ' campaign(s).'
+                'message' => 'Cannot delete template. It is being used by '.$campaignCount.' campaign(s).',
             ], 422);
         }
 
         $template->delete();
 
         return response()->json([
-            'message' => 'Template deleted successfully'
+            'message' => 'Template deleted successfully',
         ]);
     }
 
@@ -111,13 +112,13 @@ class TemplateController extends Controller {
         }
 
         $newTemplate = $template->replicate();
-        $newTemplate->name = $template->name . ' (Copy)';
+        $newTemplate->name = $template->name.' (Copy)';
         $newTemplate->is_favorite = false;
         $newTemplate->save();
 
         return response()->json([
             'message' => 'Template duplicated successfully',
-            'template' => $newTemplate
+            'template' => $newTemplate,
         ], 201);
     }
 
@@ -128,12 +129,12 @@ class TemplateController extends Controller {
         }
 
         $template->update([
-            'is_favorite' => !$template->is_favorite
+            'is_favorite' => ! $template->is_favorite,
         ]);
 
         return response()->json([
             'message' => 'Template favorite status updated',
-            'template' => $template->fresh()
+            'template' => $template->fresh(),
         ]);
     }
 }

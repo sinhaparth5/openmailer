@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class EmailEvent extends Model {
+class EmailEvent extends Model
+{
     use HasFactory, HasUuid;
 
     protected $fillable = [
@@ -17,14 +18,16 @@ class EmailEvent extends Model {
         'event_type',
         'link_url',
         'user_agent',
-        'ip_address'
+        'ip_address',
     ];
 
-    public function campaign(): BelongsTo {
+    public function campaign(): BelongsTo
+    {
         return $this->belongsTo(Campaign::class);
     }
 
-    public function contact(): BelongsTo {
+    public function contact(): BelongsTo
+    {
         return $this->belongsTo(Contact::class);
     }
 }

@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Contact extends Model {
+class Contact extends Model
+{
     use HasFactory, HasUuid;
 
     protected $fillable = [
@@ -30,20 +31,24 @@ class Contact extends Model {
         'unsubscribed_at' => 'datetime',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function contactLists(): BelongsToMany {
+    public function contactLists(): BelongsToMany
+    {
         return $this->belongsToMany(ContactList::class, 'contact_list_contacts')
             ->withTimestamps();
     }
 
-    public function emailEvents(): HasMany {
+    public function emailEvents(): HasMany
+    {
         return $this->hasMany(EmailEvent::class);
     }
 
-    public function campaigns(): BelongsToMany {
+    public function campaigns(): BelongsToMany
+    {
         return $this->belongsToMany(Campaign::class, 'campaign_recipients')
             ->withPivot('campaign_list_id')
             ->withTimestamps();

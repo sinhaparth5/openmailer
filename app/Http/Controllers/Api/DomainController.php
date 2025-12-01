@@ -7,7 +7,8 @@ use App\Models\Domain;
 use App\Services\DomainService;
 use Illuminate\Http\Request;
 
-class DomainController extends Controller {
+class DomainController extends Controller
+{
     protected DomainService $domainService;
 
     public function __construct(DomainService $domainService)
@@ -38,7 +39,7 @@ class DomainController extends Controller {
         return response()->json([
             'message' => 'Domain added successfully',
             'domain' => $domain,
-            'dns_instructions' => $this->domainService->getDNSInstructions($domain)
+            'dns_instructions' => $this->domainService->getDNSInstructions($domain),
         ], 201);
     }
 
@@ -50,7 +51,7 @@ class DomainController extends Controller {
 
         return response()->json([
             'domain' => $domain,
-            'dns_instructions' => $this->domainService->getDNSInstructions($domain)
+            'dns_instructions' => $this->domainService->getDNSInstructions($domain),
         ]);
     }
 
@@ -65,7 +66,7 @@ class DomainController extends Controller {
         return response()->json([
             'verified' => $verified,
             'domain' => $domain->fresh(),
-            'message' => $verified ? 'Domain verified successfully' : 'Domain verification failed. Please check DNS records.'
+            'message' => $verified ? 'Domain verified successfully' : 'Domain verification failed. Please check DNS records.',
         ]);
     }
 

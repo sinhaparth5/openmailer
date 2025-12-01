@@ -7,8 +7,10 @@ use App\Models\ContactList;
 use Illuminate\Support\Facades\Validator;
 use League\Csv\Reader;
 
-class ContactImportService {
-    public function importFromCSV(int $userId, ContactList $contactList, string $filePath): array {
+class ContactImportService
+{
+    public function importFromCSV(int $userId, ContactList $contactList, string $filePath): array
+    {
         $csv = Reader::createFromPath($filePath, 'r');
         $csv->setHeaderOffset(0);
 
@@ -27,7 +29,8 @@ class ContactImportService {
 
                 if ($validator->fails()) {
                     $skipped++;
-                    $errors[] = "Row {$offset}: Invalid email - " . ($record['email'] ?? 'missing');
+                    $errors[] = "Row {$offset}: Invalid email - ".($record['email'] ?? 'missing');
+
                     continue;
                 }
 
@@ -50,12 +53,12 @@ class ContactImportService {
                 $imported++;
             } catch (\Exception $e) {
                 $skipped++;
-                $errors[] = "Row {$offset}: " . $e->getMessage();
+                $errors[] = "Row {$offset}: ".$e->getMessage();
             }
         }
 
         $contactList->update([
-            'total_contacts' => $contactList->contacts()->count()
+            'total_contacts' => $contactList->contacts()->count(),
         ]);
 
         return [
@@ -65,7 +68,8 @@ class ContactImportService {
         ];
     }
 
-    public function importFromArray(int $userId, ContactList $contactList, array $contacts): array {
+    public function importFromArray(int $userId, ContactList $contactList, array $contacts): array
+    {
         $imported = 0;
         $skipped = 0;
         $errors = [];
@@ -79,6 +83,7 @@ class ContactImportService {
                 if ($validator->fails()) {
                     $skipped++;
                     $errors[] = "Contact {$index}: Invalid data";
+
                     continue;
                 }
 
@@ -99,12 +104,12 @@ class ContactImportService {
                 $imported++;
             } catch (\Exception $e) {
                 $skipped++;
-                $errors[] = "Contact {$index}: " . $e->getMessage();
+                $errors[] = "Contact {$index}: ".$e->getMessage();
             }
         }
 
         $contactList->update([
-            'total_contacts' => $contactList->contacts()->count()
+            'total_contacts' => $contactList->contacts()->count(),
         ]);
 
         return [
@@ -114,10 +119,11 @@ class ContactImportService {
         ];
     }
 
-    private function extractCustomFields(array $record): ?array {
+    private function extractCustomFields(array $record): ?array
+    {
         $standardFields = ['email', 'first_name', 'last_name'];
         $customFields = array_diff_key($record, array_flip($standardFields));
 
-        return !empty($customFields) ? $customFields : null;
+        return ! empty($customFields) ? $customFields : null;
     }
 }

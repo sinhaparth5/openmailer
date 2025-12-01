@@ -8,7 +8,8 @@ use App\Models\ContactList;
 use App\Services\ContactImportService;
 use Illuminate\Http\Request;
 
-class ContactController extends Controller {
+class ContactController extends Controller
+{
     protected ContactImportService $importService;
 
     public function __construct(ContactImportService $importService)
@@ -42,7 +43,7 @@ class ContactController extends Controller {
 
         return response()->json([
             'message' => 'Contact list created successfully',
-            'list' => $list
+            'list' => $list,
         ], 201);
     }
 
@@ -70,7 +71,7 @@ class ContactController extends Controller {
 
         return response()->json([
             'message' => 'Contact list updated successfully',
-            'list' => $contactList
+            'list' => $contactList,
         ]);
     }
 
@@ -99,7 +100,7 @@ class ContactController extends Controller {
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'email' => 'required|email|unique:contacts,email,NULL,id,user_id,' . $request->user()->id,
+            'email' => 'required|email|unique:contacts,email,NULL,id,user_id,'.$request->user()->id,
             'first_name' => 'nullable|string|max:100',
             'last_name' => 'nullable|string|max:100',
             'custom_fields' => 'nullable|array',
@@ -124,7 +125,7 @@ class ContactController extends Controller {
 
         return response()->json([
             'message' => 'Contact created successfully',
-            'contact' => $contact->load('contactLists')
+            'contact' => $contact->load('contactLists'),
         ], 201);
     }
 
@@ -155,7 +156,7 @@ class ContactController extends Controller {
 
         return response()->json([
             'message' => 'Contact updated successfully',
-            'contact' => $contact
+            'contact' => $contact,
         ]);
     }
 
@@ -191,7 +192,7 @@ class ContactController extends Controller {
 
         return response()->json([
             'message' => 'Import completed',
-            'result' => $result
+            'result' => $result,
         ]);
     }
 }

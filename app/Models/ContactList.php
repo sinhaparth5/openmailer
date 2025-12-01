@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class ContactList extends Model {
+class ContactList extends Model
+{
     use HasFactory, HasUuid;
 
     protected $fillable = [
@@ -22,11 +23,13 @@ class ContactList extends Model {
         'total_contacts' => 'integer',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function contacts(): BelongsToMany {
+    public function contacts(): BelongsToMany
+    {
         return $this->belongsToMany(Contact::class, 'contact_list_member')
             ->withTimestamps();
     }
