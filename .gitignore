@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Node ###
+node_modules/
+npm-debug.log*
+package-lock.json
+
+### Tailwind CSS ###
+src/main/resources/static/css/output.css
