@@ -39,3 +39,6 @@ package-lock.json
 
 ### Tailwind CSS ###
 src/main/resources/static/css/output.css
+
+### Liquibase ###
+src/main/resources/liquibase.properties

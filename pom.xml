@@ -102,6 +102,24 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>4.30.0</version>
+				<configuration>
+					<propertyFile>src/main/resources/liquibase.properties</propertyFile>
+					<changeLogFile>src/main/resources/db/changelog/db.changelog-generated.xml</changeLogFile>
+					<diffChangeLogFile>src/main/resources/db/changelog/changes/diff-${maven.build.timestamp}.xml</diffChangeLogFile>
+					<outputChangeLogFile>src/main/resources/db/changelog/db.changelog-generated.xml</outputChangeLogFile>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>${postgresql.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 
