@@ -28,6 +28,12 @@ public class RegisterRequest {
   )
   private String password;
 
+  @Size(max = 100, message = "First name must not exceed 100 characters")
+  private String firstName;
+
+  @Size(max = 100, message = "Last name must not exceed 100 characters")
+  private String lastName;
+
   public RegisterRequest() {
   }
 
@@ -60,5 +66,21 @@ public class RegisterRequest {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
   }
 }
