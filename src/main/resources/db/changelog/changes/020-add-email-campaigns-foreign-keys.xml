@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="020-add-email-campaigns-foreign-keys" author="openmailer">
+        <!-- Add foreign key constraints now that referenced tables exist -->
+        <addForeignKeyConstraint baseTableName="email_campaigns"
+                               baseColumnNames="domain_id"
+                               constraintName="fk_campaigns_domain"
+                               referencedTableName="domains"
+                               referencedColumnNames="id"
+                               onDelete="SET NULL"/>
+
+        <addForeignKeyConstraint baseTableName="email_campaigns"
+                               baseColumnNames="provider_id"
+                               constraintName="fk_campaigns_provider"
+                               referencedTableName="email_providers"
+                               referencedColumnNames="id"
+                               onDelete="SET NULL"/>
+
+        <addForeignKeyConstraint baseTableName="email_campaigns"
+                               baseColumnNames="list_id"
+                               constraintName="fk_campaigns_list"
+                               referencedTableName="contact_lists"
+                               referencedColumnNames="id"
+                               onDelete="SET NULL"/>
+
+        <addForeignKeyConstraint baseTableName="email_campaigns"
+                               baseColumnNames="segment_id"
+                               constraintName="fk_campaigns_segment"
+                               referencedTableName="segments"
+                               referencedColumnNames="id"
+                               onDelete="SET NULL"/>
+
+        <!-- Create indexes for these foreign keys -->
+        <createIndex indexName="idx_email_campaigns_domain" tableName="email_campaigns">
+            <column name="domain_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_email_campaigns_provider" tableName="email_campaigns">
+            <column name="provider_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_email_campaigns_list" tableName="email_campaigns">
+            <column name="list_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_email_campaigns_segment" tableName="email_campaigns">
+            <column name="segment_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

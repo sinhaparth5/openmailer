@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="014-create-campaign-links-table" author="openmailer">
+        <createTable tableName="campaign_links">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="campaign_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_links_campaign" references="email_campaigns(id)"
+                             deleteCascade="true"/>
+            </column>
+
+            <column name="original_url" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="short_code" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <!-- Analytics -->
+            <column name="click_count" type="INT" defaultValueNumeric="0"/>
+            <column name="unique_click_count" type="INT" defaultValueNumeric="0"/>
+
+            <!-- Timestamps -->
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Indexes -->
+        <createIndex indexName="idx_campaign_links_campaign" tableName="campaign_links">
+            <column name="campaign_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_campaign_links_short_code" tableName="campaign_links">
+            <column name="short_code"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="004-add-user-columns" author="openmailer">
+        <!-- Add role and account status -->
+        <addColumn tableName="users">
+            <column name="role" type="VARCHAR(50)" defaultValue="USER">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="users">
+            <column name="account_status" type="VARCHAR(50)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Add subscription fields -->
+        <addColumn tableName="users">
+            <column name="subscription_plan" type="VARCHAR(50)" defaultValue="FREE"/>
+        </addColumn>
+
+        <addColumn tableName="users">
+            <column name="subscription_expires_at" type="TIMESTAMP"/>
+        </addColumn>
+
+        <!-- Add API and email limits -->
+        <addColumn tableName="users">
+            <column name="api_enabled" type="BOOLEAN" defaultValueBoolean="true"/>
+        </addColumn>
+
+        <addColumn tableName="users">
+            <column name="monthly_email_limit" type="INT" defaultValueNumeric="1000"/>
+        </addColumn>
+
+        <addColumn tableName="users">
+            <column name="monthly_emails_sent" type="INT" defaultValueNumeric="0"/>
+        </addColumn>
+
+        <!-- Add login tracking -->
+        <addColumn tableName="users">
+            <column name="last_login_at" type="TIMESTAMP"/>
+        </addColumn>
+
+        <addColumn tableName="users">
+            <column name="last_login_ip" type="VARCHAR(45)"/>
+        </addColumn>
+
+        <addColumn tableName="users">
+            <column name="failed_login_attempts" type="INT" defaultValueNumeric="0"/>
+        </addColumn>
+
+        <addColumn tableName="users">
+            <column name="account_locked_until" type="TIMESTAMP"/>
+        </addColumn>
+
+        <!-- Add two-factor authentication -->
+        <addColumn tableName="users">
+            <column name="two_factor_enabled" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+
+        <addColumn tableName="users">
+            <column name="two_factor_secret" type="VARCHAR(255)"/>
+        </addColumn>
+
+        <!-- Create indexes -->
+        <createIndex indexName="idx_users_role" tableName="users">
+            <column name="role"/>
+        </createIndex>
+
+        <createIndex indexName="idx_users_account_status" tableName="users">
+            <column name="account_status"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

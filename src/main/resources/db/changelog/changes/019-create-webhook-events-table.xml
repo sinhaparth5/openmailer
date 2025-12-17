@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="019-create-webhook-events-table" author="openmailer">
+        <createTable tableName="webhook_events">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_webhook_events_user" references="users(id)"
+                             deleteCascade="true"/>
+            </column>
+
+            <column name="provider_id" type="BIGINT">
+                <constraints foreignKeyName="fk_webhook_events_provider" references="email_providers(id)"
+                             deleteSetNull="true"/>
+            </column>
+
+            <column name="event_type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="provider_event_id" type="VARCHAR(255)"/>
+
+            <!-- Raw payload -->
+            <column name="payload" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Processing status -->
+            <column name="processed" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="processed_at" type="TIMESTAMP"/>
+            <column name="error_message" type="TEXT"/>
+
+            <!-- Timestamps -->
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Indexes -->
+        <createIndex indexName="idx_webhook_events_user" tableName="webhook_events">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_webhook_events_type" tableName="webhook_events">
+            <column name="event_type"/>
+        </createIndex>
+
+        <createIndex indexName="idx_webhook_events_processed" tableName="webhook_events">
+            <column name="processed"/>
+        </createIndex>
+
+        <createIndex indexName="idx_webhook_events_provider_event" tableName="webhook_events">
+            <column name="provider_event_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="008-create-email-providers-table" author="openmailer">
+        <createTable tableName="email_providers">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_email_providers_user" references="users(id)"
+                             deleteCascade="true"/>
+            </column>
+
+            <column name="domain_id" type="BIGINT">
+                <constraints foreignKeyName="fk_email_providers_domain" references="domains(id)"
+                             deleteSetNull="true"/>
+            </column>
+
+            <column name="provider_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="provider_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Encrypted configuration JSON -->
+            <column name="configuration" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="is_default" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="priority" type="INT" defaultValueNumeric="0"/>
+
+            <!-- Limits -->
+            <column name="daily_limit" type="INT"/>
+            <column name="monthly_limit" type="INT"/>
+
+            <!-- Status tracking -->
+            <column name="status" type="VARCHAR(50)" defaultValue="ACTIVE"/>
+            <column name="last_error" type="TEXT"/>
+            <column name="last_error_at" type="TIMESTAMP"/>
+
+            <!-- Timestamps -->
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Indexes -->
+        <createIndex indexName="idx_email_providers_user_id" tableName="email_providers">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_email_providers_active" tableName="email_providers">
+            <column name="is_active"/>
+            <column name="is_default"/>
+        </createIndex>
+
+        <!-- Partial unique index for default provider per user -->
+        <sql>
+            CREATE UNIQUE INDEX idx_user_default_provider ON email_providers(user_id, is_default)
+            WHERE is_default = TRUE;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

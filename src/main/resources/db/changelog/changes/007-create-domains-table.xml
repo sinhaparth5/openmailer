@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="007-create-domains-table" author="openmailer">
+        <createTable tableName="domains">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_domains_user" references="users(id)"
+                             deleteCascade="true"/>
+            </column>
+
+            <column name="domain_name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="status" type="VARCHAR(50)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- SPF Record -->
+            <column name="spf_record" type="TEXT"/>
+            <column name="spf_verified" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="spf_last_checked_at" type="TIMESTAMP"/>
+
+            <!-- DKIM Record -->
+            <column name="dkim_selector" type="VARCHAR(100)" defaultValue="openmailer"/>
+            <column name="dkim_public_key" type="TEXT"/>
+            <column name="dkim_private_key" type="TEXT"/>
+            <column name="dkim_verified" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="dkim_last_checked_at" type="TIMESTAMP"/>
+
+            <!-- DMARC Record -->
+            <column name="dmarc_record" type="TEXT"/>
+            <column name="dmarc_verified" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="dmarc_last_checked_at" type="TIMESTAMP"/>
+
+            <!-- Verification -->
+            <column name="verification_token" type="VARCHAR(255)">
+                <constraints unique="true"/>
+            </column>
+            <column name="verified_at" type="TIMESTAMP"/>
+
+            <!-- Timestamps -->
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Indexes -->
+        <createIndex indexName="idx_domains_user_id" tableName="domains">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_domains_status" tableName="domains">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_domains_domain_name" tableName="domains">
+            <column name="domain_name"/>
+        </createIndex>
+
+        <!-- Unique constraint for user_id and domain_name combination -->
+        <addUniqueConstraint tableName="domains"
+                           columnNames="user_id, domain_name"
+                           constraintName="idx_domains_user_id_unique"/>
+    </changeSet>
+
+</databaseChangeLog>

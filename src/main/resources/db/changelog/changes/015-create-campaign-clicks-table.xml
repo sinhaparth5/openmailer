@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="015-create-campaign-clicks-table" author="openmailer">
+        <createTable tableName="campaign_clicks">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="campaign_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_clicks_campaign" references="email_campaigns(id)"
+                             deleteCascade="true"/>
+            </column>
+
+            <column name="recipient_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_clicks_recipient" references="campaign_recipients(id)"
+                             deleteCascade="true"/>
+            </column>
+
+            <column name="link_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_clicks_link" references="campaign_links(id)"
+                             deleteCascade="true"/>
+            </column>
+
+            <column name="clicked_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Metadata -->
+            <column name="ip_address" type="VARCHAR(45)"/>
+            <column name="user_agent" type="TEXT"/>
+        </createTable>
+
+        <!-- Indexes -->
+        <createIndex indexName="idx_campaign_clicks_campaign" tableName="campaign_clicks">
+            <column name="campaign_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_campaign_clicks_recipient" tableName="campaign_clicks">
+            <column name="recipient_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_campaign_clicks_link" tableName="campaign_clicks">
+            <column name="link_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_campaign_clicks_timestamp" tableName="campaign_clicks">
+            <column name="clicked_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
