@@ -1,0 +1,61 @@
+package com.openmailer.openmailer.dto.request.auth;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+/**
+ * Request DTO for user login.
+ * Supports optional two-factor authentication.
+ */
+public class LoginRequest {
+  @NotBlank(message = "Email is required")
+  @Email(message = "Email must be valid")
+  private String email;
+
+  @NotBlank(message = "Password is required")
+  @Size(min = 1, max = 100, message = "Password must not exceed 100 characters")
+  private String password;
+
+  @Size(min = 6, max = 6, message = "Two-factor code must be 6 digits")
+  private String twoFactorCode;
+
+  public LoginRequest() {
+  }
+
+  public LoginRequest(String email, String password) {
+    this.email = email;
+    this.password = password;
+  }
+
+  public LoginRequest(String email, String password, String twoFactorCode) {
+    this.email = email;
+    this.password = password;
+    this.twoFactorCode = twoFactorCode;
+  }
+
+  // Getters and Setters
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public String getTwoFactorCode() {
+    return twoFactorCode;
+  }
+
+  public void setTwoFactorCode(String twoFactorCode) {
+    this.twoFactorCode = twoFactorCode;
+  }
+}
