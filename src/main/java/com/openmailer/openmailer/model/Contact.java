@@ -42,6 +42,9 @@ public class Contact {
     @Column(name = "confirmed_at")
     private LocalDateTime confirmedAt;
 
+    @Column(name = "subscribed_at")
+    private LocalDateTime subscribedAt;
+
     @Column(name = "unsubscribe_token", unique = true)
     private String unsubscribeToken;
 
@@ -323,5 +326,22 @@ public class Contact {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getSubscribedAt() {
+        return subscribedAt;
+    }
+
+    public void setSubscribedAt(LocalDateTime subscribedAt) {
+        this.subscribedAt = subscribedAt;
+    }
+
+    // Convenience methods for service layer
+    public Long getUserId() {
+        return this.user != null ? this.user.getId() : null;
+    }
+
+    public void setLastBouncedAt(LocalDateTime lastBouncedAt) {
+        this.lastBounceAt = lastBouncedAt;
     }
 }

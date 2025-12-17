@@ -11,6 +11,9 @@ public class EmailProvider {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
+    private Long userId;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -51,6 +54,15 @@ public class EmailProvider {
 
     @Column(name = "last_error_at")
     private LocalDateTime lastErrorAt;
+
+    @Column(name = "emails_sent")
+    private Integer emailsSent = 0;
+
+    @Column(name = "emails_failed")
+    private Integer emailsFailed = 0;
+
+    @Column(name = "last_used_at")
+    private LocalDateTime lastUsedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -211,5 +223,46 @@ public class EmailProvider {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Integer getEmailsSent() {
+        return emailsSent;
+    }
+
+    public void setEmailsSent(Integer emailsSent) {
+        this.emailsSent = emailsSent;
+    }
+
+    public Integer getEmailsFailed() {
+        return emailsFailed;
+    }
+
+    public void setEmailsFailed(Integer emailsFailed) {
+        this.emailsFailed = emailsFailed;
+    }
+
+    public LocalDateTime getLastUsedAt() {
+        return lastUsedAt;
+    }
+
+    public void setLastUsedAt(LocalDateTime lastUsedAt) {
+        this.lastUsedAt = lastUsedAt;
+    }
+
+    // Convenience method for service layer
+    public String getName() {
+        return this.providerName;
+    }
+
+    public void setName(String name) {
+        this.providerName = name;
     }
 }

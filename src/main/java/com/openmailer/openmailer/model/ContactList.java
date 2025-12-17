@@ -131,4 +131,9 @@ public class ContactList {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    // Convenience methods for service layer
+    public Long getUserId() {
+        return this.user != null ? this.user.getId() : null;
+    }
 }

@@ -11,6 +11,9 @@ public class Domain {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
+    private Long userId;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -34,6 +37,9 @@ public class Domain {
     // DKIM Record
     @Column(name = "dkim_selector", length = 100)
     private String dkimSelector = "openmailer";
+
+    @Column(name = "dkim_record", columnDefinition = "TEXT")
+    private String dkimRecord;
 
     @Column(name = "dkim_public_key", columnDefinition = "TEXT")
     private String dkimPublicKey;
@@ -63,6 +69,9 @@ public class Domain {
 
     @Column(name = "verified_at")
     private LocalDateTime verifiedAt;
+
+    @Column(name = "last_checked_at")
+    private LocalDateTime lastCheckedAt;
 
     // Timestamps
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -247,5 +256,29 @@ public class Domain {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getDkimRecord() {
+        return dkimRecord;
+    }
+
+    public void setDkimRecord(String dkimRecord) {
+        this.dkimRecord = dkimRecord;
+    }
+
+    public LocalDateTime getLastCheckedAt() {
+        return lastCheckedAt;
+    }
+
+    public void setLastCheckedAt(LocalDateTime lastCheckedAt) {
+        this.lastCheckedAt = lastCheckedAt;
     }
 }

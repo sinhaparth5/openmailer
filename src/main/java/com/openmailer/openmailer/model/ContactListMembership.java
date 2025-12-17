@@ -19,8 +19,17 @@ public class ContactListMembership {
     @JoinColumn(name = "list_id", nullable = false)
     private ContactList contactList;
 
+    @Column(name = "contact_id", nullable = false, insertable = false, updatable = false)
+    private Long contactId;
+
+    @Column(name = "list_id", nullable = false, insertable = false, updatable = false)
+    private Long listId;
+
     @Column(length = 50)
     private String status = "ACTIVE";
+
+    @Column(name = "added_at")
+    private LocalDateTime addedAt;
 
     @Column(name = "subscribed_at")
     private LocalDateTime subscribedAt;
@@ -105,5 +114,29 @@ public class ContactListMembership {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getContactId() {
+        return contactId;
+    }
+
+    public void setContactId(Long contactId) {
+        this.contactId = contactId;
+    }
+
+    public Long getListId() {
+        return listId;
+    }
+
+    public void setListId(Long listId) {
+        this.listId = listId;
+    }
+
+    public LocalDateTime getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(LocalDateTime addedAt) {
+        this.addedAt = addedAt;
     }
 }

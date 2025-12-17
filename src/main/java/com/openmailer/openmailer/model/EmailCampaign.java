@@ -37,6 +37,9 @@ public class EmailCampaign {
     @Column(name = "failed_count")
     private Integer failedCount = 0;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
@@ -389,5 +392,22 @@ public class EmailCampaign {
 
     public void setMaxRetries(Integer maxRetries) {
         this.maxRetries = maxRetries;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    // Convenience methods for service layer
+    public String getSubject() {
+        return this.subjectLine;
+    }
+
+    public void setSubject(String subject) {
+        this.subjectLine = subject;
     }
 }

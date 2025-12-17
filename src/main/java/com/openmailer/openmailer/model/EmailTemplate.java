@@ -20,8 +20,17 @@ public class EmailTemplate {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
+    @Column(name = "html_content", columnDefinition = "TEXT")
+    private String htmlContent;
+
+    @Column(name = "plain_text_content", columnDefinition = "TEXT")
+    private String plainTextContent;
+
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
@@ -176,5 +185,29 @@ public class EmailTemplate {
 
     public void setPreviewText(String previewText) {
         this.previewText = previewText;
+    }
+
+    public String getHtmlContent() {
+        return htmlContent;
+    }
+
+    public void setHtmlContent(String htmlContent) {
+        this.htmlContent = htmlContent;
+    }
+
+    public String getPlainTextContent() {
+        return plainTextContent;
+    }
+
+    public void setPlainTextContent(String plainTextContent) {
+        this.plainTextContent = plainTextContent;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }
