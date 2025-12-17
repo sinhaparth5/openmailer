@@ -1,0 +1,109 @@
+package com.openmailer.openmailer.model;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "campaign_clicks")
+public class CampaignClick {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "campaign_id", nullable = false)
+    private EmailCampaign campaign;
+
+    @ManyToOne
+    @JoinColumn(name = "recipient_id", nullable = false)
+    private CampaignRecipient recipient;
+
+    @ManyToOne
+    @JoinColumn(name = "link_id", nullable = false)
+    private CampaignLink link;
+
+    @Column(name = "clicked_at", nullable = false)
+    private LocalDateTime clickedAt;
+
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress;
+
+    @Column(name = "user_agent", columnDefinition = "TEXT")
+    private String userAgent;
+
+    // Constructors
+    public CampaignClick() {
+    }
+
+    public CampaignClick(EmailCampaign campaign, CampaignRecipient recipient, CampaignLink link) {
+        this.campaign = campaign;
+        this.recipient = recipient;
+        this.link = link;
+        this.clickedAt = LocalDateTime.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (clickedAt == null) {
+            clickedAt = LocalDateTime.now();
+        }
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public EmailCampaign getCampaign() {
+        return campaign;
+    }
+
+    public void setCampaign(EmailCampaign campaign) {
+        this.campaign = campaign;
+    }
+
+    public CampaignRecipient getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(CampaignRecipient recipient) {
+        this.recipient = recipient;
+    }
+
+    public CampaignLink getLink() {
+        return link;
+    }
+
+    public void setLink(CampaignLink link) {
+        this.link = link;
+    }
+
+    public LocalDateTime getClickedAt() {
+        return clickedAt;
+    }
+
+    public void setClickedAt(LocalDateTime clickedAt) {
+        this.clickedAt = clickedAt;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+}

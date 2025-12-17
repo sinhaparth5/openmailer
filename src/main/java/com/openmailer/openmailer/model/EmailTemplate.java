@@ -27,11 +27,41 @@ public class EmailTemplate {
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
+    @Column(name = "template_type", length = 50)
+    private String templateType = "CUSTOM";
+
+    @Column(name = "is_html")
+    private Boolean isHtml = true;
+
+    @Column(name = "version")
+    private Integer version = 1;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
+    @Column(name = "preview_text")
+    private String previewText;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    // Constructors
+    public EmailTemplate() {
+    }
+
+    public EmailTemplate(String name, String subject, String body, User createdBy) {
+        this.name = name;
+        this.subject = subject;
+        this.body = body;
+        this.createdBy = createdBy;
+        this.templateType = "CUSTOM";
+        this.isHtml = true;
+        this.version = 1;
+        this.isActive = true;
+    }
 
     @PrePersist
     protected void onCreate() {
@@ -106,5 +136,45 @@ public class EmailTemplate {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
+    }
+
+    public Boolean getIsHtml() {
+        return isHtml;
+    }
+
+    public void setIsHtml(Boolean isHtml) {
+        this.isHtml = isHtml;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public String getPreviewText() {
+        return previewText;
+    }
+
+    public void setPreviewText(String previewText) {
+        this.previewText = previewText;
     }
 }
