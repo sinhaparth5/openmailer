@@ -13,12 +13,12 @@
 
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_webhook_events_user" references="users(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="provider_id" type="BIGINT">
                 <constraints foreignKeyName="fk_webhook_events_provider" references="email_providers(id)"
-                             deleteSetNull="true"/>
+                             onDelete="SET NULL"/>
             </column>
 
             <column name="event_type" type="VARCHAR(100)">

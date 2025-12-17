@@ -13,12 +13,12 @@
 
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_segments_user" references="users(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="list_id" type="BIGINT">
                 <constraints foreignKeyName="fk_segments_list" references="contact_lists(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="name" type="VARCHAR(255)">

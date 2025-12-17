@@ -13,22 +13,22 @@
 
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_email_logs_user" references="users(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="campaign_id" type="BIGINT">
                 <constraints foreignKeyName="fk_email_logs_campaign" references="email_campaigns(id)"
-                             deleteSetNull="true"/>
+                             onDelete="SET NULL"/>
             </column>
 
             <column name="recipient_id" type="BIGINT">
                 <constraints foreignKeyName="fk_email_logs_recipient" references="campaign_recipients(id)"
-                             deleteSetNull="true"/>
+                             onDelete="SET NULL"/>
             </column>
 
             <column name="provider_id" type="BIGINT">
                 <constraints foreignKeyName="fk_email_logs_provider" references="email_providers(id)"
-                             deleteSetNull="true"/>
+                             onDelete="SET NULL"/>
             </column>
 
             <column name="email_type" type="VARCHAR(50)">

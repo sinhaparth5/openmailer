@@ -13,12 +13,12 @@
 
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_email_providers_user" references="users(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="domain_id" type="BIGINT">
                 <constraints foreignKeyName="fk_email_providers_domain" references="domains(id)"
-                             deleteSetNull="true"/>
+                             onDelete="SET NULL"/>
             </column>
 
             <column name="provider_type" type="VARCHAR(50)">

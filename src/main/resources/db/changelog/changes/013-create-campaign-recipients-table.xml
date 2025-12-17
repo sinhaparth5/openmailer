@@ -13,12 +13,12 @@
 
             <column name="campaign_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_recipients_campaign" references="email_campaigns(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="contact_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_recipients_contact" references="contacts(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="status" type="VARCHAR(50)" defaultValue="PENDING"/>

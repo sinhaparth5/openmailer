@@ -13,7 +13,7 @@
 
             <column name="campaign_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_links_campaign" references="email_campaigns(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="original_url" type="TEXT">

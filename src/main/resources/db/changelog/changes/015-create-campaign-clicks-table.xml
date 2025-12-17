@@ -13,17 +13,17 @@
 
             <column name="campaign_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_clicks_campaign" references="email_campaigns(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="recipient_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_clicks_recipient" references="campaign_recipients(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="link_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_clicks_link" references="campaign_links(id)"
-                             deleteCascade="true"/>
+                             onDelete="CASCADE"/>
             </column>
 
             <column name="clicked_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
