@@ -57,14 +57,14 @@ public class ContactController {
             contacts = contactService.searchContacts(user.getId(), search, pageable);
         } else if (status != null) {
             // Filter by status
-            contacts = contactService.findByUserAndStatus(user.getId(), status, pageable);
+            contacts = contactService.findByStatus(user.getId(), status, pageable);
         } else if (tags != null && !tags.isEmpty()) {
-            // Filter by tags
-            String[] tagArray = tags.split(",");
-            contacts = contactService.findByUserAndTags(user.getId(), List.of(tagArray), pageable);
+            // Filter by tags - use the first tag for now
+            String tag = tags.split(",")[0];
+            contacts = contactService.findByTag(user.getId(), tag, pageable);
         } else {
             // All contacts
-            contacts = contactService.findAllByUser(user.getId(), pageable);
+            contacts = contactService.findByUserId(user.getId(), pageable);
         }
 
         List<ContactResponse> responses = contacts.getContent().stream()
@@ -106,7 +106,7 @@ public class ContactController {
             @Valid @RequestBody ContactRequest request) {
 
         // Check if contact already exists
-        if (contactService.existsByEmailAndUser(request.getEmail(), user.getId())) {
+        if (contactService.emailExists(request.getEmail(), user.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(ApiResponse.error("CONTACT_EXISTS", "Contact with this email already exists", "email"));
         }
@@ -115,7 +115,12 @@ public class ContactController {
         contact.setEmail(request.getEmail());
         contact.setFirstName(request.getFirstName());
         contact.setLastName(request.getLastName());
-        contact.setCustomFields(request.getCustomFields());
+
+        // Convert Map<String, String> to Map<String, Object>
+        if (request.getCustomFields() != null) {
+            contact.setCustomFields(new java.util.HashMap<>(request.getCustomFields()));
+        }
+
         if (request.getTags() != null) {
             contact.setTags(request.getTags().toArray(new String[0]));
         }
@@ -124,7 +129,7 @@ public class ContactController {
         contact.setStatus("PENDING");
         contact.setUser(user);
 
-        Contact saved = contactService.save(contact);
+        Contact saved = contactService.createContact(contact);
 
         log.info("Contact created: {} ({}) by user: {}", saved.getId(), saved.getEmail(), user.getEmail());
 
@@ -151,7 +156,7 @@ public class ContactController {
 
         // Check if email is being changed and already exists
         if (!contact.getEmail().equals(request.getEmail()) &&
-                contactService.existsByEmailAndUser(request.getEmail(), user.getId())) {
+                contactService.emailExists(request.getEmail(), user.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(ApiResponse.error("CONTACT_EXISTS", "Contact with this email already exists", "email"));
         }
@@ -159,11 +164,20 @@ public class ContactController {
         contact.setEmail(request.getEmail());
         contact.setFirstName(request.getFirstName());
         contact.setLastName(request.getLastName());
-        contact.setCustomFields(request.getCustomFields());
-        contact.setTags(request.getTags());
+
+        // Convert Map<String, String> to Map<String, Object>
+        if (request.getCustomFields() != null) {
+            contact.setCustomFields(new java.util.HashMap<>(request.getCustomFields()));
+        }
+
+        // Convert List<String> to String[]
+        if (request.getTags() != null) {
+            contact.setTags(request.getTags().toArray(new String[0]));
+        }
+
         contact.setGdprConsent(request.getGdprConsent());
 
-        Contact updated = contactService.save(contact);
+        Contact updated = contactService.updateContact(id, user.getId(), contact);
 
         log.info("Contact updated: {} ({}) by user: {}", updated.getId(), updated.getEmail(), user.getEmail());
 
@@ -186,7 +200,7 @@ public class ContactController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this contact", null));
         }
 
-        contactService.deleteById(id);
+        contactService.deleteContact(id, user.getId());
 
         log.info("Contact deleted: {} by user: {}", id, user.getEmail());
 
@@ -211,7 +225,7 @@ public class ContactController {
         }
 
         contact.setStatus(status);
-        Contact updated = contactService.save(contact);
+        Contact updated = contactService.updateContact(id, user.getId(), contact);
 
         log.info("Contact status updated: {} to {} by user: {}", id, status, user.getEmail());
 
@@ -235,10 +249,11 @@ public class ContactController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this contact", null));
         }
 
-        List<String> currentTags = contact.getTags();
-        if (currentTags == null) {
-            currentTags = new java.util.ArrayList<>();
-        }
+        // Convert String[] to List<String>
+        String[] tagsArray = contact.getTags();
+        java.util.List<String> currentTags = tagsArray != null
+                ? new java.util.ArrayList<>(java.util.Arrays.asList(tagsArray))
+                : new java.util.ArrayList<>();
 
         for (String tag : tags) {
             if (!currentTags.contains(tag)) {
@@ -246,8 +261,8 @@ public class ContactController {
             }
         }
 
-        contact.setTags(currentTags);
-        Contact updated = contactService.save(contact);
+        contact.setTags(currentTags.toArray(new String[0]));
+        Contact updated = contactService.updateContact(id, user.getId(), contact);
 
         log.info("Tags added to contact: {} by user: {}", id, user.getEmail());
 
@@ -271,11 +286,12 @@ public class ContactController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this contact", null));
         }
 
-        List<String> currentTags = contact.getTags();
-        if (currentTags != null) {
+        String[] tagsArray = contact.getTags();
+        if (tagsArray != null) {
+            java.util.List<String> currentTags = new java.util.ArrayList<>(java.util.Arrays.asList(tagsArray));
             currentTags.removeAll(tags);
-            contact.setTags(currentTags);
-            Contact updated = contactService.save(contact);
+            contact.setTags(currentTags.toArray(new String[0]));
+            Contact updated = contactService.updateContact(id, user.getId(), contact);
 
             log.info("Tags removed from contact: {} by user: {}", id, user.getEmail());
 

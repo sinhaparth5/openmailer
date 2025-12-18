@@ -46,7 +46,7 @@ public class DomainController {
             @RequestParam(defaultValue = "50") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Domain> domains = domainService.findAllByUser(user.getId(), pageable);
+        Page<Domain> domains = domainService.findByUserId(user.getId(), pageable);
 
         List<Map<String, Object>> responses = domains.getContent().stream()
                 .map(this::domainToResponse)
@@ -92,8 +92,8 @@ public class DomainController {
                     .body(ApiResponse.error("INVALID_REQUEST", "domainName is required", "domainName"));
         }
 
-        // Check if domain already exists for this user
-        if (domainService.existsByDomainNameAndUser(domainName, user.getId())) {
+        // Check if domain already exists
+        if (domainService.domainNameExists(domainName)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(ApiResponse.error("DOMAIN_EXISTS", "Domain already exists", "domainName"));
         }
@@ -109,7 +109,7 @@ public class DomainController {
         // domain.setDkimPublicKey(keys.getPublicKey());
         // domain.setDkimPrivateKey(encryptionService.encrypt(keys.getPrivateKey()));
 
-        Domain saved = domainService.save(domain);
+        Domain saved = domainService.createDomain(domain);
 
         log.info("Domain created: {} by user: {}", saved.getDomainName(), user.getEmail());
 
@@ -136,7 +136,7 @@ public class DomainController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this domain", null));
         }
 
-        domainService.deleteById(id);
+        domainService.deleteDomain(id, user.getId());
 
         log.info("Domain deleted: {} by user: {}", id, user.getEmail());
 
@@ -190,17 +190,21 @@ public class DomainController {
 
         // For now, simulate verification
         boolean allVerified = true; // TODO: Replace with actual verification
+        boolean spfVerified = true;
+        boolean dkimVerified = true;
+        boolean dmarcVerified = true;
 
+        String status;
         if (allVerified) {
-            domain.setStatus("VERIFIED");
-            domain.setVerifiedAt(java.time.LocalDateTime.now());
+            status = "VERIFIED";
             log.info("Domain verified: {} by user: {}", domain.getDomainName(), user.getEmail());
         } else {
-            domain.setStatus("FAILED");
+            status = "FAILED";
             log.warn("Domain verification failed: {} by user: {}", domain.getDomainName(), user.getEmail());
         }
 
-        Domain updated = domainService.save(domain);
+        Domain updated = domainService.updateVerificationStatus(id, user.getId(), status,
+                spfVerified, dkimVerified, dmarcVerified);
 
         Map<String, Object> response = new HashMap<>();
         response.put("domainName", updated.getDomainName());

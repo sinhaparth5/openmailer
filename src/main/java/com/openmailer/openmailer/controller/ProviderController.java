@@ -3,6 +3,7 @@ package com.openmailer.openmailer.controller;
 import com.openmailer.openmailer.dto.ApiResponse;
 import com.openmailer.openmailer.dto.PaginatedResponse;
 import com.openmailer.openmailer.model.EmailProvider;
+import com.openmailer.openmailer.model.ProviderType;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.service.provider.EmailProviderService;
 import com.openmailer.openmailer.service.security.EncryptionService;
@@ -49,7 +50,7 @@ public class ProviderController {
             @RequestParam(defaultValue = "50") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<EmailProvider> providers = providerService.findAllByUser(user.getId(), pageable);
+        Page<EmailProvider> providers = providerService.findByUserId(user.getId(), pageable);
 
         List<Map<String, Object>> responses = providers.getContent().stream()
                 .map(this::providerToResponse)
@@ -99,9 +100,9 @@ public class ProviderController {
                     .body(ApiResponse.error("INVALID_REQUEST", "name, providerType, and configuration are required", null));
         }
 
-        EmailProvider.ProviderType providerType;
+        ProviderType providerType;
         try {
-            providerType = EmailProvider.ProviderType.valueOf(providerTypeStr.toUpperCase());
+            providerType = ProviderType.valueOf(providerTypeStr.toUpperCase());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("INVALID_PROVIDER_TYPE", "Invalid provider type: " + providerTypeStr, "providerType"));
@@ -111,12 +112,12 @@ public class ProviderController {
         Map<String, String> encryptedConfig = encryptSensitiveConfig(configuration);
 
         EmailProvider provider = new EmailProvider();
-        provider.setName(name);
+        provider.setProviderName(name);
         provider.setProviderType(providerType);
-        provider.setConfiguration(encryptedConfig);
-        provider.setActive(true);
-        provider.setSentToday(0);
-        provider.setSentThisMonth(0);
+        provider.setConfigurationMap(encryptedConfig);
+        provider.setIsActive(true);
+        provider.setEmailsSent(0);
+        provider.setEmailsFailed(0);
         provider.setUser(user);
 
         // Set default limits if provided
@@ -127,7 +128,7 @@ public class ProviderController {
             provider.setMonthlyLimit(((Number) request.get("monthlyLimit")).intValue());
         }
 
-        EmailProvider saved = providerService.save(provider);
+        EmailProvider saved = providerService.createProvider(provider);
 
         log.info("Email provider created: {} ({}) by user: {}", saved.getId(), saved.getName(), user.getEmail());
 
@@ -162,7 +163,7 @@ public class ProviderController {
             @SuppressWarnings("unchecked")
             Map<String, String> configuration = (Map<String, String>) request.get("configuration");
             Map<String, String> encryptedConfig = encryptSensitiveConfig(configuration);
-            provider.setConfiguration(encryptedConfig);
+            provider.setConfigurationMap(encryptedConfig);
         }
 
         // Update limits if provided
@@ -175,10 +176,10 @@ public class ProviderController {
 
         // Update active status if provided
         if (request.containsKey("active")) {
-            provider.setActive((Boolean) request.get("active"));
+            provider.setIsActive((Boolean) request.get("active"));
         }
 
-        EmailProvider updated = providerService.save(provider);
+        EmailProvider updated = providerService.updateProvider(id, user.getId(), provider);
 
         log.info("Email provider updated: {} by user: {}", updated.getId(), user.getEmail());
 
@@ -201,7 +202,7 @@ public class ProviderController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this provider", null));
         }
 
-        providerService.deleteById(id);
+        providerService.deleteProvider(id, user.getId());
 
         log.info("Email provider deleted: {} by user: {}", id, user.getEmail());
 
@@ -258,13 +259,14 @@ public class ProviderController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this provider", null));
         }
 
-        provider.setActive(!provider.isActive());
-        EmailProvider updated = providerService.save(provider);
+        Boolean currentStatus = provider.getIsActive();
+        provider.setIsActive(currentStatus == null || !currentStatus);
+        EmailProvider updated = providerService.updateProvider(id, user.getId(), provider);
 
-        log.info("Provider {} {} by user: {}", id, updated.isActive() ? "activated" : "deactivated", user.getEmail());
+        log.info("Provider {} {} by user: {}", id, Boolean.TRUE.equals(updated.getIsActive()) ? "activated" : "deactivated", user.getEmail());
 
         return ResponseEntity.ok(ApiResponse.success(providerToResponse(updated),
-                "Provider " + (updated.isActive() ? "activated" : "deactivated")));
+                "Provider " + (Boolean.TRUE.equals(updated.getIsActive()) ? "activated" : "deactivated")));
     }
 
     /**
@@ -286,17 +288,17 @@ public class ProviderController {
         Map<String, Object> stats = new HashMap<>();
         stats.put("providerId", provider.getId());
         stats.put("providerName", provider.getName());
-        stats.put("sentToday", provider.getSentToday());
-        stats.put("sentThisMonth", provider.getSentThisMonth());
+        stats.put("sentToday", provider.getEmailsSent());
+        stats.put("sentThisMonth", provider.getEmailsSent());
         stats.put("dailyLimit", provider.getDailyLimit());
         stats.put("monthlyLimit", provider.getMonthlyLimit());
 
         // Calculate remaining
-        if (provider.getDailyLimit() != null) {
-            stats.put("dailyRemaining", provider.getDailyLimit() - provider.getSentToday());
+        if (provider.getDailyLimit() != null && provider.getEmailsSent() != null) {
+            stats.put("dailyRemaining", provider.getDailyLimit() - provider.getEmailsSent());
         }
-        if (provider.getMonthlyLimit() != null) {
-            stats.put("monthlyRemaining", provider.getMonthlyLimit() - provider.getSentThisMonth());
+        if (provider.getMonthlyLimit() != null && provider.getEmailsSent() != null) {
+            stats.put("monthlyRemaining", provider.getMonthlyLimit() - provider.getEmailsSent());
         }
 
         return ResponseEntity.ok(ApiResponse.success(stats));
@@ -310,11 +312,11 @@ public class ProviderController {
         response.put("id", provider.getId());
         response.put("name", provider.getName());
         response.put("providerType", provider.getProviderType());
-        response.put("active", provider.isActive());
+        response.put("active", provider.getIsActive());
         response.put("dailyLimit", provider.getDailyLimit());
         response.put("monthlyLimit", provider.getMonthlyLimit());
-        response.put("sentToday", provider.getSentToday());
-        response.put("sentThisMonth", provider.getSentThisMonth());
+        response.put("sentToday", provider.getEmailsSent());
+        response.put("sentThisMonth", provider.getEmailsSent());
         response.put("createdAt", provider.getCreatedAt());
 
         // Return masked configuration (don't expose sensitive values)

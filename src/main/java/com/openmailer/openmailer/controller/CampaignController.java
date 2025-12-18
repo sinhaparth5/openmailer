@@ -66,9 +66,9 @@ public class CampaignController {
         Page<EmailCampaign> campaigns;
 
         if (status != null) {
-            campaigns = campaignService.findByUserAndStatus(user.getId(), status, pageable);
+            campaigns = campaignService.findByStatus(user.getId(), status, pageable);
         } else {
-            campaigns = campaignService.findAllByUser(user.getId(), pageable);
+            campaigns = campaignService.findByUserId(user.getId(), pageable);
         }
 
         List<CampaignResponse> responses = campaigns.getContent().stream()
@@ -93,7 +93,7 @@ public class CampaignController {
         EmailCampaign campaign = campaignService.findById(id);
 
         // Check ownership
-        if (!campaign.getUser().getId().equals(user.getId())) {
+        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
         }
@@ -111,7 +111,7 @@ public class CampaignController {
 
         // Validate template
         EmailTemplate template = templateService.findById(request.getTemplateId());
-        if (!template.getUser().getId().equals(user.getId())) {
+        if (!template.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this template", "templateId"));
         }
@@ -147,7 +147,7 @@ public class CampaignController {
         EmailCampaign campaign = new EmailCampaign();
         campaign.setName(request.getName());
         campaign.setTemplate(template);
-        campaign.setList(list);
+        campaign.setContactList(list);
         campaign.setSubjectLine(request.getSubjectLine());
         campaign.setPreviewText(request.getPreviewText());
         campaign.setFromName(request.getFromName());
@@ -159,10 +159,11 @@ public class CampaignController {
         campaign.setTrackClicks(request.getTrackClicks());
         campaign.setSendSpeed(request.getSendSpeed());
         campaign.setStatus("DRAFT");
-        campaign.setTotalRecipients(list.getActiveContacts());
-        campaign.setUser(user);
+        campaign.setTotalRecipients(list.getTotalContacts());
+        campaign.setCreatedBy(user);
+        campaign.setUserId(user.getId());
 
-        EmailCampaign saved = campaignService.save(campaign);
+        EmailCampaign saved = campaignService.createCampaign(campaign);
 
         log.info("Campaign created: {} by user: {}", saved.getId(), user.getEmail());
 
@@ -182,7 +183,7 @@ public class CampaignController {
         EmailCampaign campaign = campaignService.findById(id);
 
         // Check ownership
-        if (!campaign.getUser().getId().equals(user.getId())) {
+        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
         }
@@ -195,7 +196,7 @@ public class CampaignController {
 
         // Validate and update template
         EmailTemplate template = templateService.findById(request.getTemplateId());
-        if (!template.getUser().getId().equals(user.getId())) {
+        if (!template.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this template", "templateId"));
         }
@@ -209,7 +210,7 @@ public class CampaignController {
 
         campaign.setName(request.getName());
         campaign.setTemplate(template);
-        campaign.setList(list);
+        campaign.setContactList(list);
         campaign.setSubjectLine(request.getSubjectLine());
         campaign.setPreviewText(request.getPreviewText());
         campaign.setFromName(request.getFromName());
@@ -218,9 +219,9 @@ public class CampaignController {
         campaign.setTrackOpens(request.getTrackOpens());
         campaign.setTrackClicks(request.getTrackClicks());
         campaign.setSendSpeed(request.getSendSpeed());
-        campaign.setTotalRecipients(list.getActiveContacts());
+        campaign.setTotalRecipients(list.getTotalContacts());
 
-        EmailCampaign updated = campaignService.save(campaign);
+        EmailCampaign updated = campaignService.updateCampaign(id, user.getId(), campaign);
 
         log.info("Campaign updated: {} by user: {}", updated.getId(), user.getEmail());
 
@@ -238,7 +239,7 @@ public class CampaignController {
         EmailCampaign campaign = campaignService.findById(id);
 
         // Check ownership
-        if (!campaign.getUser().getId().equals(user.getId())) {
+        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
         }
@@ -249,7 +250,7 @@ public class CampaignController {
                     .body(ApiResponse.error("INVALID_STATUS", "Can only delete campaigns in DRAFT status", "status"));
         }
 
-        campaignService.deleteById(id);
+        campaignService.deleteCampaign(id, user.getId());
 
         log.info("Campaign deleted: {} by user: {}", id, user.getEmail());
 
@@ -268,7 +269,7 @@ public class CampaignController {
         EmailCampaign campaign = campaignService.findById(id);
 
         // Check ownership
-        if (!campaign.getUser().getId().equals(user.getId())) {
+        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
         }
@@ -296,7 +297,7 @@ public class CampaignController {
         campaign.setScheduledAt(scheduledAt);
         campaign.setStatus("SCHEDULED");
 
-        EmailCampaign updated = campaignService.save(campaign);
+        EmailCampaign updated = campaignService.updateCampaign(id, user.getId(), campaign);
 
         log.info("Campaign scheduled: {} for {} by user: {}", id, scheduledAt, user.getEmail());
 
@@ -314,7 +315,7 @@ public class CampaignController {
         EmailCampaign campaign = campaignService.findById(id);
 
         // Check ownership
-        if (!campaign.getUser().getId().equals(user.getId())) {
+        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
         }
@@ -329,7 +330,7 @@ public class CampaignController {
         // Update status to SENDING
         campaign.setStatus("SENDING");
         campaign.setSentAt(LocalDateTime.now());
-        campaignService.save(campaign);
+        campaignService.updateCampaign(id, user.getId(), campaign);
 
         // TODO: Trigger async campaign sending service
         // campaignSendingService.sendCampaign(campaign);
@@ -352,7 +353,7 @@ public class CampaignController {
         EmailCampaign campaign = campaignService.findById(id);
 
         // Check ownership
-        if (!campaign.getUser().getId().equals(user.getId())) {
+        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
         }
@@ -366,7 +367,7 @@ public class CampaignController {
         campaign.setStatus("DRAFT");
         campaign.setScheduledAt(null);
 
-        EmailCampaign updated = campaignService.save(campaign);
+        EmailCampaign updated = campaignService.updateCampaign(id, user.getId(), campaign);
 
         log.info("Campaign cancelled: {} by user: {}", id, user.getEmail());
 
@@ -384,7 +385,7 @@ public class CampaignController {
         EmailCampaign campaign = campaignService.findById(id);
 
         // Check ownership
-        if (!campaign.getUser().getId().equals(user.getId())) {
+        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
         }
@@ -395,28 +396,20 @@ public class CampaignController {
         stats.put("status", campaign.getStatus());
         stats.put("totalRecipients", campaign.getTotalRecipients());
         stats.put("sentCount", campaign.getSentCount());
-        stats.put("deliveredCount", campaign.getDeliveredCount());
         stats.put("failedCount", campaign.getFailedCount());
-        stats.put("openedCount", campaign.getOpenedCount());
-        stats.put("clickedCount", campaign.getClickedCount());
-        stats.put("bouncedCount", campaign.getBouncedCount());
-        stats.put("complainedCount", campaign.getComplainedCount());
-        stats.put("unsubscribedCount", campaign.getUnsubscribedCount());
+        stats.put("unsubscribeCount", campaign.getUnsubscribeCount());
+        stats.put("complaintCount", campaign.getComplaintCount());
+
+        // TODO: Add tracking for deliveredCount, openedCount, clickedCount, bouncedCount
+        stats.put("deliveredCount", 0);
+        stats.put("openedCount", 0);
+        stats.put("clickedCount", 0);
+        stats.put("bouncedCount", 0);
 
         // Calculate rates
-        if (campaign.getDeliveredCount() != null && campaign.getDeliveredCount() > 0) {
-            double openRate = (campaign.getOpenedCount() != null ? campaign.getOpenedCount() : 0) * 100.0 / campaign.getDeliveredCount();
-            double clickRate = (campaign.getClickedCount() != null ? campaign.getClickedCount() : 0) * 100.0 / campaign.getDeliveredCount();
-            double bounceRate = (campaign.getBouncedCount() != null ? campaign.getBouncedCount() : 0) * 100.0 / campaign.getTotalRecipients();
-
-            stats.put("openRate", String.format("%.2f", openRate));
-            stats.put("clickRate", String.format("%.2f", clickRate));
-            stats.put("bounceRate", String.format("%.2f", bounceRate));
-        } else {
-            stats.put("openRate", "0.00");
-            stats.put("clickRate", "0.00");
-            stats.put("bounceRate", "0.00");
-        }
+        stats.put("openRate", "0.00");
+        stats.put("clickRate", "0.00");
+        stats.put("bounceRate", "0.00");
 
         stats.put("sentAt", campaign.getSentAt());
 

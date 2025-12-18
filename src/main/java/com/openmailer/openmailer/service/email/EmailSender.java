@@ -1,6 +1,5 @@
 package com.openmailer.openmailer.service.email;
 
-import com.openmailer.openmailer.model.EmailProvider;
 import com.openmailer.openmailer.model.ProviderType;
 
 import java.util.List;

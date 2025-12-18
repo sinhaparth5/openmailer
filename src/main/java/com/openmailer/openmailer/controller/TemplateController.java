@@ -51,7 +51,7 @@ public class TemplateController {
             @RequestParam(defaultValue = "50") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<EmailTemplate> templates = templateService.findAllByUser(user.getId(), pageable);
+        Page<EmailTemplate> templates = templateService.findByUserId(user.getId(), pageable);
 
         List<TemplateResponse> responses = templates.getContent().stream()
                 .map(TemplateResponse::fromEntity)
@@ -75,7 +75,7 @@ public class TemplateController {
         EmailTemplate template = templateService.findById(id);
 
         // Check ownership
-        if (!template.getUser().getId().equals(user.getId())) {
+        if (!template.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this template", null));
         }
@@ -95,11 +95,12 @@ public class TemplateController {
         template.setName(request.getName());
         template.setDescription(request.getDescription());
         template.setHtmlContent(request.getHtmlContent());
-        template.setTextContent(request.getTextContent());
+        template.setPlainTextContent(request.getTextContent());
         template.setPreviewText(request.getPreviewText());
-        template.setUser(user);
+        template.setCreatedBy(user);
+        template.setUserId(user.getId());
 
-        EmailTemplate saved = templateService.save(template);
+        EmailTemplate saved = templateService.createTemplate(template);
 
         log.info("Template created: {} by user: {}", saved.getId(), user.getEmail());
 
@@ -119,7 +120,7 @@ public class TemplateController {
         EmailTemplate template = templateService.findById(id);
 
         // Check ownership
-        if (!template.getUser().getId().equals(user.getId())) {
+        if (!template.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this template", null));
         }
@@ -127,10 +128,10 @@ public class TemplateController {
         template.setName(request.getName());
         template.setDescription(request.getDescription());
         template.setHtmlContent(request.getHtmlContent());
-        template.setTextContent(request.getTextContent());
+        template.setPlainTextContent(request.getTextContent());
         template.setPreviewText(request.getPreviewText());
 
-        EmailTemplate updated = templateService.save(template);
+        EmailTemplate updated = templateService.updateTemplate(id, user.getId(), template);
 
         log.info("Template updated: {} by user: {}", updated.getId(), user.getEmail());
 
@@ -148,12 +149,12 @@ public class TemplateController {
         EmailTemplate template = templateService.findById(id);
 
         // Check ownership
-        if (!template.getUser().getId().equals(user.getId())) {
+        if (!template.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this template", null));
         }
 
-        templateService.deleteById(id);
+        templateService.deleteTemplate(id, user.getId());
 
         log.info("Template deleted: {} by user: {}", id, user.getEmail());
 
@@ -172,7 +173,7 @@ public class TemplateController {
         EmailTemplate template = templateService.findById(id);
 
         // Check ownership
-        if (!template.getUser().getId().equals(user.getId())) {
+        if (!template.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this template", null));
         }
@@ -184,8 +185,8 @@ public class TemplateController {
 
         // Render template
         String renderedHtml = rendererService.render(template.getHtmlContent(), sampleData);
-        String renderedText = template.getTextContent() != null
-                ? rendererService.render(template.getTextContent(), sampleData)
+        String renderedText = template.getPlainTextContent() != null
+                ? rendererService.render(template.getPlainTextContent(), sampleData)
                 : null;
 
         Map<String, String> preview = new HashMap<>();
@@ -206,7 +207,7 @@ public class TemplateController {
         EmailTemplate template = templateService.findById(id);
 
         // Check ownership
-        if (!template.getUser().getId().equals(user.getId())) {
+        if (!template.getCreatedBy().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this template", null));
         }

@@ -38,7 +38,7 @@ public class TemplateResponse {
         response.setName(template.getName());
         response.setDescription(template.getDescription());
         response.setHtmlContent(template.getHtmlContent());
-        response.setTextContent(template.getTextContent());
+        response.setTextContent(template.getPlainTextContent());
         response.setPreviewText(template.getPreviewText());
         response.setCreatedAt(template.getCreatedAt());
         response.setUpdatedAt(template.getUpdatedAt());

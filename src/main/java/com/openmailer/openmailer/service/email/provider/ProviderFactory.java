@@ -1,7 +1,6 @@
 package com.openmailer.openmailer.service.email.provider;
 
 import com.openmailer.openmailer.model.EmailProvider;
-import com.openmailer.openmailer.model.ProviderType;
 import com.openmailer.openmailer.service.email.EmailSender;
 import com.openmailer.openmailer.service.security.EncryptionService;
 import org.slf4j.Logger;
@@ -39,7 +38,7 @@ public class ProviderFactory {
             throw new IllegalArgumentException("Provider cannot be null");
         }
 
-        if (!provider.isActive()) {
+        if (provider.getIsActive() == null || !provider.getIsActive()) {
             throw new IllegalArgumentException("Provider is not active: " + provider.getName());
         }
 
@@ -152,7 +151,7 @@ public class ProviderFactory {
      * @return true if the provider is valid and can be used
      */
     public boolean isProviderValid(EmailProvider provider) {
-        if (provider == null || !provider.isActive()) {
+        if (provider == null || provider.getIsActive() == null || !provider.getIsActive()) {
             return false;
         }
 
