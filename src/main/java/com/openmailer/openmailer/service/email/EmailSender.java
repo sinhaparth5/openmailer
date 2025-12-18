@@ -32,7 +32,7 @@ public interface EmailSender {
      *
      * @return The provider type
      */
-    EmailProvider.ProviderType getProviderType();
+    String getProviderType();
 
     /**
      * Request object for sending emails

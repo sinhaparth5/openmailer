@@ -4,7 +4,8 @@ import com.openmailer.openmailer.model.EmailProvider;
 import com.openmailer.openmailer.service.email.EmailSender;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.util.UUID;
@@ -12,8 +13,9 @@ import java.util.UUID;
 /**
  * SMTP email provider implementation using JavaMail
  */
-@Slf4j
 public class SmtpProvider implements EmailSender {
+
+    private static final Logger log = LoggerFactory.getLogger(SmtpProvider.class);
 
     private final EmailProvider provider;
     private final Session session;

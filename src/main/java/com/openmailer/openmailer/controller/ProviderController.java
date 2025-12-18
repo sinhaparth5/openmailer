@@ -7,8 +7,8 @@ import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.service.provider.EmailProviderService;
 import com.openmailer.openmailer.service.security.EncryptionService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,14 +25,19 @@ import java.util.stream.Collectors;
 /**
  * REST controller for email provider management
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/providers")
-@RequiredArgsConstructor
 public class ProviderController {
+
+    private static final Logger log = LoggerFactory.getLogger(ProviderController.class);
 
     private final EmailProviderService providerService;
     private final EncryptionService encryptionService;
+
+    public ProviderController(EmailProviderService providerService, EncryptionService encryptionService) {
+        this.providerService = providerService;
+        this.encryptionService = encryptionService;
+    }
 
     /**
      * GET /api/v1/providers - List all email providers

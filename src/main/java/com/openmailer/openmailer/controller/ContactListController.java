@@ -12,8 +12,8 @@ import com.openmailer.openmailer.service.contact.ContactListMembershipService;
 import com.openmailer.openmailer.service.contact.ContactListService;
 import com.openmailer.openmailer.service.contact.ContactService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,15 +30,22 @@ import java.util.stream.Collectors;
 /**
  * REST controller for contact list management
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/lists")
-@RequiredArgsConstructor
 public class ContactListController {
+
+    private static final Logger log = LoggerFactory.getLogger(ContactListController.class);
 
     private final ContactListService listService;
     private final ContactListMembershipService membershipService;
     private final ContactService contactService;
+
+    public ContactListController(ContactListService listService, ContactListMembershipService membershipService,
+                                 ContactService contactService) {
+        this.listService = listService;
+        this.membershipService = membershipService;
+        this.contactService = contactService;
+    }
 
     /**
      * GET /api/v1/lists - List all contact lists
@@ -310,10 +317,10 @@ public class ContactListController {
         stats.put("listName", list.getName());
         stats.put("totalContacts", list.getTotalContacts());
         stats.put("activeContacts", list.getActiveContacts());
-        stats.put("subscribedCount", membershipService.countByListAndStatus(id, Contact.ContactStatus.SUBSCRIBED));
-        stats.put("unsubscribedCount", membershipService.countByListAndStatus(id, Contact.ContactStatus.UNSUBSCRIBED));
-        stats.put("bouncedCount", membershipService.countByListAndStatus(id, Contact.ContactStatus.BOUNCED));
-        stats.put("pendingCount", membershipService.countByListAndStatus(id, Contact.ContactStatus.PENDING));
+        stats.put("subscribedCount", membershipService.countByListAndStatus(id, "SUBSCRIBED"));
+        stats.put("unsubscribedCount", membershipService.countByListAndStatus(id, "UNSUBSCRIBED"));
+        stats.put("bouncedCount", membershipService.countByListAndStatus(id, "BOUNCED"));
+        stats.put("pendingCount", membershipService.countByListAndStatus(id, "PENDING"));
 
         return ResponseEntity.ok(ApiResponse.success(stats));
     }

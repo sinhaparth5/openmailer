@@ -11,8 +11,8 @@ import com.openmailer.openmailer.service.domain.DomainService;
 import com.openmailer.openmailer.service.provider.EmailProviderService;
 import com.openmailer.openmailer.service.template.EmailTemplateService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,17 +30,27 @@ import java.util.stream.Collectors;
 /**
  * REST controller for campaign management
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/campaigns")
-@RequiredArgsConstructor
 public class CampaignController {
+
+    private static final Logger log = LoggerFactory.getLogger(CampaignController.class);
 
     private final CampaignService campaignService;
     private final EmailTemplateService templateService;
     private final ContactListService listService;
     private final DomainService domainService;
     private final EmailProviderService providerService;
+
+    public CampaignController(CampaignService campaignService, EmailTemplateService templateService,
+                              ContactListService listService, DomainService domainService,
+                              EmailProviderService providerService) {
+        this.campaignService = campaignService;
+        this.templateService = templateService;
+        this.listService = listService;
+        this.domainService = domainService;
+        this.providerService = providerService;
+    }
 
     /**
      * GET /api/v1/campaigns - List all campaigns
@@ -50,7 +60,7 @@ public class CampaignController {
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false) EmailCampaign.CampaignStatus status) {
+            @RequestParam(required = false) String status) {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<EmailCampaign> campaigns;
@@ -121,7 +131,7 @@ public class CampaignController {
         }
 
         // Check if domain is verified
-        if (domain.getStatus() != Domain.DomainStatus.VERIFIED) {
+        if (!"VERIFIED".equals(domain.getStatus())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("DOMAIN_NOT_VERIFIED", "Domain must be verified before sending", "domainId"));
         }
@@ -148,7 +158,7 @@ public class CampaignController {
         campaign.setTrackOpens(request.getTrackOpens());
         campaign.setTrackClicks(request.getTrackClicks());
         campaign.setSendSpeed(request.getSendSpeed());
-        campaign.setStatus(EmailCampaign.CampaignStatus.DRAFT);
+        campaign.setStatus("DRAFT");
         campaign.setTotalRecipients(list.getActiveContacts());
         campaign.setUser(user);
 
@@ -178,7 +188,7 @@ public class CampaignController {
         }
 
         // Only allow updates if campaign is DRAFT
-        if (campaign.getStatus() != EmailCampaign.CampaignStatus.DRAFT) {
+        if (!"DRAFT".equals(campaign.getStatus())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("INVALID_STATUS", "Can only update campaigns in DRAFT status", "status"));
         }
@@ -234,7 +244,7 @@ public class CampaignController {
         }
 
         // Only allow deletion if campaign is DRAFT
-        if (campaign.getStatus() != EmailCampaign.CampaignStatus.DRAFT) {
+        if (!"DRAFT".equals(campaign.getStatus())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("INVALID_STATUS", "Can only delete campaigns in DRAFT status", "status"));
         }
@@ -264,7 +274,7 @@ public class CampaignController {
         }
 
         // Only allow scheduling if campaign is DRAFT
-        if (campaign.getStatus() != EmailCampaign.CampaignStatus.DRAFT) {
+        if (!"DRAFT".equals(campaign.getStatus())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("INVALID_STATUS", "Can only schedule campaigns in DRAFT status", "status"));
         }
@@ -284,7 +294,7 @@ public class CampaignController {
         }
 
         campaign.setScheduledAt(scheduledAt);
-        campaign.setStatus(EmailCampaign.CampaignStatus.SCHEDULED);
+        campaign.setStatus("SCHEDULED");
 
         EmailCampaign updated = campaignService.save(campaign);
 
@@ -310,14 +320,14 @@ public class CampaignController {
         }
 
         // Only allow sending if campaign is DRAFT or SCHEDULED
-        if (campaign.getStatus() != EmailCampaign.CampaignStatus.DRAFT &&
-                campaign.getStatus() != EmailCampaign.CampaignStatus.SCHEDULED) {
+        if (!"DRAFT".equals(campaign.getStatus()) &&
+                !"SCHEDULED".equals(campaign.getStatus())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("INVALID_STATUS", "Campaign is not in a sendable state", "status"));
         }
 
         // Update status to SENDING
-        campaign.setStatus(EmailCampaign.CampaignStatus.SENDING);
+        campaign.setStatus("SENDING");
         campaign.setSentAt(LocalDateTime.now());
         campaignService.save(campaign);
 
@@ -348,12 +358,12 @@ public class CampaignController {
         }
 
         // Only allow cancellation if campaign is SCHEDULED
-        if (campaign.getStatus() != EmailCampaign.CampaignStatus.SCHEDULED) {
+        if (!"SCHEDULED".equals(campaign.getStatus())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("INVALID_STATUS", "Can only cancel scheduled campaigns", "status"));
         }
 
-        campaign.setStatus(EmailCampaign.CampaignStatus.DRAFT);
+        campaign.setStatus("DRAFT");
         campaign.setScheduledAt(null);
 
         EmailCampaign updated = campaignService.save(campaign);

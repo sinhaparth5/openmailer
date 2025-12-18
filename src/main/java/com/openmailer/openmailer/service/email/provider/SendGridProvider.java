@@ -7,15 +7,17 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 /**
  * SendGrid email provider implementation
  */
-@Slf4j
 public class SendGridProvider implements EmailSender {
+
+    private static final Logger log = LoggerFactory.getLogger(SendGridProvider.class);
 
     private final EmailProvider provider;
     private final SendGrid sendGrid;

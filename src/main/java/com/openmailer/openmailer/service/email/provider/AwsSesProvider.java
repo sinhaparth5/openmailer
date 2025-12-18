@@ -2,7 +2,8 @@ package com.openmailer.openmailer.service.email.provider;
 
 import com.openmailer.openmailer.model.EmailProvider;
 import com.openmailer.openmailer.service.email.EmailSender;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -12,8 +13,9 @@ import software.amazon.awssdk.services.ses.model.*;
 /**
  * AWS SES email provider implementation
  */
-@Slf4j
 public class AwsSesProvider implements EmailSender {
+
+    private static final Logger log = LoggerFactory.getLogger(AwsSesProvider.class);
 
     private final EmailProvider provider;
     private final SesClient sesClient;

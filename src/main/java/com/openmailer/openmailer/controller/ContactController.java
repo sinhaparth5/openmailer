@@ -8,8 +8,8 @@ import com.openmailer.openmailer.model.Contact;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.service.contact.ContactService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,13 +24,17 @@ import java.util.stream.Collectors;
 /**
  * REST controller for contact management
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/contacts")
-@RequiredArgsConstructor
 public class ContactController {
 
+    private static final Logger log = LoggerFactory.getLogger(ContactController.class);
+
     private final ContactService contactService;
+
+    public ContactController(ContactService contactService) {
+        this.contactService = contactService;
+    }
 
     /**
      * GET /api/v1/contacts - List contacts with pagination and filtering
@@ -40,7 +44,7 @@ public class ContactController {
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false) Contact.ContactStatus status,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) String tags,
             @RequestParam(required = false) String search) {
 
@@ -112,10 +116,12 @@ public class ContactController {
         contact.setFirstName(request.getFirstName());
         contact.setLastName(request.getLastName());
         contact.setCustomFields(request.getCustomFields());
-        contact.setTags(request.getTags());
+        if (request.getTags() != null) {
+            contact.setTags(request.getTags().toArray(new String[0]));
+        }
         contact.setGdprConsent(request.getGdprConsent());
         contact.setGdprIpAddress(request.getGdprIpAddress());
-        contact.setStatus(Contact.ContactStatus.PENDING);
+        contact.setStatus("PENDING");
         contact.setUser(user);
 
         Contact saved = contactService.save(contact);
@@ -194,7 +200,7 @@ public class ContactController {
     public ResponseEntity<ApiResponse<ContactResponse>> updateContactStatus(
             @AuthenticationPrincipal User user,
             @PathVariable Long id,
-            @RequestParam Contact.ContactStatus status) {
+            @RequestParam String status) {
 
         Contact contact = contactService.findById(id);
 

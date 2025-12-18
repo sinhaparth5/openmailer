@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.service.security;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +21,10 @@ import java.util.Base64;
  * - DKIM private keys
  * - Two-factor secrets
  */
-@Slf4j
 @Service
 public class EncryptionService {
+
+    private static final Logger log = LoggerFactory.getLogger(EncryptionService.class);
 
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_TAG_LENGTH = 128; // bits

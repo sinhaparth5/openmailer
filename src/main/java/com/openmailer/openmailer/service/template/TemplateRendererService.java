@@ -1,7 +1,8 @@
 package com.openmailer.openmailer.service.template;
 
 import com.openmailer.openmailer.model.Contact;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,9 +16,10 @@ import java.util.regex.Pattern;
  * Service for rendering email templates with variable substitution
  * Supports variables like {{first_name}}, {{last_name}}, {{custom.field}}, etc.
  */
-@Slf4j
 @Service
 public class TemplateRendererService {
+
+    private static final Logger log = LoggerFactory.getLogger(TemplateRendererService.class);
 
     // Pattern to match {{variable}} or {{custom.field}}
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{\\s*([a-zA-Z0-9_.]+)\\s*\\}\\}");
@@ -98,19 +100,19 @@ public class TemplateRendererService {
 
         // Status
         if (contact.getStatus() != null) {
-            variables.put("status", contact.getStatus().name());
+            variables.put("status", contact.getStatus());
         }
 
         // Custom fields (prefixed with "custom.")
         if (contact.getCustomFields() != null && !contact.getCustomFields().isEmpty()) {
-            for (Map.Entry<String, String> entry : contact.getCustomFields().entrySet()) {
+            for (Map.Entry<String, Object> entry : contact.getCustomFields().entrySet()) {
                 String key = "custom." + entry.getKey();
-                variables.put(key, entry.getValue() != null ? entry.getValue() : "");
+                variables.put(key, entry.getValue() != null ? entry.getValue().toString() : "");
             }
         }
 
         // Tags (comma-separated)
-        if (contact.getTags() != null && !contact.getTags().isEmpty()) {
+        if (contact.getTags() != null && contact.getTags().length > 0) {
             variables.put("tags", String.join(", ", contact.getTags()));
         }
 

@@ -1,23 +1,27 @@
 package com.openmailer.openmailer.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 /**
  * Standard API response wrapper
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ApiResponse<T> {
     private boolean success;
     private T data;
     private String message;
     private ErrorDetails error;
     private LocalDateTime timestamp;
+
+    public ApiResponse() {
+    }
+
+    public ApiResponse(boolean success, T data, String message, ErrorDetails error, LocalDateTime timestamp) {
+        this.success = success;
+        this.data = data;
+        this.message = message;
+        this.error = error;
+        this.timestamp = timestamp;
+    }
 
     public ApiResponse(boolean success, T data) {
         this.success = success;
@@ -56,12 +60,82 @@ public class ApiResponse<T> {
         return response;
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public ErrorDetails getError() {
+        return error;
+    }
+
+    public void setError(ErrorDetails error) {
+        this.error = error;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public static class ErrorDetails {
         private String code;
         private String message;
         private String field;
+
+        public ErrorDetails() {
+        }
+
+        public ErrorDetails(String code, String message, String field) {
+            this.code = code;
+            this.message = message;
+            this.field = field;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getField() {
+            return field;
+        }
+
+        public void setField(String field) {
+            this.field = field;
+        }
     }
 }

@@ -9,8 +9,8 @@ import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.service.template.EmailTemplateService;
 import com.openmailer.openmailer.service.template.TemplateRendererService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,14 +27,19 @@ import java.util.stream.Collectors;
 /**
  * REST controller for email template management
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/templates")
-@RequiredArgsConstructor
 public class TemplateController {
+
+    private static final Logger log = LoggerFactory.getLogger(TemplateController.class);
 
     private final EmailTemplateService templateService;
     private final TemplateRendererService rendererService;
+
+    public TemplateController(EmailTemplateService templateService, TemplateRendererService rendererService) {
+        this.templateService = templateService;
+        this.rendererService = rendererService;
+    }
 
     /**
      * GET /api/v1/templates - List all templates with pagination

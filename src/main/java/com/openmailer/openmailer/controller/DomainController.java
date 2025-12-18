@@ -6,8 +6,8 @@ import com.openmailer.openmailer.model.Domain;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.service.domain.DomainService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,13 +24,17 @@ import java.util.stream.Collectors;
 /**
  * REST controller for domain management
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/domains")
-@RequiredArgsConstructor
 public class DomainController {
 
+    private static final Logger log = LoggerFactory.getLogger(DomainController.class);
+
     private final DomainService domainService;
+
+    public DomainController(DomainService domainService) {
+        this.domainService = domainService;
+    }
 
     /**
      * GET /api/v1/domains - List all domains
@@ -96,7 +100,7 @@ public class DomainController {
 
         Domain domain = new Domain();
         domain.setDomainName(domainName);
-        domain.setStatus(Domain.DomainStatus.PENDING);
+        domain.setStatus("PENDING");
         domain.setUser(user);
 
         // Generate DKIM keys
@@ -188,11 +192,11 @@ public class DomainController {
         boolean allVerified = true; // TODO: Replace with actual verification
 
         if (allVerified) {
-            domain.setStatus(Domain.DomainStatus.VERIFIED);
+            domain.setStatus("VERIFIED");
             domain.setVerifiedAt(java.time.LocalDateTime.now());
             log.info("Domain verified: {} by user: {}", domain.getDomainName(), user.getEmail());
         } else {
-            domain.setStatus(Domain.DomainStatus.FAILED);
+            domain.setStatus("FAILED");
             log.warn("Domain verification failed: {} by user: {}", domain.getDomainName(), user.getEmail());
         }
 

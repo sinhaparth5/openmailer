@@ -3,8 +3,8 @@ package com.openmailer.openmailer.service.email.provider;
 import com.openmailer.openmailer.model.EmailProvider;
 import com.openmailer.openmailer.service.email.EmailSender;
 import com.openmailer.openmailer.service.security.EncryptionService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -14,12 +14,16 @@ import java.util.Map;
  * Factory for creating EmailSender instances based on provider type
  * Handles decryption of provider credentials and instantiation
  */
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class ProviderFactory {
 
+    private static final Logger log = LoggerFactory.getLogger(ProviderFactory.class);
+
     private final EncryptionService encryptionService;
+
+    public ProviderFactory(EncryptionService encryptionService) {
+        this.encryptionService = encryptionService;
+    }
 
     /**
      * Creates an EmailSender instance for the given provider
@@ -46,15 +50,15 @@ public class ProviderFactory {
 
         // Instantiate the appropriate provider
         return switch (provider.getProviderType()) {
-            case AWS_SES -> {
+            case "AWS_SES" -> {
                 log.info("Creating AWS SES provider: {}", provider.getName());
                 yield new AwsSesProvider(decryptedProvider);
             }
-            case SENDGRID -> {
+            case "SENDGRID" -> {
                 log.info("Creating SendGrid provider: {}", provider.getName());
                 yield new SendGridProvider(decryptedProvider);
             }
-            case SMTP -> {
+            case "SMTP" -> {
                 log.info("Creating SMTP provider: {}", provider.getName());
                 yield new SmtpProvider(decryptedProvider);
             }
@@ -131,14 +135,11 @@ public class ProviderFactory {
     private EmailProvider copyProviderWithDecryptedConfig(EmailProvider original, Map<String, String> decryptedConfig) {
         EmailProvider copy = new EmailProvider();
         copy.setId(original.getId());
-        copy.setName(original.getName());
+        copy.setProviderName(original.getProviderName());
         copy.setProviderType(original.getProviderType());
-        copy.setConfiguration(decryptedConfig);
-        copy.setActive(original.isActive());
+        copy.setIsActive(original.getIsActive());
         copy.setDailyLimit(original.getDailyLimit());
         copy.setMonthlyLimit(original.getMonthlyLimit());
-        copy.setSentToday(original.getSentToday());
-        copy.setSentThisMonth(original.getSentThisMonth());
         copy.setUser(original.getUser());
         return copy;
     }
