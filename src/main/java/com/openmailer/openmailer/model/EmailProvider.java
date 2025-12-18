@@ -75,7 +75,7 @@ public class EmailProvider {
     public EmailProvider() {
     }
 
-    public EmailProvider(User user, String providerType, String providerName, String configuration) {
+    public EmailProvider(User user, ProviderType providerType, String providerName, String configuration) {
         this.user = user;
         this.providerType = providerType;
         this.providerName = providerName;
@@ -122,11 +122,11 @@ public class EmailProvider {
         this.domain = domain;
     }
 
-    public String getProviderType() {
+    public ProviderType getProviderType() {
         return providerType;
     }
 
-    public void setProviderType(String providerType) {
+    public void setProviderType(ProviderType providerType) {
         this.providerType = providerType;
     }
 

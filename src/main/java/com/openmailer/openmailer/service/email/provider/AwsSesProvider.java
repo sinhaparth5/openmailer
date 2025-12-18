@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.service.email.provider;
 
 import com.openmailer.openmailer.model.EmailProvider;
+import com.openmailer.openmailer.model.ProviderType;
 import com.openmailer.openmailer.service.email.EmailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +133,7 @@ public class AwsSesProvider implements EmailSender {
     }
 
     @Override
-    public EmailProvider.ProviderType getProviderType() {
-        return EmailProvider.ProviderType.AWS_SES;
+    public ProviderType getProviderType() {
+        return ProviderType.AWS_SES;
     }
 }
