@@ -1,0 +1,320 @@
+package com.openmailer.openmailer.controller;
+
+import com.openmailer.openmailer.dto.ApiResponse;
+import com.openmailer.openmailer.dto.PaginatedResponse;
+import com.openmailer.openmailer.dto.contact.ContactResponse;
+import com.openmailer.openmailer.dto.list.ContactListRequest;
+import com.openmailer.openmailer.dto.list.ContactListResponse;
+import com.openmailer.openmailer.model.Contact;
+import com.openmailer.openmailer.model.ContactList;
+import com.openmailer.openmailer.model.User;
+import com.openmailer.openmailer.service.contact.ContactListMembershipService;
+import com.openmailer.openmailer.service.contact.ContactListService;
+import com.openmailer.openmailer.service.contact.ContactService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * REST controller for contact list management
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/lists")
+@RequiredArgsConstructor
+public class ContactListController {
+
+    private final ContactListService listService;
+    private final ContactListMembershipService membershipService;
+    private final ContactService contactService;
+
+    /**
+     * GET /api/v1/lists - List all contact lists
+     */
+    @GetMapping
+    public ResponseEntity<PaginatedResponse<ContactListResponse>> listContactLists(
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ContactList> lists = listService.findAllByUser(user.getId(), pageable);
+
+        List<ContactListResponse> responses = lists.getContent().stream()
+                .map(ContactListResponse::fromEntity)
+                .collect(Collectors.toList());
+
+        PaginatedResponse.PaginationInfo pagination = new PaginatedResponse.PaginationInfo(
+                page, size, lists.getTotalElements(), lists.getTotalPages()
+        );
+
+        return ResponseEntity.ok(new PaginatedResponse<>(responses, pagination));
+    }
+
+    /**
+     * GET /api/v1/lists/{id} - Get contact list by ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ContactListResponse>> getContactList(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id) {
+
+        ContactList list = listService.findById(id);
+
+        // Check ownership
+        if (!list.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", null));
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(ContactListResponse.fromEntity(list)));
+    }
+
+    /**
+     * POST /api/v1/lists - Create new contact list
+     */
+    @PostMapping
+    public ResponseEntity<ApiResponse<ContactListResponse>> createContactList(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody ContactListRequest request) {
+
+        ContactList list = new ContactList();
+        list.setName(request.getName());
+        list.setDescription(request.getDescription());
+        list.setDoubleOptInEnabled(request.getDoubleOptInEnabled());
+        list.setTotalContacts(0);
+        list.setActiveContacts(0);
+        list.setUser(user);
+
+        ContactList saved = listService.save(list);
+
+        log.info("Contact list created: {} by user: {}", saved.getId(), user.getEmail());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(ContactListResponse.fromEntity(saved), "Contact list created successfully"));
+    }
+
+    /**
+     * PUT /api/v1/lists/{id} - Update contact list
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ContactListResponse>> updateContactList(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id,
+            @Valid @RequestBody ContactListRequest request) {
+
+        ContactList list = listService.findById(id);
+
+        // Check ownership
+        if (!list.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", null));
+        }
+
+        list.setName(request.getName());
+        list.setDescription(request.getDescription());
+        list.setDoubleOptInEnabled(request.getDoubleOptInEnabled());
+
+        ContactList updated = listService.save(list);
+
+        log.info("Contact list updated: {} by user: {}", updated.getId(), user.getEmail());
+
+        return ResponseEntity.ok(ApiResponse.success(ContactListResponse.fromEntity(updated), "Contact list updated successfully"));
+    }
+
+    /**
+     * DELETE /api/v1/lists/{id} - Delete contact list
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteContactList(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id) {
+
+        ContactList list = listService.findById(id);
+
+        // Check ownership
+        if (!list.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", null));
+        }
+
+        listService.deleteById(id);
+
+        log.info("Contact list deleted: {} by user: {}", id, user.getEmail());
+
+        return ResponseEntity.ok(ApiResponse.success(null, "Contact list deleted successfully"));
+    }
+
+    /**
+     * GET /api/v1/lists/{id}/contacts - Get contacts in list with pagination
+     */
+    @GetMapping("/{id}/contacts")
+    public ResponseEntity<PaginatedResponse<ContactResponse>> getListContacts(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+
+        ContactList list = listService.findById(id);
+
+        // Check ownership
+        if (!list.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Contact> contacts = membershipService.findContactsByList(id, pageable);
+
+        List<ContactResponse> responses = contacts.getContent().stream()
+                .map(ContactResponse::fromEntity)
+                .collect(Collectors.toList());
+
+        PaginatedResponse.PaginationInfo pagination = new PaginatedResponse.PaginationInfo(
+                page, size, contacts.getTotalElements(), contacts.getTotalPages()
+        );
+
+        return ResponseEntity.ok(new PaginatedResponse<>(responses, pagination));
+    }
+
+    /**
+     * POST /api/v1/lists/{id}/contacts - Add contacts to list
+     */
+    @PostMapping("/{id}/contacts")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> addContactsToList(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id,
+            @RequestBody Map<String, List<Long>> request) {
+
+        ContactList list = listService.findById(id);
+
+        // Check ownership
+        if (!list.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", null));
+        }
+
+        List<Long> contactIds = request.get("contactIds");
+        if (contactIds == null || contactIds.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("INVALID_REQUEST", "contactIds is required", "contactIds"));
+        }
+
+        int added = 0;
+        int skipped = 0;
+        List<String> errors = new java.util.ArrayList<>();
+
+        for (Long contactId : contactIds) {
+            try {
+                Contact contact = contactService.findById(contactId);
+
+                // Verify contact belongs to user
+                if (!contact.getUser().getId().equals(user.getId())) {
+                    errors.add("Contact " + contactId + " does not belong to you");
+                    skipped++;
+                    continue;
+                }
+
+                // Check if already in list
+                if (membershipService.existsByContactAndList(contactId, id)) {
+                    skipped++;
+                    continue;
+                }
+
+                membershipService.addContactToList(contactId, id);
+                added++;
+
+            } catch (Exception e) {
+                errors.add("Error adding contact " + contactId + ": " + e.getMessage());
+                skipped++;
+            }
+        }
+
+        // Update list counts
+        listService.updateContactCounts(id);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("added", added);
+        result.put("skipped", skipped);
+        result.put("errors", errors);
+
+        log.info("Added {} contacts to list {} by user: {}", added, id, user.getEmail());
+
+        return ResponseEntity.ok(ApiResponse.success(result, added + " contacts added to list"));
+    }
+
+    /**
+     * DELETE /api/v1/lists/{id}/contacts/{contactId} - Remove contact from list
+     */
+    @DeleteMapping("/{id}/contacts/{contactId}")
+    public ResponseEntity<ApiResponse<Void>> removeContactFromList(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id,
+            @PathVariable Long contactId) {
+
+        ContactList list = listService.findById(id);
+
+        // Check ownership
+        if (!list.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", null));
+        }
+
+        Contact contact = contactService.findById(contactId);
+
+        // Verify contact belongs to user
+        if (!contact.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this contact", null));
+        }
+
+        membershipService.removeContactFromList(contactId, id);
+
+        // Update list counts
+        listService.updateContactCounts(id);
+
+        log.info("Removed contact {} from list {} by user: {}", contactId, id, user.getEmail());
+
+        return ResponseEntity.ok(ApiResponse.success(null, "Contact removed from list"));
+    }
+
+    /**
+     * GET /api/v1/lists/{id}/stats - Get list statistics
+     */
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getListStats(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id) {
+
+        ContactList list = listService.findById(id);
+
+        // Check ownership
+        if (!list.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", null));
+        }
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("listId", list.getId());
+        stats.put("listName", list.getName());
+        stats.put("totalContacts", list.getTotalContacts());
+        stats.put("activeContacts", list.getActiveContacts());
+        stats.put("subscribedCount", membershipService.countByListAndStatus(id, Contact.ContactStatus.SUBSCRIBED));
+        stats.put("unsubscribedCount", membershipService.countByListAndStatus(id, Contact.ContactStatus.UNSUBSCRIBED));
+        stats.put("bouncedCount", membershipService.countByListAndStatus(id, Contact.ContactStatus.BOUNCED));
+        stats.put("pendingCount", membershipService.countByListAndStatus(id, Contact.ContactStatus.PENDING));
+
+        return ResponseEntity.ok(ApiResponse.success(stats));
+    }
+}
