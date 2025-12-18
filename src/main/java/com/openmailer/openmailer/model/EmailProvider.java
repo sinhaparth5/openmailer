@@ -21,9 +21,10 @@ public class EmailProvider {
     @ManyToOne
     @JoinColumn(name = "domain_id")
     private Domain domain;
-
+    
+    @Enumerated(EnumType.STRING)
     @Column(name = "provider_type", nullable = false, length = 50)
-    private String providerType;
+    private ProviderType providerType;
 
     @Column(name = "provider_name", nullable = false)
     private String providerName;
@@ -267,8 +268,3 @@ public class EmailProvider {
     }
 }
 
-public enum ProviderType {
-  AWS_SES,
-  SENDGRID,
-  SMTP
-}
