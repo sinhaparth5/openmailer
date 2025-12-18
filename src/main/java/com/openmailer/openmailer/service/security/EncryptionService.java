@@ -36,12 +36,13 @@ public class EncryptionService {
     public EncryptionService(@Value("${encryption.key:}") String encryptionKey) {
         if (encryptionKey == null || encryptionKey.isEmpty()) {
             log.warn("ENCRYPTION_KEY not set! Using default key (NOT SECURE FOR PRODUCTION)");
-            encryptionKey = "ThisIsADefaultKeyForDevelopmentOnly32"; // 32 bytes for AES-256
+            // Exactly 32 bytes for AES-256
+            encryptionKey = "OpenMailerDevKey1234567890123456"; // 32 characters = 32 bytes
         }
 
         byte[] keyBytes = encryptionKey.getBytes();
         if (keyBytes.length != 16 && keyBytes.length != 24 && keyBytes.length != 32) {
-            throw new IllegalArgumentException("Encryption key must be 16, 24, or 32 bytes for AES");
+            throw new IllegalArgumentException("Encryption key must be 16, 24, or 32 bytes for AES. Current length: " + keyBytes.length);
         }
 
         this.secretKey = new SecretKeySpec(keyBytes, "AES");
