@@ -1,7 +1,11 @@
 package com.openmailer.openmailer.model;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "email_providers")
@@ -144,6 +148,41 @@ public class EmailProvider {
 
     public void setConfiguration(String configuration) {
         this.configuration = configuration;
+    }
+
+    /**
+     * Parses the JSON configuration string into a Map
+     *
+     * @return Map of configuration key-value pairs
+     */
+    public Map<String, String> getConfigurationMap() {
+        if (configuration == null || configuration.isEmpty()) {
+            return new HashMap<>();
+        }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(configuration, new TypeReference<Map<String, String>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse configuration JSON", e);
+        }
+    }
+
+    /**
+     * Sets the configuration from a Map by converting it to JSON
+     *
+     * @param configMap The configuration map
+     */
+    public void setConfigurationMap(Map<String, String> configMap) {
+        if (configMap == null || configMap.isEmpty()) {
+            this.configuration = "{}";
+            return;
+        }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            this.configuration = mapper.writeValueAsString(configMap);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize configuration to JSON", e);
+        }
     }
 
     public Boolean getIsActive() {

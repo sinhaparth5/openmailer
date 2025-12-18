@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.service.email.provider;
 
 import com.openmailer.openmailer.model.EmailProvider;
+import com.openmailer.openmailer.model.ProviderType;
 import com.openmailer.openmailer.service.email.EmailSender;
 import com.openmailer.openmailer.service.security.EncryptionService;
 import org.slf4j.Logger;
@@ -43,26 +44,25 @@ public class ProviderFactory {
         }
 
         // Decrypt encrypted configuration values
-        Map<String, String> decryptedConfig = decryptConfiguration(provider.getConfiguration());
+        Map<String, String> decryptedConfig = decryptConfiguration(provider.getConfigurationMap());
 
         // Create a copy of the provider with decrypted configuration
         EmailProvider decryptedProvider = copyProviderWithDecryptedConfig(provider, decryptedConfig);
 
         // Instantiate the appropriate provider
         return switch (provider.getProviderType()) {
-            case "AWS_SES" -> {
+            case AWS_SES -> {
                 log.info("Creating AWS SES provider: {}", provider.getName());
                 yield new AwsSesProvider(decryptedProvider);
             }
-            case "SENDGRID" -> {
+            case SENDGRID -> {
                 log.info("Creating SendGrid provider: {}", provider.getName());
                 yield new SendGridProvider(decryptedProvider);
             }
-            case "SMTP" -> {
+            case SMTP -> {
                 log.info("Creating SMTP provider: {}", provider.getName());
                 yield new SmtpProvider(decryptedProvider);
             }
-            default -> throw new IllegalArgumentException("Unsupported provider type: " + provider.getProviderType());
         };
     }
 
@@ -141,6 +141,7 @@ public class ProviderFactory {
         copy.setDailyLimit(original.getDailyLimit());
         copy.setMonthlyLimit(original.getMonthlyLimit());
         copy.setUser(original.getUser());
+        copy.setConfigurationMap(decryptedConfig);
         return copy;
     }
 

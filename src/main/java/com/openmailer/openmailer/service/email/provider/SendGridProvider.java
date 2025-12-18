@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.service.email.provider;
 
 import com.openmailer.openmailer.model.EmailProvider;
+import com.openmailer.openmailer.model.ProviderType;
 import com.openmailer.openmailer.service.email.EmailSender;
 import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
@@ -26,7 +27,7 @@ public class SendGridProvider implements EmailSender {
         this.provider = provider;
 
         // Get API key from configuration
-        String apiKey = provider.getConfiguration().get("apiKey");
+        String apiKey = provider.getConfigurationMap().get("apiKey");
         if (apiKey == null || apiKey.isEmpty()) {
             throw new IllegalArgumentException("SendGrid requires apiKey in configuration");
         }
@@ -130,12 +131,12 @@ public class SendGridProvider implements EmailSender {
     @Override
     public boolean isConfigured() {
         return provider != null
-                && provider.getConfiguration() != null
-                && provider.getConfiguration().containsKey("apiKey");
+                && provider.getConfigurationMap() != null
+                && provider.getConfigurationMap().containsKey("apiKey");
     }
 
     @Override
-    public EmailProvider.ProviderType getProviderType() {
-        return EmailProvider.ProviderType.SENDGRID;
+    public ProviderType getProviderType() {
+        return ProviderType.SENDGRID;
     }
 }

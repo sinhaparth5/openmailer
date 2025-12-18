@@ -25,9 +25,9 @@ public class AwsSesProvider implements EmailSender {
         this.provider = provider;
 
         // Parse configuration
-        String accessKey = provider.getConfiguration().get("accessKey");
-        String secretKey = provider.getConfiguration().get("secretKey");
-        String regionStr = provider.getConfiguration().getOrDefault("region", "us-east-1");
+        String accessKey = provider.getConfigurationMap().get("accessKey");
+        String secretKey = provider.getConfigurationMap().get("secretKey");
+        String regionStr = provider.getConfigurationMap().getOrDefault("region", "us-east-1");
 
         if (accessKey == null || secretKey == null) {
             throw new IllegalArgumentException("AWS SES requires accessKey and secretKey");
@@ -127,9 +127,9 @@ public class AwsSesProvider implements EmailSender {
     @Override
     public boolean isConfigured() {
         return provider != null
-                && provider.getConfiguration() != null
-                && provider.getConfiguration().containsKey("accessKey")
-                && provider.getConfiguration().containsKey("secretKey");
+                && provider.getConfigurationMap() != null
+                && provider.getConfigurationMap().containsKey("accessKey")
+                && provider.getConfigurationMap().containsKey("secretKey");
     }
 
     @Override

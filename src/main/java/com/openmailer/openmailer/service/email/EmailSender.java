@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.service.email;
 
 import com.openmailer.openmailer.model.EmailProvider;
+import com.openmailer.openmailer.model.ProviderType;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public interface EmailSender {
      *
      * @return The provider type
      */
-    String getProviderType();
+    ProviderType getProviderType();
 
     /**
      * Request object for sending emails

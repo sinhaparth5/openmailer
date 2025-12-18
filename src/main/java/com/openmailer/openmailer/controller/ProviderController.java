@@ -319,8 +319,8 @@ public class ProviderController {
 
         // Return masked configuration (don't expose sensitive values)
         Map<String, String> maskedConfig = new HashMap<>();
-        if (provider.getConfiguration() != null) {
-            for (Map.Entry<String, String> entry : provider.getConfiguration().entrySet()) {
+        if (provider.getConfiguration() != null && !provider.getConfiguration().isEmpty()) {
+            for (Map.Entry<String, String> entry : provider.getConfigurationMap().entrySet()) {
                 if (isSensitiveKey(entry.getKey())) {
                     maskedConfig.put(entry.getKey(), "********");
                 } else {

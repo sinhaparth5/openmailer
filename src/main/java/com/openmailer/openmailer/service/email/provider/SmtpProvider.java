@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.service.email.provider;
 
 import com.openmailer.openmailer.model.EmailProvider;
+import com.openmailer.openmailer.model.ProviderType;
 import com.openmailer.openmailer.service.email.EmailSender;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
@@ -26,11 +27,11 @@ public class SmtpProvider implements EmailSender {
         this.provider = provider;
 
         // Parse configuration
-        String host = provider.getConfiguration().get("host");
-        String portStr = provider.getConfiguration().getOrDefault("port", "587");
-        this.username = provider.getConfiguration().get("username");
-        this.password = provider.getConfiguration().get("password");
-        String encryption = provider.getConfiguration().getOrDefault("encryption", "TLS"); // TLS or SSL
+        String host = provider.getConfigurationMap().get("host");
+        String portStr = provider.getConfigurationMap().getOrDefault("port", "587");
+        this.username = provider.getConfigurationMap().get("username");
+        this.password = provider.getConfigurationMap().get("password");
+        String encryption = provider.getConfigurationMap().getOrDefault("encryption", "TLS"); // TLS or SSL
 
         if (host == null || username == null || password == null) {
             throw new IllegalArgumentException("SMTP requires host, username, and password");
@@ -171,14 +172,14 @@ public class SmtpProvider implements EmailSender {
     @Override
     public boolean isConfigured() {
         return provider != null
-                && provider.getConfiguration() != null
-                && provider.getConfiguration().containsKey("host")
-                && provider.getConfiguration().containsKey("username")
-                && provider.getConfiguration().containsKey("password");
+                && provider.getConfigurationMap() != null
+                && provider.getConfigurationMap().containsKey("host")
+                && provider.getConfigurationMap().containsKey("username")
+                && provider.getConfigurationMap().containsKey("password");
     }
 
     @Override
-    public EmailProvider.ProviderType getProviderType() {
-        return EmailProvider.ProviderType.SMTP;
+    public ProviderType getProviderType() {
+        return ProviderType.SMTP;
     }
 }
