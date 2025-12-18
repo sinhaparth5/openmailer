@@ -7,7 +7,18 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.0.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+  </parent>
+    <dependencyManagement>
+      <dependencies>
+          <dependency>
+              <groupId>software.amazon.awssdk</groupId>
+              <artifactId>bom</artifactId>
+              <version>2.28.28</version>  <!-- Safe, recent stable; bump to higher 2.x if available -->
+              <type>pom</type>
+              <scope>import</scope>
+          </dependency>
+      </dependencies>
+  </dependencyManagement>
 	<groupId>com.openmailer</groupId>
 	<artifactId>openmailer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -105,7 +116,28 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
-		</dependency>
+    </dependency>
+    <dependency>
+      <groupId>com.sendgrid</groupId>
+      <artifactId>sendgrid-java</artifactId>
+      <version>4.10.3</version>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>ses</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>auth</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>regions</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>netty-nio-client</artifactId>  <!-- Recommended for performance -->
+    </dependency>
 	</dependencies>
 
 	<build>
