@@ -266,3 +266,9 @@ public class EmailProvider {
         this.providerName = name;
     }
 }
+
+public enum ProviderType {
+  AWS_SES,
+  SENDGRID,
+  SMTP
+}
