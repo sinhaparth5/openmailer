@@ -221,4 +221,12 @@ public class ContactService {
   public boolean emailExists(String email, Long userId) {
     return contactRepository.existsByEmailAndUser_Id(email, userId);
   }
+
+  /**
+   * Count contacts in a list by status.
+   */
+  @Transactional(readOnly = true)
+  public long countByListAndStatus(Long listId, String status) {
+    return contactRepository.countByListAndStatus(listId, status);
+  }
 }

@@ -170,4 +170,18 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param userId the user ID
    */
   void deleteByUser_Id(Long userId);
+
+  /**
+   * Count contacts in a specific list by their status.
+   *
+   * @param listId the contact list ID
+   * @param status the contact status
+   * @return count of contacts in the list with the given status
+   */
+  @Query("""
+      SELECT COUNT(c) FROM Contact c
+      JOIN ContactListMembership m ON c.id = m.contactId
+      WHERE m.listId = :listId AND c.status = :status
+  """)
+  long countByListAndStatus(@Param("listId") Long listId, @Param("status") String status);
 }

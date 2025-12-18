@@ -41,15 +41,18 @@ public class CampaignController {
     private final ContactListService listService;
     private final DomainService domainService;
     private final EmailProviderService providerService;
+    private final com.openmailer.openmailer.service.campaign.CampaignSendingService campaignSendingService;
 
     public CampaignController(CampaignService campaignService, EmailTemplateService templateService,
                               ContactListService listService, DomainService domainService,
-                              EmailProviderService providerService) {
+                              EmailProviderService providerService,
+                              com.openmailer.openmailer.service.campaign.CampaignSendingService campaignSendingService) {
         this.campaignService = campaignService;
         this.templateService = templateService;
         this.listService = listService;
         this.domainService = domainService;
         this.providerService = providerService;
+        this.campaignSendingService = campaignSendingService;
     }
 
     /**
@@ -332,8 +335,8 @@ public class CampaignController {
         campaign.setSentAt(LocalDateTime.now());
         campaignService.updateCampaign(id, user.getId(), campaign);
 
-        // TODO: Trigger async campaign sending service
-        // campaignSendingService.sendCampaign(campaign);
+        // Trigger async campaign sending service
+        campaignSendingService.sendCampaignAsync(id);
 
         log.info("Campaign send initiated: {} by user: {}", id, user.getEmail());
 
@@ -400,11 +403,17 @@ public class CampaignController {
         stats.put("unsubscribeCount", campaign.getUnsubscribeCount());
         stats.put("complaintCount", campaign.getComplaintCount());
 
-        // TODO: Add tracking for deliveredCount, openedCount, clickedCount, bouncedCount
-        stats.put("deliveredCount", 0);
-        stats.put("openedCount", 0);
-        stats.put("clickedCount", 0);
-        stats.put("bouncedCount", 0);
+        // TODO: Implement email tracking system
+        // This requires:
+        // 1. Creating EmailEvent table to track delivery, opens, clicks, bounces
+        // 2. Adding tracking pixels to emails for opens
+        // 3. Rewriting links in emails to track clicks
+        // 4. Processing webhook callbacks from email providers for bounces/deliveries
+        // 5. Querying EmailEvent table by campaign_id and event_type for these counts
+        stats.put("deliveredCount", 0); // Count of successfully delivered emails
+        stats.put("openedCount", 0);    // Count of unique email opens
+        stats.put("clickedCount", 0);   // Count of unique link clicks
+        stats.put("bouncedCount", 0);   // Count of bounced emails
 
         // Calculate rates
         stats.put("openRate", "0.00");

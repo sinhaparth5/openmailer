@@ -34,10 +34,13 @@ public class ProviderController {
 
     private final EmailProviderService providerService;
     private final EncryptionService encryptionService;
+    private final com.openmailer.openmailer.service.email.provider.ProviderFactory providerFactory;
 
-    public ProviderController(EmailProviderService providerService, EncryptionService encryptionService) {
+    public ProviderController(EmailProviderService providerService, EncryptionService encryptionService,
+                              com.openmailer.openmailer.service.email.provider.ProviderFactory providerFactory) {
         this.providerService = providerService;
         this.encryptionService = encryptionService;
+        this.providerFactory = providerFactory;
     }
 
     /**
@@ -225,19 +228,32 @@ public class ProviderController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this provider", null));
         }
 
-        // TODO: Implement provider test using ProviderFactory
-        // EmailSender sender = providerFactory.createProvider(provider);
-        // boolean configured = sender.isConfigured();
+        boolean configured = false;
+        String errorMessage = null;
 
-        boolean configured = true; // Placeholder
+        try {
+            // Create provider instance and test configuration
+            com.openmailer.openmailer.service.email.EmailSender sender = providerFactory.createProvider(provider);
+            configured = sender.isConfigured();
+
+            log.info("Provider test: {} - {} by user: {}", id, configured ? "SUCCESS" : "FAILED", user.getEmail());
+        } catch (IllegalArgumentException e) {
+            errorMessage = e.getMessage();
+            log.warn("Provider test failed for {}: {}", id, e.getMessage());
+        } catch (Exception e) {
+            errorMessage = "Failed to test provider: " + e.getMessage();
+            log.error("Provider test error for {}: {}", id, e.getMessage(), e);
+        }
 
         Map<String, Object> result = new HashMap<>();
         result.put("providerId", provider.getId());
         result.put("providerName", provider.getName());
+        result.put("providerType", provider.getProviderType());
         result.put("configured", configured);
         result.put("status", configured ? "success" : "failed");
-
-        log.info("Provider test: {} - {} by user: {}", id, configured ? "SUCCESS" : "FAILED", user.getEmail());
+        if (errorMessage != null) {
+            result.put("error", errorMessage);
+        }
 
         return ResponseEntity.ok(ApiResponse.success(result,
                 configured ? "Provider is configured correctly" : "Provider configuration is invalid"));

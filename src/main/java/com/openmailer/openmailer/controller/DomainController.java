@@ -31,9 +31,18 @@ public class DomainController {
     private static final Logger log = LoggerFactory.getLogger(DomainController.class);
 
     private final DomainService domainService;
+    private final com.openmailer.openmailer.service.domain.DkimKeyGenerationService dkimKeyGenerationService;
+    private final com.openmailer.openmailer.service.security.EncryptionService encryptionService;
+    private final com.openmailer.openmailer.service.domain.DnsVerificationService dnsVerificationService;
 
-    public DomainController(DomainService domainService) {
+    public DomainController(DomainService domainService,
+                           com.openmailer.openmailer.service.domain.DkimKeyGenerationService dkimKeyGenerationService,
+                           com.openmailer.openmailer.service.security.EncryptionService encryptionService,
+                           com.openmailer.openmailer.service.domain.DnsVerificationService dnsVerificationService) {
         this.domainService = domainService;
+        this.dkimKeyGenerationService = dkimKeyGenerationService;
+        this.encryptionService = encryptionService;
+        this.dnsVerificationService = dnsVerificationService;
     }
 
     /**
@@ -104,10 +113,25 @@ public class DomainController {
         domain.setUser(user);
 
         // Generate DKIM keys
-        // TODO: Implement DKIM key generation service
-        // DkimKeyPair keys = dkimUtils.generateDkimKeys();
-        // domain.setDkimPublicKey(keys.getPublicKey());
-        // domain.setDkimPrivateKey(encryptionService.encrypt(keys.getPrivateKey()));
+        try {
+            com.openmailer.openmailer.service.domain.DkimKeyGenerationService.DkimKeyPair keys =
+                    dkimKeyGenerationService.generateDkimKeys();
+
+            // Format and set public key for DNS record
+            String formattedPublicKey = dkimKeyGenerationService.formatPublicKeyForDns(keys.getPublicKey());
+            domain.setDkimPublicKey(formattedPublicKey);
+
+            // Encrypt and store private key
+            String encryptedPrivateKey = encryptionService.encrypt(keys.getPrivateKey());
+            domain.setDkimPrivateKey(encryptedPrivateKey);
+
+            log.info("DKIM keys generated and encrypted for domain: {}", domainName);
+        } catch (Exception e) {
+            log.error("Failed to generate DKIM keys for domain: {}", domainName, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("DKIM_GENERATION_FAILED",
+                            "Failed to generate DKIM keys: " + e.getMessage(), null));
+        }
 
         Domain saved = domainService.createDomain(domain);
 
@@ -182,29 +206,44 @@ public class DomainController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this domain", null));
         }
 
-        // TODO: Implement DNS verification service
-        // DnsVerificationResult result = dnsVerificationService.verify(domain);
-        // domain.setSpfVerified(result.isSpfVerified());
-        // domain.setDkimVerified(result.isDkimVerified());
-        // domain.setDmarcVerified(result.isDmarcVerified());
+        // Perform DNS verification
+        com.openmailer.openmailer.service.domain.DnsVerificationService.DnsVerificationResult verificationResult;
+        try {
+            String dkimSelector = domain.getDkimSelector() != null ? domain.getDkimSelector() : "openmailer";
+            String expectedPublicKey = domain.getDkimPublicKey();
 
-        // For now, simulate verification
-        boolean allVerified = true; // TODO: Replace with actual verification
-        boolean spfVerified = true;
-        boolean dkimVerified = true;
-        boolean dmarcVerified = true;
+            verificationResult = dnsVerificationService.verifyDomain(
+                    domain.getDomainName(),
+                    dkimSelector,
+                    expectedPublicKey
+            );
 
-        String status;
-        if (allVerified) {
-            status = "VERIFIED";
-            log.info("Domain verified: {} by user: {}", domain.getDomainName(), user.getEmail());
-        } else {
-            status = "FAILED";
-            log.warn("Domain verification failed: {} by user: {}", domain.getDomainName(), user.getEmail());
+            boolean spfVerified = verificationResult.isSpfVerified();
+            boolean dkimVerified = verificationResult.isDkimVerified();
+            boolean dmarcVerified = verificationResult.isDmarcVerified();
+            boolean allVerified = verificationResult.isAllVerified();
+
+            String status;
+            if (allVerified) {
+                status = "VERIFIED";
+                log.info("Domain verified: {} by user: {}", domain.getDomainName(), user.getEmail());
+            } else {
+                status = "FAILED";
+                log.warn("Domain verification failed: {} (SPF={}, DKIM={}, DMARC={}) by user: {}",
+                        domain.getDomainName(), spfVerified, dkimVerified, dmarcVerified, user.getEmail());
+            }
+
+            domainService.updateVerificationStatus(id, user.getId(), status,
+                    spfVerified, dkimVerified, dmarcVerified);
+        } catch (Exception e) {
+            log.error("DNS verification failed for domain {}: {}", domain.getDomainName(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("VERIFICATION_FAILED",
+                            "DNS verification failed: " + e.getMessage(), null));
         }
 
-        Domain updated = domainService.updateVerificationStatus(id, user.getId(), status,
-                spfVerified, dkimVerified, dmarcVerified);
+        // Fetch updated domain
+        Domain updated = domainService.findById(id);
 
         Map<String, Object> response = new HashMap<>();
         response.put("domainName", updated.getDomainName());
@@ -214,6 +253,7 @@ public class DomainController {
         response.put("dmarcVerified", updated.getDmarcVerified());
         response.put("verifiedAt", updated.getVerifiedAt());
 
+        boolean allVerified = "VERIFIED".equals(updated.getStatus());
         return ResponseEntity.ok(ApiResponse.success(response,
                 allVerified ? "Domain verified successfully" : "Domain verification failed"));
     }

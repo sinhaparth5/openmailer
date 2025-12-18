@@ -329,11 +329,11 @@ public class ContactListController {
         stats.put("totalContacts", list.getTotalContacts());
         stats.put("activeContacts", list.getActiveContacts());
 
-        // Get counts by status from membership repository
-        stats.put("subscribedCount", 0); // TODO: Implement status-based counting
-        stats.put("unsubscribedCount", 0);
-        stats.put("bouncedCount", 0);
-        stats.put("pendingCount", 0);
+        // Get counts by status from contact repository
+        stats.put("subscribedCount", contactService.countByListAndStatus(id, "SUBSCRIBED"));
+        stats.put("unsubscribedCount", contactService.countByListAndStatus(id, "UNSUBSCRIBED"));
+        stats.put("bouncedCount", contactService.countByListAndStatus(id, "BOUNCED"));
+        stats.put("pendingCount", contactService.countByListAndStatus(id, "PENDING"));
 
         return ResponseEntity.ok(ApiResponse.success(stats));
     }
