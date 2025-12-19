@@ -1,5 +1,6 @@
 package com.openmailer.openmailer.model;
 
+import com.openmailer.openmailer.util.IdGenerator;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,8 +10,8 @@ import java.time.LocalDateTime;
 public class EmailCampaign {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 50)
+    private String id;
 
     @Column(nullable = false)
     private String name;
@@ -37,8 +38,8 @@ public class EmailCampaign {
     @Column(name = "failed_count")
     private Integer failedCount = 0;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, length = 50)
+    private String userId;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
@@ -137,6 +138,9 @@ public class EmailCampaign {
 
     @PrePersist
     protected void onCreate() {
+        if (id == null || id.isEmpty()) {
+            id = IdGenerator.generateId();
+        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -146,11 +150,11 @@ public class EmailCampaign {
         updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -394,11 +398,11 @@ public class EmailCampaign {
         this.maxRetries = maxRetries;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

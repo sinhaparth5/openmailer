@@ -14,7 +14,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for contact list management.
  */
 @Repository
-public interface ContactListRepository extends JpaRepository<ContactList, Long> {
+public interface ContactListRepository extends JpaRepository<ContactList, String> {
 
   /**
    * Find all contact lists for a specific user.
@@ -22,7 +22,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, Long> 
    * @param userId the user ID
    * @return list of contact lists
    */
-  List<ContactList> findByUserId(Long userId);
+  List<ContactList> findByUserId(String userId);
 
   /**
    * Find all contact lists for a specific user with pagination.
@@ -31,7 +31,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, Long> 
    * @param pageable pagination information
    * @return page of contact lists
    */
-  Page<ContactList> findByUserId(Long userId, Pageable pageable);
+  Page<ContactList> findByUserId(String userId, Pageable pageable);
 
   /**
    * Find contact list by ID and user ID.
@@ -40,7 +40,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, Long> 
    * @param userId the user ID
    * @return Optional containing the list if found
    */
-  Optional<ContactList> findByIdAndUserId(Long id, Long userId);
+  Optional<ContactList> findByIdAndUserId(String id, String userId);
 
   /**
    * Find contact list by name and user ID.
@@ -49,7 +49,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, Long> 
    * @param userId the user ID
    * @return Optional containing the list if found
    */
-  Optional<ContactList> findByNameAndUserId(String name, Long userId);
+  Optional<ContactList> findByNameAndUserId(String name, String userId);
 
   /**
    * Search contact lists by name.
@@ -59,7 +59,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, Long> 
    * @param pageable pagination information
    * @return page of matching contact lists
    */
-  Page<ContactList> findByUserIdAndNameContainingIgnoreCase(Long userId, String name, Pageable pageable);
+  Page<ContactList> findByUserIdAndNameContainingIgnoreCase(String userId, String name, Pageable pageable);
 
   /**
    * Count contact lists for a specific user.
@@ -67,12 +67,12 @@ public interface ContactListRepository extends JpaRepository<ContactList, Long> 
    * @param userId the user ID
    * @return count of contact lists
    */
-  long countByUserId(Long userId);
+  long countByUserId(String userId);
 
   /**
    * Delete all contact lists for a specific user.
    *
    * @param userId the user ID
    */
-  void deleteByUserId(Long userId);
+  void deleteByUserId(String userId);
 }

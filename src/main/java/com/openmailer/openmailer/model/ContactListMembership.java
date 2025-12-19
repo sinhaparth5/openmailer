@@ -1,5 +1,6 @@
 package com.openmailer.openmailer.model;
 
+import com.openmailer.openmailer.util.IdGenerator;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -8,8 +9,8 @@ import java.time.LocalDateTime;
 public class ContactListMembership {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 50)
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "contact_id", nullable = false)
@@ -19,11 +20,11 @@ public class ContactListMembership {
     @JoinColumn(name = "list_id", nullable = false)
     private ContactList contactList;
 
-    @Column(name = "contact_id", nullable = false, insertable = false, updatable = false)
-    private Long contactId;
+    @Column(name = "contact_id", nullable = false, insertable = false, updatable = false, length = 50)
+    private String contactId;
 
-    @Column(name = "list_id", nullable = false, insertable = false, updatable = false)
-    private Long listId;
+    @Column(name = "list_id", nullable = false, insertable = false, updatable = false, length = 50)
+    private String listId;
 
     @Column(length = 50)
     private String status = "ACTIVE";
@@ -53,6 +54,9 @@ public class ContactListMembership {
 
     @PrePersist
     protected void onCreate() {
+        if (id == null || id.isEmpty()) {
+            id = IdGenerator.generateId();
+        }
         createdAt = LocalDateTime.now();
         if (subscribedAt == null) {
             subscribedAt = LocalDateTime.now();
@@ -60,11 +64,11 @@ public class ContactListMembership {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -116,19 +120,19 @@ public class ContactListMembership {
         this.createdAt = createdAt;
     }
 
-    public Long getContactId() {
+    public String getContactId() {
         return contactId;
     }
 
-    public void setContactId(Long contactId) {
+    public void setContactId(String contactId) {
         this.contactId = contactId;
     }
 
-    public Long getListId() {
+    public String getListId() {
         return listId;
     }
 
-    public void setListId(Long listId) {
+    public void setListId(String listId) {
         this.listId = listId;
     }
 

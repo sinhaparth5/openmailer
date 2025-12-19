@@ -58,7 +58,7 @@ public class ContactService {
    * Find contact by ID.
    */
   @Transactional(readOnly = true)
-  public Contact findById(Long id) {
+  public Contact findById(String id) {
     return contactRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Contact", "id", id));
   }
@@ -67,7 +67,7 @@ public class ContactService {
    * Find contact by ID and verify user ownership.
    */
   @Transactional(readOnly = true)
-  public Contact findByIdAndUserId(Long id, Long userId) {
+  public Contact findByIdAndUserId(String id, String userId) {
     return contactRepository.findByIdAndUser_Id(id, userId)
         .orElseThrow(() -> new ResourceNotFoundException("Contact", "id", id));
   }
@@ -76,7 +76,7 @@ public class ContactService {
    * Find contact by email.
    */
   @Transactional(readOnly = true)
-  public Contact findByEmail(String email, Long userId) {
+  public Contact findByEmail(String email, String userId) {
     return contactRepository.findByEmailAndUser_Id(email, userId)
         .orElseThrow(() -> new ResourceNotFoundException("Contact", "email", email));
   }
@@ -85,7 +85,7 @@ public class ContactService {
    * Find all contacts for a user.
    */
   @Transactional(readOnly = true)
-  public List<Contact> findByUserId(Long userId) {
+  public List<Contact> findByUserId(String userId) {
     return contactRepository.findByUser_Id(userId);
   }
 
@@ -93,7 +93,7 @@ public class ContactService {
    * Find all contacts for a user with pagination.
    */
   @Transactional(readOnly = true)
-  public Page<Contact> findByUserId(Long userId, Pageable pageable) {
+  public Page<Contact> findByUserId(String userId, Pageable pageable) {
     return contactRepository.findByUser_Id(userId, pageable);
   }
 
@@ -101,7 +101,7 @@ public class ContactService {
    * Find contacts by status.
    */
   @Transactional(readOnly = true)
-  public Page<Contact> findByStatus(Long userId, String status, Pageable pageable) {
+  public Page<Contact> findByStatus(String userId, String status, Pageable pageable) {
     return contactRepository.findByUser_IdAndStatus(userId, status, pageable);
   }
 
@@ -109,7 +109,7 @@ public class ContactService {
    * Search contacts by email, first name, or last name.
    */
   @Transactional(readOnly = true)
-  public Page<Contact> searchContacts(Long userId, String searchTerm, Pageable pageable) {
+  public Page<Contact> searchContacts(String userId, String searchTerm, Pageable pageable) {
     return contactRepository.searchContacts(userId, searchTerm, pageable);
   }
 
@@ -117,14 +117,14 @@ public class ContactService {
    * Find contacts by tag.
    */
   @Transactional(readOnly = true)
-  public Page<Contact> findByTag(Long userId, String tag, Pageable pageable) {
+  public Page<Contact> findByTag(String userId, String tag, Pageable pageable) {
     return contactRepository.findByTag(userId, tag, pageable);
   }
 
   /**
    * Update an existing contact.
    */
-  public Contact updateContact(Long id, Long userId, Contact updatedContact) {
+  public Contact updateContact(String id, String userId, Contact updatedContact) {
 
     Contact contact = findByIdAndUserId(id, userId);
 
@@ -151,7 +151,7 @@ public class ContactService {
   /**
    * Subscribe a contact.
    */
-  public Contact subscribe(Long id, Long userId) {
+  public Contact subscribe(String id, String userId) {
     Contact contact = findByIdAndUserId(id, userId);
     contact.setStatus("SUBSCRIBED");
     contact.setSubscribedAt(LocalDateTime.now());
@@ -162,7 +162,7 @@ public class ContactService {
   /**
    * Unsubscribe a contact.
    */
-  public Contact unsubscribe(Long id, Long userId, String reason) {
+  public Contact unsubscribe(String id, String userId, String reason) {
     Contact contact = findByIdAndUserId(id, userId);
     contact.setStatus("UNSUBSCRIBED");
     contact.setUnsubscribedAt(LocalDateTime.now());
@@ -174,7 +174,7 @@ public class ContactService {
   /**
    * Mark contact as bounced.
    */
-  public Contact markAsBounced(Long id, Long userId) {
+  public Contact markAsBounced(String id, String userId) {
     Contact contact = findByIdAndUserId(id, userId);
     contact.setStatus("BOUNCED");
     contact.setBounceCount(contact.getBounceCount() + 1);
@@ -186,7 +186,7 @@ public class ContactService {
   /**
    * Delete a contact.
    */
-  public void deleteContact(Long id, Long userId) {
+  public void deleteContact(String id, String userId) {
     Contact contact = findByIdAndUserId(id, userId);
     contactRepository.delete(contact);
   }
@@ -194,7 +194,7 @@ public class ContactService {
   /**
    * Delete all contacts for a user (GDPR compliance).
    */
-  public void deleteAllByUserId(Long userId) {
+  public void deleteAllByUserId(String userId) {
     contactRepository.deleteByUser_Id(userId);
   }
 
@@ -202,7 +202,7 @@ public class ContactService {
    * Count contacts for a user.
    */
   @Transactional(readOnly = true)
-  public long countByUserId(Long userId) {
+  public long countByUserId(String userId) {
     return contactRepository.countByUser_Id(userId);
   }
 
@@ -210,7 +210,7 @@ public class ContactService {
    * Count contacts by status.
    */
   @Transactional(readOnly = true)
-  public long countByStatus(Long userId, String status) {
+  public long countByStatus(String userId, String status) {
     return contactRepository.countByUser_IdAndStatus(userId, status);
   }
 
@@ -218,7 +218,7 @@ public class ContactService {
    * Check if email exists for a user.
    */
   @Transactional(readOnly = true)
-  public boolean emailExists(String email, Long userId) {
+  public boolean emailExists(String email, String userId) {
     return contactRepository.existsByEmailAndUser_Id(email, userId);
   }
 
@@ -226,7 +226,7 @@ public class ContactService {
    * Count contacts in a list by status.
    */
   @Transactional(readOnly = true)
-  public long countByListAndStatus(Long listId, String status) {
+  public long countByListAndStatus(String listId, String status) {
     return contactRepository.countByListAndStatus(listId, status);
   }
 }

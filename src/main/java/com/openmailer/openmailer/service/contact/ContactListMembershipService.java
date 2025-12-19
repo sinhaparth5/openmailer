@@ -57,7 +57,7 @@ public class ContactListMembershipService {
    * @param listId the list ID
    * @return list of created memberships
    */
-  public List<ContactListMembership> addContactsToList(List<Long> contactIds, Long listId) {
+  public List<ContactListMembership> addContactsToList(List<String> contactIds, String listId) {
     return contactIds.stream()
         .filter(contactId -> !membershipRepository.existsByContactIdAndListId(contactId, listId))
         .map(contactId -> {
@@ -80,7 +80,7 @@ public class ContactListMembershipService {
    * @throws ResourceNotFoundException if membership not found
    */
   @Transactional(readOnly = true)
-  public ContactListMembership findByContactAndList(Long contactId, Long listId) {
+  public ContactListMembership findByContactAndList(String contactId, String listId) {
     return membershipRepository.findByContactIdAndListId(contactId, listId)
         .orElseThrow(() -> new ResourceNotFoundException("ContactListMembership not found"));
   }
@@ -92,7 +92,7 @@ public class ContactListMembershipService {
    * @return list of memberships
    */
   @Transactional(readOnly = true)
-  public List<ContactListMembership> findByContact(Long contactId) {
+  public List<ContactListMembership> findByContact(String contactId) {
     return membershipRepository.findByContactId(contactId);
   }
 
@@ -103,7 +103,7 @@ public class ContactListMembershipService {
    * @return list of memberships
    */
   @Transactional(readOnly = true)
-  public List<ContactListMembership> findByList(Long listId) {
+  public List<ContactListMembership> findByList(String listId) {
     return membershipRepository.findByListId(listId);
   }
 
@@ -115,7 +115,7 @@ public class ContactListMembershipService {
    * @return page of memberships
    */
   @Transactional(readOnly = true)
-  public Page<ContactListMembership> findByList(Long listId, Pageable pageable) {
+  public Page<ContactListMembership> findByList(String listId, Pageable pageable) {
     return membershipRepository.findByListId(listId, pageable);
   }
 
@@ -128,7 +128,7 @@ public class ContactListMembershipService {
    * @return page of memberships
    */
   @Transactional(readOnly = true)
-  public Page<ContactListMembership> findByStatus(Long listId, String status, Pageable pageable) {
+  public Page<ContactListMembership> findByStatus(String listId, String status, Pageable pageable) {
     return membershipRepository.findByListIdAndStatus(listId, status, pageable);
   }
 
@@ -139,7 +139,7 @@ public class ContactListMembershipService {
    * @return list of contact IDs
    */
   @Transactional(readOnly = true)
-  public List<Long> getContactIdsByList(Long listId) {
+  public List<String> getContactIdsByList(String listId) {
     return membershipRepository.findContactIdsByListId(listId);
   }
 
@@ -150,7 +150,7 @@ public class ContactListMembershipService {
    * @return list of contact IDs
    */
   @Transactional(readOnly = true)
-  public List<Long> getActiveContactIdsByList(Long listId) {
+  public List<String> getActiveContactIdsByList(String listId) {
     return membershipRepository.findContactIdsByListIdAndStatus(listId, "ACTIVE");
   }
 
@@ -162,7 +162,7 @@ public class ContactListMembershipService {
    * @param status the new status
    * @return the updated membership
    */
-  public ContactListMembership updateStatus(Long contactId, Long listId, String status) {
+  public ContactListMembership updateStatus(String contactId, String listId, String status) {
     ContactListMembership membership = findByContactAndList(contactId, listId);
     membership.setStatus(status);
     return membershipRepository.save(membership);
@@ -174,7 +174,7 @@ public class ContactListMembershipService {
    * @param contactId the contact ID
    * @param listId the list ID
    */
-  public void removeContactFromList(Long contactId, Long listId) {
+  public void removeContactFromList(String contactId, String listId) {
     membershipRepository.deleteByContactIdAndListId(contactId, listId);
   }
 
@@ -184,7 +184,7 @@ public class ContactListMembershipService {
    * @param contactIds list of contact IDs
    * @param listId the list ID
    */
-  public void removeContactsFromList(List<Long> contactIds, Long listId) {
+  public void removeContactsFromList(List<String> contactIds, String listId) {
     contactIds.forEach(contactId ->
         membershipRepository.deleteByContactIdAndListId(contactId, listId)
     );
@@ -195,7 +195,7 @@ public class ContactListMembershipService {
    *
    * @param listId the list ID
    */
-  public void removeAllContactsFromList(Long listId) {
+  public void removeAllContactsFromList(String listId) {
     membershipRepository.deleteByListId(listId);
   }
 
@@ -206,7 +206,7 @@ public class ContactListMembershipService {
    * @return count of memberships
    */
   @Transactional(readOnly = true)
-  public long countByList(Long listId) {
+  public long countByList(String listId) {
     return membershipRepository.countByListId(listId);
   }
 
@@ -217,7 +217,7 @@ public class ContactListMembershipService {
    * @return count of active memberships
    */
   @Transactional(readOnly = true)
-  public long countActiveByList(Long listId) {
+  public long countActiveByList(String listId) {
     return membershipRepository.countByListIdAndStatus(listId, "ACTIVE");
   }
 
@@ -229,7 +229,7 @@ public class ContactListMembershipService {
    * @return true if contact is in list, false otherwise
    */
   @Transactional(readOnly = true)
-  public boolean isContactInList(Long contactId, Long listId) {
+  public boolean isContactInList(String contactId, String listId) {
     return membershipRepository.existsByContactIdAndListId(contactId, listId);
   }
 }

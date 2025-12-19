@@ -17,7 +17,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for webhook event management.
  */
 @Repository
-public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long> {
+public interface WebhookEventRepository extends JpaRepository<WebhookEvent, String> {
 
   /**
    * Find all webhook events for a user.
@@ -26,7 +26,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return list of webhook events
    */
   @Query("SELECT w FROM WebhookEvent w WHERE w.user.id = :userId")
-  List<WebhookEvent> findByUserId(@Param("userId") Long userId);
+  List<WebhookEvent> findByUserId(@Param("userId") String userId);
 
   /**
    * Find all webhook events for a user with pagination.
@@ -36,7 +36,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return page of webhook events
    */
   @Query("SELECT w FROM WebhookEvent w WHERE w.user.id = :userId")
-  Page<WebhookEvent> findByUserId(@Param("userId") Long userId, Pageable pageable);
+  Page<WebhookEvent> findByUserId(@Param("userId") String userId, Pageable pageable);
 
   /**
    * Find webhook event by provider event ID.
@@ -55,7 +55,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return page of webhook events
    */
   @Query("SELECT w FROM WebhookEvent w WHERE w.user.id = :userId AND w.eventType = :eventType")
-  Page<WebhookEvent> findByEventType(@Param("userId") Long userId, @Param("eventType") String eventType, Pageable pageable);
+  Page<WebhookEvent> findByEventType(@Param("userId") String userId, @Param("eventType") String eventType, Pageable pageable);
 
   /**
    * Find webhook events by provider.
@@ -65,7 +65,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return page of webhook events
    */
   @Query("SELECT w FROM WebhookEvent w WHERE w.provider.id = :providerId")
-  Page<WebhookEvent> findByProviderId(@Param("providerId") Long providerId, Pageable pageable);
+  Page<WebhookEvent> findByProviderId(@Param("providerId") String providerId, Pageable pageable);
 
   /**
    * Find unprocessed webhook events.
@@ -75,7 +75,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return page of unprocessed webhook events
    */
   @Query("SELECT w FROM WebhookEvent w WHERE w.user.id = :userId AND w.processed = false")
-  Page<WebhookEvent> findUnprocessed(@Param("userId") Long userId, Pageable pageable);
+  Page<WebhookEvent> findUnprocessed(@Param("userId") String userId, Pageable pageable);
 
   /**
    * Find unprocessed webhook events (all users).
@@ -93,7 +93,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return page of processed webhook events
    */
   @Query("SELECT w FROM WebhookEvent w WHERE w.user.id = :userId AND w.processed = true")
-  Page<WebhookEvent> findProcessed(@Param("userId") Long userId, Pageable pageable);
+  Page<WebhookEvent> findProcessed(@Param("userId") String userId, Pageable pageable);
 
   /**
    * Find failed webhook events (processed with errors).
@@ -103,7 +103,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return page of failed webhook events
    */
   @Query("SELECT w FROM WebhookEvent w WHERE w.user.id = :userId AND w.processed = true AND w.errorMessage IS NOT NULL")
-  Page<WebhookEvent> findFailed(@Param("userId") Long userId, Pageable pageable);
+  Page<WebhookEvent> findFailed(@Param("userId") String userId, Pageable pageable);
 
   /**
    * Find webhook events within a date range.
@@ -115,7 +115,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return page of webhook events
    */
   @Query("SELECT w FROM WebhookEvent w WHERE w.user.id = :userId AND w.createdAt BETWEEN :startDate AND :endDate")
-  Page<WebhookEvent> findByDateRange(@Param("userId") Long userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
+  Page<WebhookEvent> findByDateRange(@Param("userId") String userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
   /**
    * Count webhook events for a user.
@@ -124,7 +124,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return count of webhook events
    */
   @Query("SELECT COUNT(w) FROM WebhookEvent w WHERE w.user.id = :userId")
-  long countByUserId(@Param("userId") Long userId);
+  long countByUserId(@Param("userId") String userId);
 
   /**
    * Count unprocessed webhook events for a user.
@@ -133,7 +133,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return count of unprocessed webhook events
    */
   @Query("SELECT COUNT(w) FROM WebhookEvent w WHERE w.user.id = :userId AND w.processed = false")
-  long countUnprocessed(@Param("userId") Long userId);
+  long countUnprocessed(@Param("userId") String userId);
 
   /**
    * Count webhook events by event type.
@@ -143,7 +143,7 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @return count of webhook events
    */
   @Query("SELECT COUNT(w) FROM WebhookEvent w WHERE w.user.id = :userId AND w.eventType = :eventType")
-  long countByEventType(@Param("userId") Long userId, @Param("eventType") String eventType);
+  long countByEventType(@Param("userId") String userId, @Param("eventType") String eventType);
 
   /**
    * Check if provider event ID exists.
@@ -167,5 +167,5 @@ public interface WebhookEventRepository extends JpaRepository<WebhookEvent, Long
    * @param userId the user ID
    */
   @Query("DELETE FROM WebhookEvent w WHERE w.user.id = :userId")
-  void deleteByUserId(@Param("userId") Long userId);
+  void deleteByUserId(@Param("userId") String userId);
 }

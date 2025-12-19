@@ -11,7 +11,7 @@ import java.util.Map;
  * Response DTO for contact data
  */
 public class ContactResponse {
-    private Long id;
+    private String id;
     private String email;
     private String firstName;
     private String lastName;
@@ -25,7 +25,7 @@ public class ContactResponse {
     public ContactResponse() {
     }
 
-    public ContactResponse(Long id, String email, String firstName, String lastName, String status,
+    public ContactResponse(String id, String email, String firstName, String lastName, String status,
                            Map<String, Object> customFields, List<String> tags, Boolean gdprConsent,
                            LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -55,11 +55,11 @@ public class ContactResponse {
         return response;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

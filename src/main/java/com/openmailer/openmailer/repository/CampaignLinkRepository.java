@@ -16,7 +16,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for campaign link tracking.
  */
 @Repository
-public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long> {
+public interface CampaignLinkRepository extends JpaRepository<CampaignLink, String> {
 
   /**
    * Find all links for a campaign.
@@ -25,7 +25,7 @@ public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long
    * @return list of links
    */
   @Query("SELECT l FROM CampaignLink l WHERE l.campaign.id = :campaignId")
-  List<CampaignLink> findByCampaignId(@Param("campaignId") Long campaignId);
+  List<CampaignLink> findByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Find all links for a campaign with pagination.
@@ -35,7 +35,7 @@ public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long
    * @return page of links
    */
   @Query("SELECT l FROM CampaignLink l WHERE l.campaign.id = :campaignId")
-  Page<CampaignLink> findByCampaignId(@Param("campaignId") Long campaignId, Pageable pageable);
+  Page<CampaignLink> findByCampaignId(@Param("campaignId") String campaignId, Pageable pageable);
 
   /**
    * Find link by short code.
@@ -53,7 +53,7 @@ public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long
    * @return Optional containing the link if found
    */
   @Query("SELECT l FROM CampaignLink l WHERE l.campaign.id = :campaignId AND l.originalUrl = :originalUrl")
-  Optional<CampaignLink> findByCampaignIdAndOriginalUrl(@Param("campaignId") Long campaignId, @Param("originalUrl") String originalUrl);
+  Optional<CampaignLink> findByCampaignIdAndOriginalUrl(@Param("campaignId") String campaignId, @Param("originalUrl") String originalUrl);
 
   /**
    * Find most clicked links for a campaign.
@@ -63,7 +63,7 @@ public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long
    * @return page of links ordered by click count
    */
   @Query("SELECT l FROM CampaignLink l WHERE l.campaign.id = :campaignId ORDER BY l.clickCount DESC")
-  Page<CampaignLink> findTopClickedByCampaignId(@Param("campaignId") Long campaignId, Pageable pageable);
+  Page<CampaignLink> findTopClickedByCampaignId(@Param("campaignId") String campaignId, Pageable pageable);
 
   /**
    * Count links for a campaign.
@@ -72,7 +72,7 @@ public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long
    * @return count of links
    */
   @Query("SELECT COUNT(l) FROM CampaignLink l WHERE l.campaign.id = :campaignId")
-  long countByCampaignId(@Param("campaignId") Long campaignId);
+  long countByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Get total clicks for a campaign.
@@ -81,7 +81,7 @@ public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long
    * @return total click count
    */
   @Query("SELECT SUM(l.clickCount) FROM CampaignLink l WHERE l.campaign.id = :campaignId")
-  Long getTotalClicksByCampaignId(@Param("campaignId") Long campaignId);
+  Long getTotalClicksByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Get total unique clicks for a campaign.
@@ -90,7 +90,7 @@ public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long
    * @return total unique click count
    */
   @Query("SELECT SUM(l.uniqueClickCount) FROM CampaignLink l WHERE l.campaign.id = :campaignId")
-  Long getTotalUniqueClicksByCampaignId(@Param("campaignId") Long campaignId);
+  Long getTotalUniqueClicksByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Check if short code exists.
@@ -106,5 +106,5 @@ public interface CampaignLinkRepository extends JpaRepository<CampaignLink, Long
    * @param campaignId the campaign ID
    */
   @Query("DELETE FROM CampaignLink l WHERE l.campaign.id = :campaignId")
-  void deleteByCampaignId(@Param("campaignId") Long campaignId);
+  void deleteByCampaignId(@Param("campaignId") String campaignId);
 }

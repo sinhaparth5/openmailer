@@ -16,7 +16,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for campaign recipient tracking.
  */
 @Repository
-public interface CampaignRecipientRepository extends JpaRepository<CampaignRecipient, Long> {
+public interface CampaignRecipientRepository extends JpaRepository<CampaignRecipient, String> {
 
   /**
    * Find all recipients for a campaign.
@@ -25,7 +25,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return list of recipients
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.campaign.id = :campaignId")
-  List<CampaignRecipient> findByCampaignId(@Param("campaignId") Long campaignId);
+  List<CampaignRecipient> findByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Find all recipients for a campaign with pagination.
@@ -35,7 +35,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return page of recipients
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.campaign.id = :campaignId")
-  Page<CampaignRecipient> findByCampaignId(@Param("campaignId") Long campaignId, Pageable pageable);
+  Page<CampaignRecipient> findByCampaignId(@Param("campaignId") String campaignId, Pageable pageable);
 
   /**
    * Find recipients by campaign and status.
@@ -46,7 +46,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return page of recipients
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.status = :status")
-  Page<CampaignRecipient> findByCampaignIdAndStatus(@Param("campaignId") Long campaignId, @Param("status") String status, Pageable pageable);
+  Page<CampaignRecipient> findByCampaignIdAndStatus(@Param("campaignId") String campaignId, @Param("status") String status, Pageable pageable);
 
   /**
    * Find all recipients for a contact.
@@ -55,7 +55,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return list of recipients
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.contact.id = :contactId")
-  List<CampaignRecipient> findByContactId(@Param("contactId") Long contactId);
+  List<CampaignRecipient> findByContactId(@Param("contactId") String contactId);
 
   /**
    * Find recipient by campaign and contact.
@@ -65,7 +65,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return Optional containing the recipient if found
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.contact.id = :contactId")
-  Optional<CampaignRecipient> findByCampaignIdAndContactId(@Param("campaignId") Long campaignId, @Param("contactId") Long contactId);
+  Optional<CampaignRecipient> findByCampaignIdAndContactId(@Param("campaignId") String campaignId, @Param("contactId") String contactId);
 
   /**
    * Find recipient by tracking ID.
@@ -83,7 +83,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return page of recipients who opened
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.openedAt IS NOT NULL")
-  Page<CampaignRecipient> findOpenedByCampaignId(@Param("campaignId") Long campaignId, Pageable pageable);
+  Page<CampaignRecipient> findOpenedByCampaignId(@Param("campaignId") String campaignId, Pageable pageable);
 
   /**
    * Find recipients that clicked links.
@@ -93,7 +93,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return page of recipients who clicked
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.clickedAt IS NOT NULL")
-  Page<CampaignRecipient> findClickedByCampaignId(@Param("campaignId") Long campaignId, Pageable pageable);
+  Page<CampaignRecipient> findClickedByCampaignId(@Param("campaignId") String campaignId, Pageable pageable);
 
   /**
    * Find recipients that bounced.
@@ -103,7 +103,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return page of recipients who bounced
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.bouncedAt IS NOT NULL")
-  Page<CampaignRecipient> findBouncedByCampaignId(@Param("campaignId") Long campaignId, Pageable pageable);
+  Page<CampaignRecipient> findBouncedByCampaignId(@Param("campaignId") String campaignId, Pageable pageable);
 
   /**
    * Count recipients by campaign.
@@ -112,7 +112,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return count of recipients
    */
   @Query("SELECT COUNT(r) FROM CampaignRecipient r WHERE r.campaign.id = :campaignId")
-  long countByCampaignId(@Param("campaignId") Long campaignId);
+  long countByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Count recipients by campaign and status.
@@ -122,7 +122,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return count of recipients
    */
   @Query("SELECT COUNT(r) FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.status = :status")
-  long countByCampaignIdAndStatus(@Param("campaignId") Long campaignId, @Param("status") String status);
+  long countByCampaignIdAndStatus(@Param("campaignId") String campaignId, @Param("status") String status);
 
   /**
    * Count opened emails for a campaign.
@@ -131,7 +131,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return count of opened emails
    */
   @Query("SELECT COUNT(r) FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.openedAt IS NOT NULL")
-  long countOpenedByCampaignId(@Param("campaignId") Long campaignId);
+  long countOpenedByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Count clicked emails for a campaign.
@@ -140,7 +140,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return count of clicked emails
    */
   @Query("SELECT COUNT(r) FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.clickedAt IS NOT NULL")
-  long countClickedByCampaignId(@Param("campaignId") Long campaignId);
+  long countClickedByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Count bounced emails for a campaign.
@@ -149,7 +149,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return count of bounced emails
    */
   @Query("SELECT COUNT(r) FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.bouncedAt IS NOT NULL")
-  long countBouncedByCampaignId(@Param("campaignId") Long campaignId);
+  long countBouncedByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Find pending recipients for a campaign (for retry logic).
@@ -159,7 +159,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return list of pending recipients
    */
   @Query("SELECT r FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.status = 'PENDING' AND r.retryCount < :maxRetries")
-  List<CampaignRecipient> findPendingRecipients(@Param("campaignId") Long campaignId, @Param("maxRetries") Integer maxRetries);
+  List<CampaignRecipient> findPendingRecipients(@Param("campaignId") String campaignId, @Param("maxRetries") Integer maxRetries);
 
   /**
    * Delete all recipients for a campaign.
@@ -167,7 +167,7 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @param campaignId the campaign ID
    */
   @Query("DELETE FROM CampaignRecipient r WHERE r.campaign.id = :campaignId")
-  void deleteByCampaignId(@Param("campaignId") Long campaignId);
+  void deleteByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Check if recipient exists for campaign and contact.
@@ -177,5 +177,5 @@ public interface CampaignRecipientRepository extends JpaRepository<CampaignRecip
    * @return true if exists, false otherwise
    */
   @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM CampaignRecipient r WHERE r.campaign.id = :campaignId AND r.contact.id = :contactId")
-  boolean existsByCampaignIdAndContactId(@Param("campaignId") Long campaignId, @Param("contactId") Long contactId);
+  boolean existsByCampaignIdAndContactId(@Param("campaignId") String campaignId, @Param("contactId") String contactId);
 }

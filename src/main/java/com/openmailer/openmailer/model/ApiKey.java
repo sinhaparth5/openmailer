@@ -1,5 +1,6 @@
 package com.openmailer.openmailer.model;
 
+import com.openmailer.openmailer.util.IdGenerator;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -7,8 +8,8 @@ import java.time.LocalDateTime;
 @Table(name = "api_keys")
 public class ApiKey {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 50)
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -52,15 +53,18 @@ public class ApiKey {
 
     @PrePersist
     protected void onCreate() {
+        if (id == null || id.isEmpty()) {
+            id = IdGenerator.generateId();
+        }
         createdAt = LocalDateTime.now();
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -54,12 +54,12 @@ public class WebhookEventService {
   /**
    * Find webhook event by ID.
    *
-   * @param id the webhook event ID
+   * @param id the ID (String)
    * @return the webhook event
    * @throws ResourceNotFoundException if webhook event not found
    */
   @Transactional(readOnly = true)
-  public WebhookEvent findById(Long id) {
+  public WebhookEvent findById(String id) {
     return webhookEventRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("WebhookEvent", "id", id));
   }
@@ -67,7 +67,7 @@ public class WebhookEventService {
   /**
    * Find webhook event by provider event ID.
    *
-   * @param providerEventId the provider event ID
+   * @param providerEventId the ID (String)
    * @return the webhook event
    * @throws ResourceNotFoundException if webhook event not found
    */
@@ -80,60 +80,60 @@ public class WebhookEventService {
   /**
    * Find all webhook events for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return list of webhook events
    */
   @Transactional(readOnly = true)
-  public List<WebhookEvent> findByUser(Long userId) {
+  public List<WebhookEvent> findByUser(String userId) {
     return webhookEventRepository.findByUserId(userId);
   }
 
   /**
    * Find all webhook events for a user with pagination.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of webhook events
    */
   @Transactional(readOnly = true)
-  public Page<WebhookEvent> findByUser(Long userId, Pageable pageable) {
+  public Page<WebhookEvent> findByUser(String userId, Pageable pageable) {
     return webhookEventRepository.findByUserId(userId, pageable);
   }
 
   /**
    * Find webhook events by event type.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param eventType the event type
    * @param pageable pagination information
    * @return page of webhook events
    */
   @Transactional(readOnly = true)
-  public Page<WebhookEvent> findByEventType(Long userId, String eventType, Pageable pageable) {
+  public Page<WebhookEvent> findByEventType(String userId, String eventType, Pageable pageable) {
     return webhookEventRepository.findByEventType(userId, eventType, pageable);
   }
 
   /**
    * Find webhook events by provider.
    *
-   * @param providerId the provider ID
+   * @param providerId the ID (String)
    * @param pageable pagination information
    * @return page of webhook events
    */
   @Transactional(readOnly = true)
-  public Page<WebhookEvent> findByProvider(Long providerId, Pageable pageable) {
+  public Page<WebhookEvent> findByProvider(String providerId, Pageable pageable) {
     return webhookEventRepository.findByProviderId(providerId, pageable);
   }
 
   /**
    * Find unprocessed webhook events for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of unprocessed webhook events
    */
   @Transactional(readOnly = true)
-  public Page<WebhookEvent> findUnprocessed(Long userId, Pageable pageable) {
+  public Page<WebhookEvent> findUnprocessed(String userId, Pageable pageable) {
     return webhookEventRepository.findUnprocessed(userId, pageable);
   }
 
@@ -150,48 +150,48 @@ public class WebhookEventService {
   /**
    * Find processed webhook events for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of processed webhook events
    */
   @Transactional(readOnly = true)
-  public Page<WebhookEvent> findProcessed(Long userId, Pageable pageable) {
+  public Page<WebhookEvent> findProcessed(String userId, Pageable pageable) {
     return webhookEventRepository.findProcessed(userId, pageable);
   }
 
   /**
    * Find failed webhook events for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of failed webhook events
    */
   @Transactional(readOnly = true)
-  public Page<WebhookEvent> findFailed(Long userId, Pageable pageable) {
+  public Page<WebhookEvent> findFailed(String userId, Pageable pageable) {
     return webhookEventRepository.findFailed(userId, pageable);
   }
 
   /**
    * Find webhook events within a date range.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param startDate start date
    * @param endDate end date
    * @param pageable pagination information
    * @return page of webhook events
    */
   @Transactional(readOnly = true)
-  public Page<WebhookEvent> findByDateRange(Long userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+  public Page<WebhookEvent> findByDateRange(String userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
     return webhookEventRepository.findByDateRange(userId, startDate, endDate, pageable);
   }
 
   /**
    * Mark webhook event as processed.
    *
-   * @param id the webhook event ID
+   * @param id the ID (String)
    * @return the updated webhook event
    */
-  public WebhookEvent markAsProcessed(Long id) {
+  public WebhookEvent markAsProcessed(String id) {
     WebhookEvent event = findById(id);
     event.setProcessed(true);
     event.setProcessedAt(LocalDateTime.now());
@@ -201,11 +201,11 @@ public class WebhookEventService {
   /**
    * Mark webhook event as failed.
    *
-   * @param id the webhook event ID
+   * @param id the ID (String)
    * @param errorMessage the error message
    * @return the updated webhook event
    */
-  public WebhookEvent markAsFailed(Long id, String errorMessage) {
+  public WebhookEvent markAsFailed(String id, String errorMessage) {
     WebhookEvent event = findById(id);
     event.setProcessed(true);
     event.setProcessedAt(LocalDateTime.now());
@@ -216,11 +216,11 @@ public class WebhookEventService {
   /**
    * Update webhook event payload.
    *
-   * @param id the webhook event ID
+   * @param id the ID (String)
    * @param payload the new payload
    * @return the updated webhook event
    */
-  public WebhookEvent updatePayload(Long id, Map<String, Object> payload) {
+  public WebhookEvent updatePayload(String id, Map<String, Object> payload) {
     WebhookEvent event = findById(id);
     event.setPayload(payload);
     return webhookEventRepository.save(event);
@@ -229,34 +229,34 @@ public class WebhookEventService {
   /**
    * Count webhook events for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of webhook events
    */
   @Transactional(readOnly = true)
-  public long countByUser(Long userId) {
+  public long countByUser(String userId) {
     return webhookEventRepository.countByUserId(userId);
   }
 
   /**
    * Count unprocessed webhook events for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of unprocessed webhook events
    */
   @Transactional(readOnly = true)
-  public long countUnprocessed(Long userId) {
+  public long countUnprocessed(String userId) {
     return webhookEventRepository.countUnprocessed(userId);
   }
 
   /**
    * Count webhook events by event type.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param eventType the event type
    * @return count of webhook events
    */
   @Transactional(readOnly = true)
-  public long countByEventType(Long userId, String eventType) {
+  public long countByEventType(String userId, String eventType) {
     return webhookEventRepository.countByEventType(userId, eventType);
   }
 
@@ -274,9 +274,9 @@ public class WebhookEventService {
   /**
    * Delete all webhook events for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    */
-  public void deleteAllByUser(Long userId) {
+  public void deleteAllByUser(String userId) {
     webhookEventRepository.deleteByUserId(userId);
   }
 }

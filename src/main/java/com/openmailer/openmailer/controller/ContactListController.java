@@ -76,7 +76,7 @@ public class ContactListController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ContactListResponse>> getContactList(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         ContactList list = listService.findById(id);
 
@@ -119,7 +119,7 @@ public class ContactListController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ContactListResponse>> updateContactList(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody ContactListRequest request) {
 
         ContactList list = listService.findById(id);
@@ -147,7 +147,7 @@ public class ContactListController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteContactList(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         ContactList list = listService.findById(id);
 
@@ -170,7 +170,7 @@ public class ContactListController {
     @GetMapping("/{id}/contacts")
     public ResponseEntity<PaginatedResponse<ContactResponse>> getListContacts(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
 
@@ -202,8 +202,8 @@ public class ContactListController {
     @PostMapping("/{id}/contacts")
     public ResponseEntity<ApiResponse<Map<String, Object>>> addContactsToList(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
-            @RequestBody Map<String, List<Long>> request) {
+            @PathVariable String id,
+            @RequestBody Map<String, List<String>> request) {
 
         ContactList list = listService.findById(id);
 
@@ -213,7 +213,7 @@ public class ContactListController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", null));
         }
 
-        List<Long> contactIds = request.get("contactIds");
+        List<String> contactIds = request.get("contactIds");
         if (contactIds == null || contactIds.isEmpty()) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("INVALID_REQUEST", "contactIds is required", "contactIds"));
@@ -223,7 +223,7 @@ public class ContactListController {
         int skipped = 0;
         List<String> errors = new java.util.ArrayList<>();
 
-        for (Long contactId : contactIds) {
+        for (String contactId : contactIds) {
             try {
                 Contact contact = contactService.findById(contactId);
 
@@ -276,8 +276,8 @@ public class ContactListController {
     @DeleteMapping("/{id}/contacts/{contactId}")
     public ResponseEntity<ApiResponse<Void>> removeContactFromList(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
-            @PathVariable Long contactId) {
+            @PathVariable String id,
+            @PathVariable String contactId) {
 
         ContactList list = listService.findById(id);
 
@@ -313,7 +313,7 @@ public class ContactListController {
     @GetMapping("/{id}/stats")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getListStats(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         ContactList list = listService.findById(id);
 

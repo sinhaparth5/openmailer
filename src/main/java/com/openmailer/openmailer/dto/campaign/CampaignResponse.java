@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * Response DTO for campaign data
  */
 public class CampaignResponse {
-    private Long id;
+    private String id;
     private String name;
     private String status;
     private String subjectLine;
@@ -26,7 +26,7 @@ public class CampaignResponse {
     public CampaignResponse() {
     }
 
-    public CampaignResponse(Long id, String name, String status, String subjectLine, String previewText,
+    public CampaignResponse(String id, String name, String status, String subjectLine, String previewText,
                             Integer totalRecipients, Integer sentCount, Integer deliveredCount, Integer failedCount,
                             Integer openedCount, Integer clickedCount, LocalDateTime scheduledAt,
                             LocalDateTime sentAt, LocalDateTime createdAt) {
@@ -62,11 +62,11 @@ public class CampaignResponse {
         return response;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -17,7 +17,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for email logging and auditing.
  */
 @Repository
-public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
+public interface EmailLogRepository extends JpaRepository<EmailLog, String> {
 
   /**
    * Find all logs for a user.
@@ -26,7 +26,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return list of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.user.id = :userId")
-  List<EmailLog> findByUserId(@Param("userId") Long userId);
+  List<EmailLog> findByUserId(@Param("userId") String userId);
 
   /**
    * Find all logs for a user with pagination.
@@ -36,7 +36,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return page of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.user.id = :userId")
-  Page<EmailLog> findByUserId(@Param("userId") Long userId, Pageable pageable);
+  Page<EmailLog> findByUserId(@Param("userId") String userId, Pageable pageable);
 
   /**
    * Find all logs for a campaign.
@@ -45,7 +45,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return list of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.campaign.id = :campaignId")
-  List<EmailLog> findByCampaignId(@Param("campaignId") Long campaignId);
+  List<EmailLog> findByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Find all logs for a campaign with pagination.
@@ -55,7 +55,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return page of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.campaign.id = :campaignId")
-  Page<EmailLog> findByCampaignId(@Param("campaignId") Long campaignId, Pageable pageable);
+  Page<EmailLog> findByCampaignId(@Param("campaignId") String campaignId, Pageable pageable);
 
   /**
    * Find all logs for a recipient.
@@ -64,7 +64,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return list of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.recipient.id = :recipientId")
-  List<EmailLog> findByRecipientId(@Param("recipientId") Long recipientId);
+  List<EmailLog> findByRecipientId(@Param("recipientId") String recipientId);
 
   /**
    * Find log by provider message ID.
@@ -83,7 +83,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return page of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.user.id = :userId AND l.status = :status")
-  Page<EmailLog> findByUserIdAndStatus(@Param("userId") Long userId, @Param("status") String status, Pageable pageable);
+  Page<EmailLog> findByUserIdAndStatus(@Param("userId") String userId, @Param("status") String status, Pageable pageable);
 
   /**
    * Find logs by campaign and status.
@@ -94,7 +94,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return page of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.campaign.id = :campaignId AND l.status = :status")
-  Page<EmailLog> findByCampaignIdAndStatus(@Param("campaignId") Long campaignId, @Param("status") String status, Pageable pageable);
+  Page<EmailLog> findByCampaignIdAndStatus(@Param("campaignId") String campaignId, @Param("status") String status, Pageable pageable);
 
   /**
    * Find logs by email type.
@@ -105,7 +105,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return page of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.user.id = :userId AND l.emailType = :emailType")
-  Page<EmailLog> findByEmailType(@Param("userId") Long userId, @Param("emailType") String emailType, Pageable pageable);
+  Page<EmailLog> findByEmailType(@Param("userId") String userId, @Param("emailType") String emailType, Pageable pageable);
 
   /**
    * Find logs within a date range.
@@ -117,7 +117,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return page of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.user.id = :userId AND l.createdAt BETWEEN :startDate AND :endDate")
-  Page<EmailLog> findByDateRange(@Param("userId") Long userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
+  Page<EmailLog> findByDateRange(@Param("userId") String userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
   /**
    * Find logs by recipient email.
@@ -128,7 +128,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return page of logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.user.id = :userId AND l.recipientEmail = :recipientEmail")
-  Page<EmailLog> findByRecipientEmail(@Param("userId") Long userId, @Param("recipientEmail") String recipientEmail, Pageable pageable);
+  Page<EmailLog> findByRecipientEmail(@Param("userId") String userId, @Param("recipientEmail") String recipientEmail, Pageable pageable);
 
   /**
    * Find failed logs for retry.
@@ -138,7 +138,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return page of failed logs
    */
   @Query("SELECT l FROM EmailLog l WHERE l.user.id = :userId AND l.status = 'FAILED'")
-  Page<EmailLog> findFailedLogs(@Param("userId") Long userId, Pageable pageable);
+  Page<EmailLog> findFailedLogs(@Param("userId") String userId, Pageable pageable);
 
   /**
    * Count logs for a user.
@@ -147,7 +147,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return count of logs
    */
   @Query("SELECT COUNT(l) FROM EmailLog l WHERE l.user.id = :userId")
-  long countByUserId(@Param("userId") Long userId);
+  long countByUserId(@Param("userId") String userId);
 
   /**
    * Count logs for a campaign.
@@ -156,7 +156,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return count of logs
    */
   @Query("SELECT COUNT(l) FROM EmailLog l WHERE l.campaign.id = :campaignId")
-  long countByCampaignId(@Param("campaignId") Long campaignId);
+  long countByCampaignId(@Param("campaignId") String campaignId);
 
   /**
    * Count logs by status.
@@ -166,7 +166,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return count of logs
    */
   @Query("SELECT COUNT(l) FROM EmailLog l WHERE l.user.id = :userId AND l.status = :status")
-  long countByUserIdAndStatus(@Param("userId") Long userId, @Param("status") String status);
+  long countByUserIdAndStatus(@Param("userId") String userId, @Param("status") String status);
 
   /**
    * Count logs by email type.
@@ -176,7 +176,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @return count of logs
    */
   @Query("SELECT COUNT(l) FROM EmailLog l WHERE l.user.id = :userId AND l.emailType = :emailType")
-  long countByEmailType(@Param("userId") Long userId, @Param("emailType") String emailType);
+  long countByEmailType(@Param("userId") String userId, @Param("emailType") String emailType);
 
   /**
    * Delete all logs for a user (GDPR compliance).
@@ -184,7 +184,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @param userId the user ID
    */
   @Query("DELETE FROM EmailLog l WHERE l.user.id = :userId")
-  void deleteByUserId(@Param("userId") Long userId);
+  void deleteByUserId(@Param("userId") String userId);
 
   /**
    * Delete all logs for a campaign.
@@ -192,5 +192,5 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
    * @param campaignId the campaign ID
    */
   @Query("DELETE FROM EmailLog l WHERE l.campaign.id = :campaignId")
-  void deleteByCampaignId(@Param("campaignId") Long campaignId);
+  void deleteByCampaignId(@Param("campaignId") String campaignId);
 }

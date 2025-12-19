@@ -55,12 +55,12 @@ public class EmailProviderService {
   /**
    * Find provider by ID.
    *
-   * @param id the provider ID
+   * @param id the ID (String)
    * @return the provider
    * @throws ResourceNotFoundException if provider not found
    */
   @Transactional(readOnly = true)
-  public EmailProvider findById(Long id) {
+  public EmailProvider findById(String id) {
     return providerRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("EmailProvider", "id", id));
   }
@@ -68,13 +68,13 @@ public class EmailProviderService {
   /**
    * Find provider by ID and verify user ownership.
    *
-   * @param id the provider ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @return the provider
    * @throws ResourceNotFoundException if provider not found
    */
   @Transactional(readOnly = true)
-  public EmailProvider findByIdAndUserId(Long id, Long userId) {
+  public EmailProvider findByIdAndUserId(String id, String userId) {
     return providerRepository.findByIdAndUserId(id, userId)
         .orElseThrow(() -> new ResourceNotFoundException("EmailProvider", "id", id));
   }
@@ -82,59 +82,59 @@ public class EmailProviderService {
   /**
    * Find all providers for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return list of providers
    */
   @Transactional(readOnly = true)
-  public List<EmailProvider> findByUserId(Long userId) {
+  public List<EmailProvider> findByUserId(String userId) {
     return providerRepository.findByUserId(userId);
   }
 
   /**
    * Find all providers for a user with pagination.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of providers
    */
   @Transactional(readOnly = true)
-  public Page<EmailProvider> findByUserId(Long userId, Pageable pageable) {
+  public Page<EmailProvider> findByUserId(String userId, Pageable pageable) {
     return providerRepository.findByUserId(userId, pageable);
   }
 
   /**
    * Find active providers for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return list of active providers
    */
   @Transactional(readOnly = true)
-  public List<EmailProvider> findActiveProviders(Long userId) {
+  public List<EmailProvider> findActiveProviders(String userId) {
     return providerRepository.findByUserIdAndIsActive(userId, true);
   }
 
   /**
    * Find providers by type.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param providerType the provider type (AWS_SES, SENDGRID, SMTP)
    * @param pageable pagination information
    * @return page of providers
    */
   @Transactional(readOnly = true)
-  public Page<EmailProvider> findByType(Long userId, String providerType, Pageable pageable) {
+  public Page<EmailProvider> findByType(String userId, String providerType, Pageable pageable) {
     return providerRepository.findByUserIdAndProviderType(userId, providerType, pageable);
   }
 
   /**
    * Find default provider for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return the default provider
    * @throws ResourceNotFoundException if no default provider found
    */
   @Transactional(readOnly = true)
-  public EmailProvider findDefaultProvider(Long userId) {
+  public EmailProvider findDefaultProvider(String userId) {
     return providerRepository.findByUserIdAndIsDefault(userId, true)
         .orElseThrow(() -> new ResourceNotFoundException("No default email provider configured"));
   }
@@ -142,13 +142,13 @@ public class EmailProviderService {
   /**
    * Update an existing provider.
    *
-   * @param id the provider ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param updatedProvider the updated provider data
    * @return the updated provider
    * @throws ResourceNotFoundException if provider not found
    */
-  public EmailProvider updateProvider(Long id, Long userId, EmailProvider updatedProvider) {
+  public EmailProvider updateProvider(String id, String userId, EmailProvider updatedProvider) {
     EmailProvider provider = findByIdAndUserId(id, userId);
 
     if (updatedProvider.getName() != null && !updatedProvider.getName().equals(provider.getName())) {
@@ -180,11 +180,11 @@ public class EmailProviderService {
   /**
    * Set provider as default.
    *
-   * @param id the provider ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @return the updated provider
    */
-  public EmailProvider setAsDefault(Long id, Long userId) {
+  public EmailProvider setAsDefault(String id, String userId) {
     EmailProvider provider = findByIdAndUserId(id, userId);
 
     // Unset other defaults
@@ -199,12 +199,12 @@ public class EmailProviderService {
   /**
    * Toggle provider active status.
    *
-   * @param id the provider ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param isActive the active status
    * @return the updated provider
    */
-  public EmailProvider setActiveStatus(Long id, Long userId, Boolean isActive) {
+  public EmailProvider setActiveStatus(String id, String userId, Boolean isActive) {
     EmailProvider provider = findByIdAndUserId(id, userId);
 
     provider.setIsActive(isActive);
@@ -216,13 +216,13 @@ public class EmailProviderService {
   /**
    * Update provider sending statistics.
    *
-   * @param id the provider ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param emailsSent increment sent count
    * @param emailsFailed increment failed count
    * @return the updated provider
    */
-  public EmailProvider updateStats(Long id, Long userId, int emailsSent, int emailsFailed) {
+  public EmailProvider updateStats(String id, String userId, int emailsSent, int emailsFailed) {
     EmailProvider provider = findByIdAndUserId(id, userId);
 
     if (emailsSent > 0) {
@@ -241,12 +241,12 @@ public class EmailProviderService {
   /**
    * Delete a provider.
    *
-   * @param id the provider ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @throws ResourceNotFoundException if provider not found
    * @throws ValidationException if trying to delete the only provider
    */
-  public void deleteProvider(Long id, Long userId) {
+  public void deleteProvider(String id, String userId) {
     EmailProvider provider = findByIdAndUserId(id, userId);
 
     // Check if this is the only provider
@@ -261,40 +261,40 @@ public class EmailProviderService {
   /**
    * Delete all providers for a user (GDPR compliance).
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    */
-  public void deleteAllByUserId(Long userId) {
+  public void deleteAllByUserId(String userId) {
     providerRepository.deleteByUserId(userId);
   }
 
   /**
    * Count providers for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of providers
    */
   @Transactional(readOnly = true)
-  public long countByUserId(Long userId) {
+  public long countByUserId(String userId) {
     return providerRepository.countByUserId(userId);
   }
 
   /**
    * Count active providers for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of active providers
    */
   @Transactional(readOnly = true)
-  public long countActiveProviders(Long userId) {
+  public long countActiveProviders(String userId) {
     return providerRepository.countByUserIdAndIsActive(userId, true);
   }
 
   /**
    * Unset default flag from all providers for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    */
-  private void unsetDefaultProvider(Long userId) {
+  private void unsetDefaultProvider(String userId) {
     List<EmailProvider> providers = providerRepository.findByUserId(userId);
     providers.forEach(p -> {
       if (p.getIsDefault() != null && p.getIsDefault()) {

@@ -55,12 +55,12 @@ public class DomainService {
   /**
    * Find domain by ID.
    *
-   * @param id the domain ID
+   * @param id the ID (String)
    * @return the domain
    * @throws ResourceNotFoundException if domain not found
    */
   @Transactional(readOnly = true)
-  public Domain findById(Long id) {
+  public Domain findById(String id) {
     return domainRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Domain", "id", id));
   }
@@ -68,13 +68,13 @@ public class DomainService {
   /**
    * Find domain by ID and verify user ownership.
    *
-   * @param id the domain ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @return the domain
    * @throws ResourceNotFoundException if domain not found
    */
   @Transactional(readOnly = true)
-  public Domain findByIdAndUserId(Long id, Long userId) {
+  public Domain findByIdAndUserId(String id, String userId) {
     return domainRepository.findByIdAndUserId(id, userId)
         .orElseThrow(() -> new ResourceNotFoundException("Domain", "id", id));
   }
@@ -95,47 +95,47 @@ public class DomainService {
   /**
    * Find all domains for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return list of domains
    */
   @Transactional(readOnly = true)
-  public List<Domain> findByUserId(Long userId) {
+  public List<Domain> findByUserId(String userId) {
     return domainRepository.findByUserId(userId);
   }
 
   /**
    * Find all domains for a user with pagination.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of domains
    */
   @Transactional(readOnly = true)
-  public Page<Domain> findByUserId(Long userId, Pageable pageable) {
+  public Page<Domain> findByUserId(String userId, Pageable pageable) {
     return domainRepository.findByUserId(userId, pageable);
   }
 
   /**
    * Find domains by status.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param status the verification status
    * @param pageable pagination information
    * @return page of domains
    */
   @Transactional(readOnly = true)
-  public Page<Domain> findByStatus(Long userId, String status, Pageable pageable) {
+  public Page<Domain> findByStatus(String userId, String status, Pageable pageable) {
     return domainRepository.findByUserIdAndStatus(userId, status, pageable);
   }
 
   /**
    * Find all verified domains for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return list of verified domains
    */
   @Transactional(readOnly = true)
-  public List<Domain> findVerifiedDomains(Long userId) {
+  public List<Domain> findVerifiedDomains(String userId) {
     return domainRepository.findByUserIdAndStatus(userId, "VERIFIED");
   }
 
@@ -164,15 +164,15 @@ public class DomainService {
   /**
    * Update domain verification status.
    *
-   * @param id the domain ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param status the new status
    * @param spfVerified SPF verification result
    * @param dkimVerified DKIM verification result
    * @param dmarcVerified DMARC verification result
    * @return the updated domain
    */
-  public Domain updateVerificationStatus(Long id, Long userId, String status,
+  public Domain updateVerificationStatus(String id, String userId, String status,
                                           Boolean spfVerified, Boolean dkimVerified, Boolean dmarcVerified) {
     Domain domain = findByIdAndUserId(id, userId);
 
@@ -194,14 +194,14 @@ public class DomainService {
   /**
    * Update domain DNS records.
    *
-   * @param id the domain ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param spfRecord SPF record value
    * @param dkimRecord DKIM record value
    * @param dmarcRecord DMARC record value
    * @return the updated domain
    */
-  public Domain updateDnsRecords(Long id, Long userId, String spfRecord, String dkimRecord, String dmarcRecord) {
+  public Domain updateDnsRecords(String id, String userId, String spfRecord, String dkimRecord, String dmarcRecord) {
     Domain domain = findByIdAndUserId(id, userId);
 
     domain.setSpfRecord(spfRecord);
@@ -215,13 +215,13 @@ public class DomainService {
   /**
    * Update DKIM key pair.
    *
-   * @param id the domain ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param dkimPublicKey the public key
    * @param dkimPrivateKey the encrypted private key
    * @return the updated domain
    */
-  public Domain updateDkimKeys(Long id, Long userId, String dkimPublicKey, String dkimPrivateKey) {
+  public Domain updateDkimKeys(String id, String userId, String dkimPublicKey, String dkimPrivateKey) {
     Domain domain = findByIdAndUserId(id, userId);
 
     domain.setDkimPublicKey(dkimPublicKey);
@@ -234,11 +234,11 @@ public class DomainService {
   /**
    * Delete a domain.
    *
-   * @param id the domain ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @throws ResourceNotFoundException if domain not found
    */
-  public void deleteDomain(Long id, Long userId) {
+  public void deleteDomain(String id, String userId) {
     Domain domain = findByIdAndUserId(id, userId);
     domainRepository.delete(domain);
   }
@@ -246,31 +246,31 @@ public class DomainService {
   /**
    * Delete all domains for a user (GDPR compliance).
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    */
-  public void deleteAllByUserId(Long userId) {
+  public void deleteAllByUserId(String userId) {
     domainRepository.deleteByUserId(userId);
   }
 
   /**
    * Count domains for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of domains
    */
   @Transactional(readOnly = true)
-  public long countByUserId(Long userId) {
+  public long countByUserId(String userId) {
     return domainRepository.countByUserId(userId);
   }
 
   /**
    * Count verified domains for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of verified domains
    */
   @Transactional(readOnly = true)
-  public long countVerifiedDomains(Long userId) {
+  public long countVerifiedDomains(String userId) {
     return domainRepository.countByUserIdAndStatus(userId, "VERIFIED");
   }
 

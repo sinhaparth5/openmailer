@@ -25,7 +25,7 @@ public class LoginResponse {
 
   // Nested UserInfo class
   public static class UserInfo {
-    private Long id;
+    private String id;
     private String email;
     private String username;
     private String role;
@@ -33,7 +33,7 @@ public class LoginResponse {
     public UserInfo() {
     }
 
-    public UserInfo(Long id, String email, String username, String role) {
+    public UserInfo(String id, String email, String username, String role) {
       this.id = id;
       this.email = email;
       this.username = username;
@@ -41,11 +41,11 @@ public class LoginResponse {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
       return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
       this.id = id;
     }
 

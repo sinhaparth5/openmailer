@@ -37,8 +37,8 @@ public class CampaignRecipientService {
    */
   public CampaignRecipient createRecipient(CampaignRecipient recipient) {
     // Check if recipient already exists
-    Long campaignId = recipient.getCampaign().getId();
-    Long contactId = recipient.getContact().getId();
+    String campaignId = recipient.getCampaign().getId();
+    String contactId = recipient.getContact().getId();
     if (recipientRepository.existsByCampaignIdAndContactId(campaignId, contactId)) {
       throw new ValidationException("Recipient already exists for this campaign and contact", "recipient");
     }
@@ -63,12 +63,12 @@ public class CampaignRecipientService {
   /**
    * Find recipient by ID.
    *
-   * @param id the recipient ID
+   * @param id the ID (String)
    * @return the recipient
    * @throws ResourceNotFoundException if recipient not found
    */
   @Transactional(readOnly = true)
-  public CampaignRecipient findById(Long id) {
+  public CampaignRecipient findById(String id) {
     return recipientRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("CampaignRecipient", "id", id));
   }
@@ -76,7 +76,7 @@ public class CampaignRecipientService {
   /**
    * Find recipient by tracking ID.
    *
-   * @param trackingId the tracking ID
+   * @param trackingId the ID (String)
    * @return the recipient
    * @throws ResourceNotFoundException if recipient not found
    */
@@ -89,13 +89,13 @@ public class CampaignRecipientService {
   /**
    * Find recipient by campaign and contact.
    *
-   * @param campaignId the campaign ID
-   * @param contactId the contact ID
+   * @param campaignId the ID (String)
+   * @param contactId the ID (String)
    * @return the recipient
    * @throws ResourceNotFoundException if recipient not found
    */
   @Transactional(readOnly = true)
-  public CampaignRecipient findByCampaignAndContact(Long campaignId, Long contactId) {
+  public CampaignRecipient findByCampaignAndContact(String campaignId, String contactId) {
     return recipientRepository.findByCampaignIdAndContactId(campaignId, contactId)
         .orElseThrow(() -> new ResourceNotFoundException("CampaignRecipient not found"));
   }
@@ -103,93 +103,93 @@ public class CampaignRecipientService {
   /**
    * Find all recipients for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return list of recipients
    */
   @Transactional(readOnly = true)
-  public List<CampaignRecipient> findByCampaign(Long campaignId) {
+  public List<CampaignRecipient> findByCampaign(String campaignId) {
     return recipientRepository.findByCampaignId(campaignId);
   }
 
   /**
    * Find all recipients for a campaign with pagination.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param pageable pagination information
    * @return page of recipients
    */
   @Transactional(readOnly = true)
-  public Page<CampaignRecipient> findByCampaign(Long campaignId, Pageable pageable) {
+  public Page<CampaignRecipient> findByCampaign(String campaignId, Pageable pageable) {
     return recipientRepository.findByCampaignId(campaignId, pageable);
   }
 
   /**
    * Find recipients by status.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param status the recipient status
    * @param pageable pagination information
    * @return page of recipients
    */
   @Transactional(readOnly = true)
-  public Page<CampaignRecipient> findByStatus(Long campaignId, String status, Pageable pageable) {
+  public Page<CampaignRecipient> findByStatus(String campaignId, String status, Pageable pageable) {
     return recipientRepository.findByCampaignIdAndStatus(campaignId, status, pageable);
   }
 
   /**
    * Find all recipients for a contact.
    *
-   * @param contactId the contact ID
+   * @param contactId the ID (String)
    * @return list of recipients
    */
   @Transactional(readOnly = true)
-  public List<CampaignRecipient> findByContact(Long contactId) {
+  public List<CampaignRecipient> findByContact(String contactId) {
     return recipientRepository.findByContactId(contactId);
   }
 
   /**
    * Find recipients who opened emails.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param pageable pagination information
    * @return page of recipients who opened
    */
   @Transactional(readOnly = true)
-  public Page<CampaignRecipient> findOpened(Long campaignId, Pageable pageable) {
+  public Page<CampaignRecipient> findOpened(String campaignId, Pageable pageable) {
     return recipientRepository.findOpenedByCampaignId(campaignId, pageable);
   }
 
   /**
    * Find recipients who clicked links.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param pageable pagination information
    * @return page of recipients who clicked
    */
   @Transactional(readOnly = true)
-  public Page<CampaignRecipient> findClicked(Long campaignId, Pageable pageable) {
+  public Page<CampaignRecipient> findClicked(String campaignId, Pageable pageable) {
     return recipientRepository.findClickedByCampaignId(campaignId, pageable);
   }
 
   /**
    * Find recipients who bounced.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param pageable pagination information
    * @return page of recipients who bounced
    */
   @Transactional(readOnly = true)
-  public Page<CampaignRecipient> findBounced(Long campaignId, Pageable pageable) {
+  public Page<CampaignRecipient> findBounced(String campaignId, Pageable pageable) {
     return recipientRepository.findBouncedByCampaignId(campaignId, pageable);
   }
 
   /**
    * Mark recipient as sent.
    *
-   * @param id the recipient ID
+   * @param id the ID (String)
    * @return the updated recipient
    */
-  public CampaignRecipient markAsSent(Long id) {
+  public CampaignRecipient markAsSent(String id) {
     CampaignRecipient recipient = findById(id);
     recipient.setStatus("SENT");
     recipient.setSentAt(LocalDateTime.now());
@@ -199,10 +199,10 @@ public class CampaignRecipientService {
   /**
    * Mark recipient as delivered.
    *
-   * @param id the recipient ID
+   * @param id the ID (String)
    * @return the updated recipient
    */
-  public CampaignRecipient markAsDelivered(Long id) {
+  public CampaignRecipient markAsDelivered(String id) {
     CampaignRecipient recipient = findById(id);
     recipient.setStatus("DELIVERED");
     recipient.setDeliveredAt(LocalDateTime.now());
@@ -212,7 +212,7 @@ public class CampaignRecipientService {
   /**
    * Track email open.
    *
-   * @param trackingId the tracking ID
+   * @param trackingId the ID (String)
    * @return the updated recipient
    */
   public CampaignRecipient trackOpen(String trackingId) {
@@ -230,7 +230,7 @@ public class CampaignRecipientService {
   /**
    * Track link click.
    *
-   * @param trackingId the tracking ID
+   * @param trackingId the ID (String)
    * @return the updated recipient
    */
   public CampaignRecipient trackClick(String trackingId) {
@@ -248,11 +248,11 @@ public class CampaignRecipientService {
   /**
    * Mark recipient as bounced.
    *
-   * @param id the recipient ID
+   * @param id the ID (String)
    * @param errorMessage the error message
    * @return the updated recipient
    */
-  public CampaignRecipient markAsBounced(Long id, String errorMessage) {
+  public CampaignRecipient markAsBounced(String id, String errorMessage) {
     CampaignRecipient recipient = findById(id);
     recipient.setStatus("BOUNCED");
     recipient.setBouncedAt(LocalDateTime.now());
@@ -263,10 +263,10 @@ public class CampaignRecipientService {
   /**
    * Mark recipient as complained.
    *
-   * @param id the recipient ID
+   * @param id the ID (String)
    * @return the updated recipient
    */
-  public CampaignRecipient markAsComplained(Long id) {
+  public CampaignRecipient markAsComplained(String id) {
     CampaignRecipient recipient = findById(id);
     recipient.setStatus("COMPLAINED");
     recipient.setComplainedAt(LocalDateTime.now());
@@ -276,11 +276,11 @@ public class CampaignRecipientService {
   /**
    * Mark recipient as failed.
    *
-   * @param id the recipient ID
+   * @param id the ID (String)
    * @param errorMessage the error message
    * @return the updated recipient
    */
-  public CampaignRecipient markAsFailed(Long id, String errorMessage) {
+  public CampaignRecipient markAsFailed(String id, String errorMessage) {
     CampaignRecipient recipient = findById(id);
     recipient.setStatus("FAILED");
     recipient.setErrorMessage(errorMessage);
@@ -291,11 +291,11 @@ public class CampaignRecipientService {
   /**
    * Update recipient status.
    *
-   * @param id the recipient ID
+   * @param id the ID (String)
    * @param status the new status
    * @return the updated recipient
    */
-  public CampaignRecipient updateStatus(Long id, String status) {
+  public CampaignRecipient updateStatus(String id, String status) {
     CampaignRecipient recipient = findById(id);
     recipient.setStatus(status);
     return recipientRepository.save(recipient);
@@ -304,77 +304,77 @@ public class CampaignRecipientService {
   /**
    * Get pending recipients for retry.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param maxRetries maximum retry attempts
    * @return list of pending recipients
    */
   @Transactional(readOnly = true)
-  public List<CampaignRecipient> getPendingRecipients(Long campaignId, Integer maxRetries) {
+  public List<CampaignRecipient> getPendingRecipients(String campaignId, Integer maxRetries) {
     return recipientRepository.findPendingRecipients(campaignId, maxRetries);
   }
 
   /**
    * Count recipients for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return count of recipients
    */
   @Transactional(readOnly = true)
-  public long countByCampaign(Long campaignId) {
+  public long countByCampaign(String campaignId) {
     return recipientRepository.countByCampaignId(campaignId);
   }
 
   /**
    * Count recipients by status.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param status the recipient status
    * @return count of recipients
    */
   @Transactional(readOnly = true)
-  public long countByStatus(Long campaignId, String status) {
+  public long countByStatus(String campaignId, String status) {
     return recipientRepository.countByCampaignIdAndStatus(campaignId, status);
   }
 
   /**
    * Count opened emails.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return count of opened emails
    */
   @Transactional(readOnly = true)
-  public long countOpened(Long campaignId) {
+  public long countOpened(String campaignId) {
     return recipientRepository.countOpenedByCampaignId(campaignId);
   }
 
   /**
    * Count clicked emails.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return count of clicked emails
    */
   @Transactional(readOnly = true)
-  public long countClicked(Long campaignId) {
+  public long countClicked(String campaignId) {
     return recipientRepository.countClickedByCampaignId(campaignId);
   }
 
   /**
    * Count bounced emails.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return count of bounced emails
    */
   @Transactional(readOnly = true)
-  public long countBounced(Long campaignId) {
+  public long countBounced(String campaignId) {
     return recipientRepository.countBouncedByCampaignId(campaignId);
   }
 
   /**
    * Delete all recipients for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    */
-  public void deleteAllByCampaign(Long campaignId) {
+  public void deleteAllByCampaign(String campaignId) {
     recipientRepository.deleteByCampaignId(campaignId);
   }
 }

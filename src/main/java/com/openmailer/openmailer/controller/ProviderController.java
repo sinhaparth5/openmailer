@@ -72,7 +72,7 @@ public class ProviderController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getProvider(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailProvider provider = providerService.findById(id);
 
@@ -145,7 +145,7 @@ public class ProviderController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateProvider(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody Map<String, Object> request) {
 
         EmailProvider provider = providerService.findById(id);
@@ -195,7 +195,7 @@ public class ProviderController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteProvider(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailProvider provider = providerService.findById(id);
 
@@ -218,7 +218,7 @@ public class ProviderController {
     @PostMapping("/{id}/test")
     public ResponseEntity<ApiResponse<Map<String, Object>>> testProvider(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailProvider provider = providerService.findById(id);
 
@@ -265,7 +265,7 @@ public class ProviderController {
     @PatchMapping("/{id}/toggle")
     public ResponseEntity<ApiResponse<Map<String, Object>>> toggleProvider(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailProvider provider = providerService.findById(id);
 
@@ -291,7 +291,7 @@ public class ProviderController {
     @GetMapping("/{id}/stats")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getProviderStats(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailProvider provider = providerService.findById(id);
 

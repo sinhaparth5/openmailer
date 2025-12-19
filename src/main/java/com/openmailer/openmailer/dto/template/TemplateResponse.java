@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * Response DTO for email template data
  */
 public class TemplateResponse {
-    private Long id;
+    private String id;
     private String name;
     private String description;
     private String htmlContent;
@@ -20,7 +20,7 @@ public class TemplateResponse {
     public TemplateResponse() {
     }
 
-    public TemplateResponse(Long id, String name, String description, String htmlContent, String textContent,
+    public TemplateResponse(String id, String name, String description, String htmlContent, String textContent,
                             String previewText, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
@@ -45,11 +45,11 @@ public class TemplateResponse {
         return response;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

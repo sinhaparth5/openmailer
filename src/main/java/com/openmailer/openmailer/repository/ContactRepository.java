@@ -17,7 +17,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for contact management.
  */
 @Repository
-public interface ContactRepository extends JpaRepository<Contact, Long> {
+public interface ContactRepository extends JpaRepository<Contact, String> {
 
   /**
    * Find all contacts for a specific user.
@@ -28,7 +28,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param userId the user ID
    * @return list of contacts
    */
-  List<Contact> findByUser_Id(Long userId);
+  List<Contact> findByUser_Id(String userId);
 
   /**
    * Find all contacts for a specific user with pagination.
@@ -37,7 +37,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param pageable pagination information
    * @return page of contacts
    */
-  Page<Contact> findByUser_Id(Long userId, Pageable pageable);
+  Page<Contact> findByUser_Id(String userId, Pageable pageable);
 
   /**
    * Find contact by ID and user ID.
@@ -46,7 +46,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param userId the user ID
    * @return Optional containing the contact if found
    */
-  Optional<Contact> findByIdAndUser_Id(Long id, Long userId);
+  Optional<Contact> findByIdAndUser_Id(String id, String userId);
 
   /**
    * Find contact by email and user ID.
@@ -55,7 +55,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param userId the user ID
    * @return Optional containing the contact if found
    */
-  Optional<Contact> findByEmailAndUser_Id(String email, Long userId);
+  Optional<Contact> findByEmailAndUser_Id(String email, String userId);
 
   /**
    * Find contacts by status.
@@ -65,7 +65,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param pageable pagination information
    * @return page of contacts
    */
-  Page<Contact> findByUser_IdAndStatus(Long userId, String status, Pageable pageable);
+  Page<Contact> findByUser_IdAndStatus(String userId, String status, Pageable pageable);
 
   /**
    * Search contacts by email, first name, or last name.
@@ -85,7 +85,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
           LOWER(c.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
       )
   """)
-  Page<Contact> searchContacts(@Param("userId") Long userId,
+  Page<Contact> searchContacts(@Param("userId") String userId,
                                @Param("searchTerm") String searchTerm,
                                Pageable pageable);
 
@@ -115,7 +115,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
       """,
       nativeQuery = true
   )
-  Page<Contact> findByTag(@Param("userId") Long userId,
+  Page<Contact> findByTag(@Param("userId") String userId,
                           @Param("tag") String tag,
                           Pageable pageable);
 
@@ -126,7 +126,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param date the date threshold
    * @return list of contacts created after the date
    */
-  List<Contact> findByUser_IdAndCreatedAtAfter(Long userId, LocalDateTime date);
+  List<Contact> findByUser_IdAndCreatedAtAfter(String userId, LocalDateTime date);
 
   /**
    * Find contacts by GDPR consent status.
@@ -136,7 +136,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param pageable pagination information
    * @return page of contacts
    */
-  Page<Contact> findByUser_IdAndGdprConsent(Long userId, Boolean gdprConsent, Pageable pageable);
+  Page<Contact> findByUser_IdAndGdprConsent(String userId, Boolean gdprConsent, Pageable pageable);
 
   /**
    * Count contacts for a specific user.
@@ -144,7 +144,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param userId the user ID
    * @return count of contacts
    */
-  long countByUser_Id(Long userId);
+  long countByUser_Id(String userId);
 
   /**
    * Count contacts by status.
@@ -153,7 +153,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param status the contact status
    * @return count of contacts with given status
    */
-  long countByUser_IdAndStatus(Long userId, String status);
+  long countByUser_IdAndStatus(String userId, String status);
 
   /**
    * Check if email exists for a user.
@@ -162,14 +162,14 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
    * @param userId the user ID
    * @return true if email exists, false otherwise
    */
-  boolean existsByEmailAndUser_Id(String email, Long userId);
+  boolean existsByEmailAndUser_Id(String email, String userId);
 
   /**
    * Delete all contacts for a specific user.
    *
    * @param userId the user ID
    */
-  void deleteByUser_Id(Long userId);
+  void deleteByUser_Id(String userId);
 
   /**
    * Count contacts in a specific list by their status.
@@ -183,5 +183,5 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
       JOIN ContactListMembership m ON c.id = m.contactId
       WHERE m.listId = :listId AND c.status = :status
   """)
-  long countByListAndStatus(@Param("listId") Long listId, @Param("status") String status);
+  long countByListAndStatus(@Param("listId") String listId, @Param("status") String status);
 }

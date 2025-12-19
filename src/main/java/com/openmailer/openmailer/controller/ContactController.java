@@ -84,7 +84,7 @@ public class ContactController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ContactResponse>> getContact(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         Contact contact = contactService.findById(id);
 
@@ -143,7 +143,7 @@ public class ContactController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ContactResponse>> updateContact(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody ContactRequest request) {
 
         Contact contact = contactService.findById(id);
@@ -190,7 +190,7 @@ public class ContactController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteContact(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         Contact contact = contactService.findById(id);
 
@@ -213,7 +213,7 @@ public class ContactController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<ContactResponse>> updateContactStatus(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam String status) {
 
         Contact contact = contactService.findById(id);
@@ -238,7 +238,7 @@ public class ContactController {
     @PostMapping("/{id}/tags")
     public ResponseEntity<ApiResponse<ContactResponse>> addTags(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestBody List<String> tags) {
 
         Contact contact = contactService.findById(id);
@@ -275,7 +275,7 @@ public class ContactController {
     @DeleteMapping("/{id}/tags")
     public ResponseEntity<ApiResponse<ContactResponse>> removeTags(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestBody List<String> tags) {
 
         Contact contact = contactService.findById(id);

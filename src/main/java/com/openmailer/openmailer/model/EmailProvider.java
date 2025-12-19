@@ -2,6 +2,7 @@ package com.openmailer.openmailer.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openmailer.openmailer.util.IdGenerator;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -12,11 +13,11 @@ import java.util.Map;
 public class EmailProvider {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 50)
+    private String id;
 
-    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, insertable = false, updatable = false, length = 50)
+    private String userId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -92,6 +93,9 @@ public class EmailProvider {
 
     @PrePersist
     protected void onCreate() {
+        if (id == null || id.isEmpty()) {
+            id = IdGenerator.generateId();
+        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -102,11 +106,11 @@ public class EmailProvider {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -265,11 +269,11 @@ public class EmailProvider {
         this.updatedAt = updatedAt;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

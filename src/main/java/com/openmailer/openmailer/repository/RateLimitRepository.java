@@ -17,7 +17,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for rate limiting.
  */
 @Repository
-public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
+public interface RateLimitRepository extends JpaRepository<RateLimit, String> {
 
   /**
    * Find all rate limits for a user.
@@ -26,7 +26,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @return list of rate limits
    */
   @Query("SELECT r FROM RateLimit r WHERE r.user.id = :userId")
-  List<RateLimit> findByUserId(@Param("userId") Long userId);
+  List<RateLimit> findByUserId(@Param("userId") String userId);
 
   /**
    * Find all rate limits for a user with pagination.
@@ -36,7 +36,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @return page of rate limits
    */
   @Query("SELECT r FROM RateLimit r WHERE r.user.id = :userId")
-  Page<RateLimit> findByUserId(@Param("userId") Long userId, Pageable pageable);
+  Page<RateLimit> findByUserId(@Param("userId") String userId, Pageable pageable);
 
   /**
    * Find active rate limit for user and resource type.
@@ -47,7 +47,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @return Optional containing the active rate limit if found
    */
   @Query("SELECT r FROM RateLimit r WHERE r.user.id = :userId AND r.resourceType = :resourceType AND r.windowStart <= :currentTime AND r.windowEnd > :currentTime")
-  Optional<RateLimit> findActiveRateLimit(@Param("userId") Long userId, @Param("resourceType") String resourceType, @Param("currentTime") LocalDateTime currentTime);
+  Optional<RateLimit> findActiveRateLimit(@Param("userId") String userId, @Param("resourceType") String resourceType, @Param("currentTime") LocalDateTime currentTime);
 
   /**
    * Find rate limits by resource type.
@@ -58,7 +58,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @return page of rate limits
    */
   @Query("SELECT r FROM RateLimit r WHERE r.user.id = :userId AND r.resourceType = :resourceType")
-  Page<RateLimit> findByResourceType(@Param("userId") Long userId, @Param("resourceType") String resourceType, Pageable pageable);
+  Page<RateLimit> findByResourceType(@Param("userId") String userId, @Param("resourceType") String resourceType, Pageable pageable);
 
   /**
    * Find rate limits within a time window.
@@ -70,7 +70,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @return list of rate limits
    */
   @Query("SELECT r FROM RateLimit r WHERE r.user.id = :userId AND r.resourceType = :resourceType AND r.windowStart >= :startTime AND r.windowEnd <= :endTime")
-  List<RateLimit> findByTimeWindow(@Param("userId") Long userId, @Param("resourceType") String resourceType, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+  List<RateLimit> findByTimeWindow(@Param("userId") String userId, @Param("resourceType") String resourceType, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
   /**
    * Find expired rate limits.
@@ -88,7 +88,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @return list of rate limits where request count exceeds limit value
    */
   @Query("SELECT r FROM RateLimit r WHERE r.user.id = :userId AND r.requestCount >= r.limitValue")
-  List<RateLimit> findExceededLimits(@Param("userId") Long userId);
+  List<RateLimit> findExceededLimits(@Param("userId") String userId);
 
   /**
    * Count rate limits for a user.
@@ -97,7 +97,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @return count of rate limits
    */
   @Query("SELECT COUNT(r) FROM RateLimit r WHERE r.user.id = :userId")
-  long countByUserId(@Param("userId") Long userId);
+  long countByUserId(@Param("userId") String userId);
 
   /**
    * Count active rate limits for a user.
@@ -107,7 +107,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @return count of active rate limits
    */
   @Query("SELECT COUNT(r) FROM RateLimit r WHERE r.user.id = :userId AND r.windowStart <= :currentTime AND r.windowEnd > :currentTime")
-  long countActiveRateLimits(@Param("userId") Long userId, @Param("currentTime") LocalDateTime currentTime);
+  long countActiveRateLimits(@Param("userId") String userId, @Param("currentTime") LocalDateTime currentTime);
 
   /**
    * Delete expired rate limits.
@@ -123,7 +123,7 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @param userId the user ID
    */
   @Query("DELETE FROM RateLimit r WHERE r.user.id = :userId")
-  void deleteByUserId(@Param("userId") Long userId);
+  void deleteByUserId(@Param("userId") String userId);
 
   /**
    * Delete rate limits by resource type.
@@ -132,5 +132,5 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, Long> {
    * @param resourceType the resource type
    */
   @Query("DELETE FROM RateLimit r WHERE r.user.id = :userId AND r.resourceType = :resourceType")
-  void deleteByResourceType(@Param("userId") Long userId, @Param("resourceType") String resourceType);
+  void deleteByResourceType(@Param("userId") String userId, @Param("resourceType") String resourceType);
 }

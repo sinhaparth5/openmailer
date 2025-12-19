@@ -9,8 +9,6 @@ import com.openmailer.openmailer.service.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -70,12 +68,9 @@ public class AuthController {
    * @return the current user
    */
   @GetMapping("/me")
-  public ResponseEntity<ApiResponse<User>> getCurrentUser() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String email = authentication.getName();
-
-    // Extract token from request header
-    String token = extractTokenFromContext();
+  public ResponseEntity<ApiResponse<User>> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+    // Extract token from Authorization header
+    String token = authHeader.substring(7); // Remove "Bearer " prefix
     User user = authenticationService.validateAccessToken(token);
 
     return ResponseEntity.ok(ApiResponse.success(user));
@@ -90,19 +85,5 @@ public class AuthController {
   public ResponseEntity<ApiResponse<Void>> logout() {
     // JWT is stateless, so logout is handled client-side by removing the token
     return ResponseEntity.ok(ApiResponse.success(null));
-  }
-
-  /**
-   * Extract JWT token from security context.
-   *
-   * @return the JWT token
-   */
-  private String extractTokenFromContext() {
-    // This is a placeholder - in a real implementation, you'd extract from the request
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && authentication.getCredentials() != null) {
-      return authentication.getCredentials().toString();
-    }
-    return null;
   }
 }

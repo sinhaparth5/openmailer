@@ -17,7 +17,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for API key management.
  */
 @Repository
-public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
+public interface ApiKeyRepository extends JpaRepository<ApiKey, String> {
 
   /**
    * Find all API keys for a user.
@@ -26,7 +26,7 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
    * @return list of API keys
    */
   @Query("SELECT k FROM ApiKey k WHERE k.user.id = :userId")
-  List<ApiKey> findByUserId(@Param("userId") Long userId);
+  List<ApiKey> findByUserId(@Param("userId") String userId);
 
   /**
    * Find all API keys for a user with pagination.
@@ -36,7 +36,7 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
    * @return page of API keys
    */
   @Query("SELECT k FROM ApiKey k WHERE k.user.id = :userId")
-  Page<ApiKey> findByUserId(@Param("userId") Long userId, Pageable pageable);
+  Page<ApiKey> findByUserId(@Param("userId") String userId, Pageable pageable);
 
   /**
    * Find API key by ID and user ID.
@@ -46,7 +46,7 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
    * @return Optional containing the API key if found
    */
   @Query("SELECT k FROM ApiKey k WHERE k.id = :id AND k.user.id = :userId")
-  Optional<ApiKey> findByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
+  Optional<ApiKey> findByIdAndUserId(@Param("id") String id, @Param("userId") String userId);
 
   /**
    * Find API key by key value.
@@ -73,7 +73,7 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
    * @return page of API keys
    */
   @Query("SELECT k FROM ApiKey k WHERE k.user.id = :userId AND k.isActive = :isActive")
-  Page<ApiKey> findByUserIdAndIsActive(@Param("userId") Long userId, @Param("isActive") Boolean isActive, Pageable pageable);
+  Page<ApiKey> findByUserIdAndIsActive(@Param("userId") String userId, @Param("isActive") Boolean isActive, Pageable pageable);
 
   /**
    * Find expired API keys.
@@ -100,7 +100,7 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
    * @return count of API keys
    */
   @Query("SELECT COUNT(k) FROM ApiKey k WHERE k.user.id = :userId")
-  long countByUserId(@Param("userId") Long userId);
+  long countByUserId(@Param("userId") String userId);
 
   /**
    * Count active API keys for a user.
@@ -109,7 +109,7 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
    * @return count of active API keys
    */
   @Query("SELECT COUNT(k) FROM ApiKey k WHERE k.user.id = :userId AND k.isActive = true")
-  long countActiveByUserId(@Param("userId") Long userId);
+  long countActiveByUserId(@Param("userId") String userId);
 
   /**
    * Check if API key exists.
@@ -133,5 +133,5 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, Long> {
    * @param userId the user ID
    */
   @Query("DELETE FROM ApiKey k WHERE k.user.id = :userId")
-  void deleteByUserId(@Param("userId") Long userId);
+  void deleteByUserId(@Param("userId") String userId);
 }

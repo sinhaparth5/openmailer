@@ -59,11 +59,11 @@ public class CampaignLinkService {
   /**
    * Find or create link for a campaign and URL.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param originalUrl the original URL
    * @return the link
    */
-  public CampaignLink findOrCreateLink(Long campaignId, String originalUrl) {
+  public CampaignLink findOrCreateLink(String campaignId, String originalUrl) {
     return linkRepository.findByCampaignIdAndOriginalUrl(campaignId, originalUrl)
         .orElseGet(() -> {
           CampaignLink newLink = new CampaignLink();
@@ -77,12 +77,12 @@ public class CampaignLinkService {
   /**
    * Find link by ID.
    *
-   * @param id the link ID
+   * @param id the ID (String)
    * @return the link
    * @throws ResourceNotFoundException if link not found
    */
   @Transactional(readOnly = true)
-  public CampaignLink findById(Long id) {
+  public CampaignLink findById(String id) {
     return linkRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("CampaignLink", "id", id));
   }
@@ -103,35 +103,35 @@ public class CampaignLinkService {
   /**
    * Find all links for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return list of links
    */
   @Transactional(readOnly = true)
-  public List<CampaignLink> findByCampaign(Long campaignId) {
+  public List<CampaignLink> findByCampaign(String campaignId) {
     return linkRepository.findByCampaignId(campaignId);
   }
 
   /**
    * Find all links for a campaign with pagination.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param pageable pagination information
    * @return page of links
    */
   @Transactional(readOnly = true)
-  public Page<CampaignLink> findByCampaign(Long campaignId, Pageable pageable) {
+  public Page<CampaignLink> findByCampaign(String campaignId, Pageable pageable) {
     return linkRepository.findByCampaignId(campaignId, pageable);
   }
 
   /**
    * Find top clicked links for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param pageable pagination information
    * @return page of top clicked links
    */
   @Transactional(readOnly = true)
-  public Page<CampaignLink> findTopClicked(Long campaignId, Pageable pageable) {
+  public Page<CampaignLink> findTopClicked(String campaignId, Pageable pageable) {
     return linkRepository.findTopClickedByCampaignId(campaignId, pageable);
   }
 
@@ -156,11 +156,11 @@ public class CampaignLinkService {
   /**
    * Get total clicks for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return total click count
    */
   @Transactional(readOnly = true)
-  public long getTotalClicks(Long campaignId) {
+  public long getTotalClicks(String campaignId) {
     Long total = linkRepository.getTotalClicksByCampaignId(campaignId);
     return total != null ? total : 0L;
   }
@@ -168,11 +168,11 @@ public class CampaignLinkService {
   /**
    * Get total unique clicks for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return total unique click count
    */
   @Transactional(readOnly = true)
-  public long getTotalUniqueClicks(Long campaignId) {
+  public long getTotalUniqueClicks(String campaignId) {
     Long total = linkRepository.getTotalUniqueClicksByCampaignId(campaignId);
     return total != null ? total : 0L;
   }
@@ -180,20 +180,20 @@ public class CampaignLinkService {
   /**
    * Count links for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return count of links
    */
   @Transactional(readOnly = true)
-  public long countByCampaign(Long campaignId) {
+  public long countByCampaign(String campaignId) {
     return linkRepository.countByCampaignId(campaignId);
   }
 
   /**
    * Delete all links for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    */
-  public void deleteAllByCampaign(Long campaignId) {
+  public void deleteAllByCampaign(String campaignId) {
     linkRepository.deleteByCampaignId(campaignId);
   }
 

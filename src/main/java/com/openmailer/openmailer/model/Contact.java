@@ -1,5 +1,6 @@
 package com.openmailer.openmailer.model;
 
+import com.openmailer.openmailer.util.IdGenerator;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -11,8 +12,8 @@ import java.util.Map;
 public class Contact {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 50)
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -110,6 +111,9 @@ public class Contact {
 
     @PrePersist
     protected void onCreate() {
+        if (id == null || id.isEmpty()) {
+            id = IdGenerator.generateId();
+        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -120,11 +124,11 @@ public class Contact {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -337,7 +341,7 @@ public class Contact {
     }
 
     // Convenience methods for service layer
-    public Long getUserId() {
+    public String getUserId() {
         return this.user != null ? this.user.getId() : null;
     }
 

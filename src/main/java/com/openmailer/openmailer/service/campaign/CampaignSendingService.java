@@ -25,10 +25,10 @@ public class CampaignSendingService {
      * Asynchronously sends a campaign to all recipients.
      * This method runs in a separate thread to avoid blocking the controller.
      *
-     * @param campaignId the ID of the campaign to send
+     * @param campaignId the ID (String) of the campaign to send
      */
     @Async
-    public void sendCampaignAsync(Long campaignId) {
+    public void sendCampaignAsync(String campaignId) {
         log.info("Starting async campaign send for campaign ID: {}", campaignId);
 
         try {
@@ -69,9 +69,9 @@ public class CampaignSendingService {
     /**
      * Sends a campaign synchronously (for testing purposes).
      *
-     * @param campaignId the ID of the campaign to send
+     * @param campaignId the ID (String) of the campaign to send
      */
-    public void sendCampaignSync(Long campaignId) {
+    public void sendCampaignSync(String campaignId) {
         log.info("Starting synchronous campaign send for campaign ID: {}", campaignId);
         // For now, just delegate to async version
         // In a real implementation, this would be the core sending logic

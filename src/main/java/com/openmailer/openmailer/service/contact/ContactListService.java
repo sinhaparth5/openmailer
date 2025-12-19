@@ -55,7 +55,7 @@ public class ContactListService {
    * @throws ResourceNotFoundException if list not found
    */
   @Transactional(readOnly = true)
-  public ContactList findById(Long id) {
+  public ContactList findById(String id) {
     return contactListRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("ContactList", "id", id));
   }
@@ -69,7 +69,7 @@ public class ContactListService {
    * @throws ResourceNotFoundException if list not found
    */
   @Transactional(readOnly = true)
-  public ContactList findByIdAndUserId(Long id, Long userId) {
+  public ContactList findByIdAndUserId(String id, String userId) {
     return contactListRepository.findByIdAndUserId(id, userId)
         .orElseThrow(() -> new ResourceNotFoundException("ContactList", "id", id));
   }
@@ -81,7 +81,7 @@ public class ContactListService {
    * @return list of contact lists
    */
   @Transactional(readOnly = true)
-  public List<ContactList> findByUserId(Long userId) {
+  public List<ContactList> findByUserId(String userId) {
     return contactListRepository.findByUserId(userId);
   }
 
@@ -93,7 +93,7 @@ public class ContactListService {
    * @return page of contact lists
    */
   @Transactional(readOnly = true)
-  public Page<ContactList> findByUserId(Long userId, Pageable pageable) {
+  public Page<ContactList> findByUserId(String userId, Pageable pageable) {
     return contactListRepository.findByUserId(userId, pageable);
   }
 
@@ -106,7 +106,7 @@ public class ContactListService {
    * @return page of matching contact lists
    */
   @Transactional(readOnly = true)
-  public Page<ContactList> searchByName(Long userId, String name, Pageable pageable) {
+  public Page<ContactList> searchByName(String userId, String name, Pageable pageable) {
     return contactListRepository.findByUserIdAndNameContainingIgnoreCase(userId, name, pageable);
   }
 
@@ -119,7 +119,7 @@ public class ContactListService {
    * @return the updated contact list
    * @throws ResourceNotFoundException if list not found
    */
-  public ContactList updateContactList(Long id, Long userId, ContactList updatedList) {
+  public ContactList updateContactList(String id, String userId, ContactList updatedList) {
     ContactList contactList = findByIdAndUserId(id, userId);
 
     // Check name uniqueness if name is being changed
@@ -150,7 +150,7 @@ public class ContactListService {
    * @param activeContacts number of active contacts
    * @return the updated contact list
    */
-  public ContactList updateStatistics(Long id, Long userId, Integer totalContacts, Integer activeContacts) {
+  public ContactList updateStatistics(String id, String userId, Integer totalContacts, Integer activeContacts) {
     ContactList contactList = findByIdAndUserId(id, userId);
 
     if (totalContacts != null) {
@@ -171,7 +171,7 @@ public class ContactListService {
    * @param userId the user ID
    * @throws ResourceNotFoundException if list not found
    */
-  public void deleteContactList(Long id, Long userId) {
+  public void deleteContactList(String id, String userId) {
     ContactList contactList = findByIdAndUserId(id, userId);
     contactListRepository.delete(contactList);
   }
@@ -181,7 +181,7 @@ public class ContactListService {
    *
    * @param userId the user ID
    */
-  public void deleteAllByUserId(Long userId) {
+  public void deleteAllByUserId(String userId) {
     contactListRepository.deleteByUserId(userId);
   }
 
@@ -192,7 +192,7 @@ public class ContactListService {
    * @return count of contact lists
    */
   @Transactional(readOnly = true)
-  public long countByUserId(Long userId) {
+  public long countByUserId(String userId) {
     return contactListRepository.countByUserId(userId);
   }
 }

@@ -15,7 +15,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for domain management.
  */
 @Repository
-public interface DomainRepository extends JpaRepository<Domain, Long> {
+public interface DomainRepository extends JpaRepository<Domain, String> {
 
   /**
    * Find all domains for a specific user.
@@ -23,7 +23,7 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
    * @param userId the user ID
    * @return list of domains
    */
-  List<Domain> findByUserId(Long userId);
+  List<Domain> findByUserId(String userId);
 
   /**
    * Find all domains for a specific user with pagination.
@@ -32,7 +32,7 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
    * @param pageable pagination information
    * @return page of domains
    */
-  Page<Domain> findByUserId(Long userId, Pageable pageable);
+  Page<Domain> findByUserId(String userId, Pageable pageable);
 
   /**
    * Find domain by ID and user ID.
@@ -41,7 +41,7 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
    * @param userId the user ID
    * @return Optional containing the domain if found
    */
-  Optional<Domain> findByIdAndUserId(Long id, Long userId);
+  Optional<Domain> findByIdAndUserId(String id, String userId);
 
   /**
    * Find domain by domain name.
@@ -58,7 +58,7 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
    * @param userId the user ID
    * @return Optional containing the domain if found
    */
-  Optional<Domain> findByDomainNameAndUserId(String domainName, Long userId);
+  Optional<Domain> findByDomainNameAndUserId(String domainName, String userId);
 
   /**
    * Find domains by verification status.
@@ -68,7 +68,7 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
    * @param pageable pagination information
    * @return page of domains
    */
-  Page<Domain> findByUserIdAndStatus(Long userId, String status, Pageable pageable);
+  Page<Domain> findByUserIdAndStatus(String userId, String status, Pageable pageable);
 
   /**
    * Find all verified domains for a user.
@@ -76,7 +76,7 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
    * @param userId the user ID
    * @return list of verified domains
    */
-  List<Domain> findByUserIdAndStatus(Long userId, String status);
+  List<Domain> findByUserIdAndStatus(String userId, String status);
 
   /**
    * Find domains that need verification (pending status).
@@ -109,7 +109,7 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
    * @param userId the user ID
    * @return count of domains
    */
-  long countByUserId(Long userId);
+  long countByUserId(String userId);
 
   /**
    * Count verified domains for a user.
@@ -118,12 +118,12 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
    * @param status the verification status
    * @return count of verified domains
    */
-  long countByUserIdAndStatus(Long userId, String status);
+  long countByUserIdAndStatus(String userId, String status);
 
   /**
    * Delete all domains for a specific user.
    *
    * @param userId the user ID
    */
-  void deleteByUserId(Long userId);
+  void deleteByUserId(String userId);
 }

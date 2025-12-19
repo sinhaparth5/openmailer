@@ -17,7 +17,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for email campaigns.
  */
 @Repository
-public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Long> {
+public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, String> {
 
   /**
    * Find all campaigns for a specific user.
@@ -25,7 +25,7 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Lo
    * @param userId the user ID
    * @return list of email campaigns
    */
-  List<EmailCampaign> findByUserId(Long userId);
+  List<EmailCampaign> findByUserId(String userId);
 
   /**
    * Find all campaigns for a specific user with pagination.
@@ -34,7 +34,7 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Lo
    * @param pageable pagination information
    * @return page of email campaigns
    */
-  Page<EmailCampaign> findByUserId(Long userId, Pageable pageable);
+  Page<EmailCampaign> findByUserId(String userId, Pageable pageable);
 
   /**
    * Find campaign by ID and user ID.
@@ -43,7 +43,7 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Lo
    * @param userId the user ID
    * @return Optional containing the campaign if found
    */
-  Optional<EmailCampaign> findByIdAndUserId(Long id, Long userId);
+  Optional<EmailCampaign> findByIdAndUserId(String id, String userId);
 
   /**
    * Find campaigns by status.
@@ -53,7 +53,7 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Lo
    * @param pageable pagination information
    * @return page of campaigns
    */
-  Page<EmailCampaign> findByUserIdAndStatus(Long userId, String status, Pageable pageable);
+  Page<EmailCampaign> findByUserIdAndStatus(String userId, String status, Pageable pageable);
 
   /**
    * Find campaigns by name containing search term.
@@ -63,7 +63,7 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Lo
    * @param pageable pagination information
    * @return page of matching campaigns
    */
-  Page<EmailCampaign> findByUserIdAndNameContainingIgnoreCase(Long userId, String name, Pageable pageable);
+  Page<EmailCampaign> findByUserIdAndNameContainingIgnoreCase(String userId, String name, Pageable pageable);
 
   /**
    * Find scheduled campaigns that are ready to send.
@@ -81,7 +81,7 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Lo
    * @param templateId the template ID
    * @return list of campaigns using this template
    */
-  List<EmailCampaign> findByTemplateId(Long templateId);
+  List<EmailCampaign> findByTemplateId(String templateId);
 
   /**
    * Count campaigns for a specific user.
@@ -89,7 +89,7 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Lo
    * @param userId the user ID
    * @return count of campaigns
    */
-  long countByUserId(Long userId);
+  long countByUserId(String userId);
 
   /**
    * Count campaigns by status for a user.
@@ -98,12 +98,12 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, Lo
    * @param status the campaign status
    * @return count of campaigns with given status
    */
-  long countByUserIdAndStatus(Long userId, String status);
+  long countByUserIdAndStatus(String userId, String status);
 
   /**
    * Delete all campaigns for a specific user.
    *
    * @param userId the user ID
    */
-  void deleteByUserId(Long userId);
+  void deleteByUserId(String userId);
 }

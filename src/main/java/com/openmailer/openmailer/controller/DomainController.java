@@ -74,7 +74,7 @@ public class DomainController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDomain(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         Domain domain = domainService.findById(id);
 
@@ -150,7 +150,7 @@ public class DomainController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteDomain(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         Domain domain = domainService.findById(id);
 
@@ -173,7 +173,7 @@ public class DomainController {
     @GetMapping("/{id}/dns-records")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDnsRecords(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         Domain domain = domainService.findById(id);
 
@@ -196,7 +196,7 @@ public class DomainController {
     @PostMapping("/{id}/verify")
     public ResponseEntity<ApiResponse<Map<String, Object>>> verifyDomain(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         Domain domain = domainService.findById(id);
 

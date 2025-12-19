@@ -69,12 +69,12 @@ public class ApiKeyService {
   /**
    * Find API key by ID.
    *
-   * @param id the API key ID
+   * @param id the ID (String)
    * @return the API key
    * @throws ResourceNotFoundException if API key not found
    */
   @Transactional(readOnly = true)
-  public ApiKey findById(Long id) {
+  public ApiKey findById(String id) {
     return apiKeyRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("ApiKey", "id", id));
   }
@@ -82,13 +82,13 @@ public class ApiKeyService {
   /**
    * Find API key by ID and user ID.
    *
-   * @param id the API key ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @return the API key
    * @throws ResourceNotFoundException if API key not found
    */
   @Transactional(readOnly = true)
-  public ApiKey findByIdAndUserId(Long id, Long userId) {
+  public ApiKey findByIdAndUserId(String id, String userId) {
     return apiKeyRepository.findByIdAndUserId(id, userId)
         .orElseThrow(() -> new ResourceNotFoundException("ApiKey", "id", id));
   }
@@ -96,36 +96,36 @@ public class ApiKeyService {
   /**
    * Find all API keys for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return list of API keys
    */
   @Transactional(readOnly = true)
-  public List<ApiKey> findByUserId(Long userId) {
+  public List<ApiKey> findByUserId(String userId) {
     return apiKeyRepository.findByUserId(userId);
   }
 
   /**
    * Find all API keys for a user with pagination.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of API keys
    */
   @Transactional(readOnly = true)
-  public Page<ApiKey> findByUserId(Long userId, Pageable pageable) {
+  public Page<ApiKey> findByUserId(String userId, Pageable pageable) {
     return apiKeyRepository.findByUserId(userId, pageable);
   }
 
   /**
    * Find active API keys for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param isActive true for active, false for inactive
    * @param pageable pagination information
    * @return page of API keys
    */
   @Transactional(readOnly = true)
-  public Page<ApiKey> findByStatus(Long userId, Boolean isActive, Pageable pageable) {
+  public Page<ApiKey> findByStatus(String userId, Boolean isActive, Pageable pageable) {
     return apiKeyRepository.findByUserIdAndIsActive(userId, isActive, pageable);
   }
 
@@ -168,11 +168,11 @@ public class ApiKeyService {
   /**
    * Revoke an API key.
    *
-   * @param id the API key ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @return the revoked API key
    */
-  public ApiKey revokeApiKey(Long id, Long userId) {
+  public ApiKey revokeApiKey(String id, String userId) {
     ApiKey apiKey = findByIdAndUserId(id, userId);
     apiKey.setIsActive(false);
     return apiKeyRepository.save(apiKey);
@@ -181,11 +181,11 @@ public class ApiKeyService {
   /**
    * Activate an API key.
    *
-   * @param id the API key ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @return the activated API key
    */
-  public ApiKey activateApiKey(Long id, Long userId) {
+  public ApiKey activateApiKey(String id, String userId) {
     ApiKey apiKey = findByIdAndUserId(id, userId);
     apiKey.setIsActive(true);
     return apiKeyRepository.save(apiKey);
@@ -194,12 +194,12 @@ public class ApiKeyService {
   /**
    * Update API key name.
    *
-   * @param id the API key ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param newName the new name
    * @return the updated API key
    */
-  public ApiKey updateKeyName(Long id, Long userId, String newName) {
+  public ApiKey updateKeyName(String id, String userId, String newName) {
     ApiKey apiKey = findByIdAndUserId(id, userId);
     apiKey.setKeyName(newName);
     return apiKeyRepository.save(apiKey);
@@ -208,12 +208,12 @@ public class ApiKeyService {
   /**
    * Update API key scopes.
    *
-   * @param id the API key ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param scopes the new scopes
    * @return the updated API key
    */
-  public ApiKey updateScopes(Long id, Long userId, String[] scopes) {
+  public ApiKey updateScopes(String id, String userId, String[] scopes) {
     ApiKey apiKey = findByIdAndUserId(id, userId);
     apiKey.setScopes(scopes);
     return apiKeyRepository.save(apiKey);
@@ -222,12 +222,12 @@ public class ApiKeyService {
   /**
    * Update API key expiration.
    *
-   * @param id the API key ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param expiresAt the new expiration date
    * @return the updated API key
    */
-  public ApiKey updateExpiration(Long id, Long userId, LocalDateTime expiresAt) {
+  public ApiKey updateExpiration(String id, String userId, LocalDateTime expiresAt) {
     ApiKey apiKey = findByIdAndUserId(id, userId);
     apiKey.setExpiresAt(expiresAt);
     return apiKeyRepository.save(apiKey);
@@ -263,10 +263,10 @@ public class ApiKeyService {
   /**
    * Delete an API key.
    *
-   * @param id the API key ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    */
-  public void deleteApiKey(Long id, Long userId) {
+  public void deleteApiKey(String id, String userId) {
     ApiKey apiKey = findByIdAndUserId(id, userId);
     apiKeyRepository.delete(apiKey);
   }
@@ -274,31 +274,31 @@ public class ApiKeyService {
   /**
    * Delete all API keys for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    */
-  public void deleteAllByUserId(Long userId) {
+  public void deleteAllByUserId(String userId) {
     apiKeyRepository.deleteByUserId(userId);
   }
 
   /**
    * Count API keys for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of API keys
    */
   @Transactional(readOnly = true)
-  public long countByUserId(Long userId) {
+  public long countByUserId(String userId) {
     return apiKeyRepository.countByUserId(userId);
   }
 
   /**
    * Count active API keys for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of active API keys
    */
   @Transactional(readOnly = true)
-  public long countActiveByUserId(Long userId) {
+  public long countActiveByUserId(String userId) {
     return apiKeyRepository.countActiveByUserId(userId);
   }
 

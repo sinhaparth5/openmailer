@@ -59,7 +59,7 @@ public class UserService {
    * @throws ResourceNotFoundException if user not found
    */
   @Transactional(readOnly = true)
-  public User findById(Long id) {
+  public User findById(String id) {
     return userRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
   }
@@ -107,7 +107,7 @@ public class UserService {
    * @return the updated user
    * @throws ResourceNotFoundException if user not found
    */
-  public User updateUser(Long id, User updatedUser) {
+  public User updateUser(String id, User updatedUser) {
     User user = findById(id);
 
     // Update allowed fields
@@ -144,7 +144,7 @@ public class UserService {
    * @param id the user ID
    * @throws ResourceNotFoundException if user not found
    */
-  public void deleteUser(Long id) {
+  public void deleteUser(String id) {
     User user = findById(id);
     userRepository.delete(user);
   }

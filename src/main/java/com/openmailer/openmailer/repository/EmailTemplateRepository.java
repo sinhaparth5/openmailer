@@ -14,7 +14,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for email templates.
  */
 @Repository
-public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Long> {
+public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, String> {
 
   /**
    * Find all templates for a specific user.
@@ -22,7 +22,7 @@ public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Lo
    * @param userId the user ID
    * @return list of email templates
    */
-  List<EmailTemplate> findByUserId(Long userId);
+  List<EmailTemplate> findByUserId(String userId);
 
   /**
    * Find all templates for a specific user with pagination.
@@ -31,7 +31,7 @@ public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Lo
    * @param pageable pagination information
    * @return page of email templates
    */
-  Page<EmailTemplate> findByUserId(Long userId, Pageable pageable);
+  Page<EmailTemplate> findByUserId(String userId, Pageable pageable);
 
   /**
    * Find template by ID and user ID.
@@ -40,7 +40,7 @@ public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Lo
    * @param userId the user ID
    * @return Optional containing the template if found
    */
-  Optional<EmailTemplate> findByIdAndUserId(Long id, Long userId);
+  Optional<EmailTemplate> findByIdAndUserId(String id, String userId);
 
   /**
    * Find templates by name containing search term.
@@ -50,7 +50,7 @@ public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Lo
    * @param pageable pagination information
    * @return page of matching templates
    */
-  Page<EmailTemplate> findByUserIdAndNameContainingIgnoreCase(Long userId, String name, Pageable pageable);
+  Page<EmailTemplate> findByUserIdAndNameContainingIgnoreCase(String userId, String name, Pageable pageable);
 
   /**
    * Count templates for a specific user.
@@ -58,12 +58,12 @@ public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Lo
    * @param userId the user ID
    * @return count of templates
    */
-  long countByUserId(Long userId);
+  long countByUserId(String userId);
 
   /**
    * Delete all templates for a specific user.
    *
    * @param userId the user ID
    */
-  void deleteByUserId(Long userId);
+  void deleteByUserId(String userId);
 }

@@ -31,11 +31,11 @@ public class JwtService {
   /**
    * Generate access token for user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param email the user email
    * @return the generated access token
    */
-  public String generateAccessToken(Long userId, String email) {
+  public String generateAccessToken(String userId, String email) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("userId", userId);
     claims.put("email", email);
@@ -45,11 +45,11 @@ public class JwtService {
   /**
    * Generate refresh token for user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param email the user email
    * @return the generated refresh token
    */
-  public String generateRefreshToken(Long userId, String email) {
+  public String generateRefreshToken(String userId, String email) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("userId", userId);
     claims.put("email", email);
@@ -64,7 +64,7 @@ public class JwtService {
    * @param expiration the expiration time in milliseconds
    * @return the generated token
    */
-  public String generateToken(Map<String, Object> claims, String subject, Long expiration) {
+  public String generateToken(Map<String, Object> claims, String subject, long expiration) {
     return Jwts.builder()
         .claims(claims)
         .subject(subject)
@@ -102,8 +102,8 @@ public class JwtService {
    * @param token the token
    * @return the user ID
    */
-  public Long extractUserId(String token) {
-    return extractClaim(token, claims -> claims.get("userId", Long.class));
+  public String extractUserId(String token) {
+    return extractClaim(token, claims -> claims.get("userId", String.class));
   }
 
   /**

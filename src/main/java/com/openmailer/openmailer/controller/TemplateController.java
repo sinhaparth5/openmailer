@@ -70,7 +70,7 @@ public class TemplateController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TemplateResponse>> getTemplate(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailTemplate template = templateService.findById(id);
 
@@ -114,7 +114,7 @@ public class TemplateController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<TemplateResponse>> updateTemplate(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody TemplateRequest request) {
 
         EmailTemplate template = templateService.findById(id);
@@ -144,7 +144,7 @@ public class TemplateController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteTemplate(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailTemplate template = templateService.findById(id);
 
@@ -167,7 +167,7 @@ public class TemplateController {
     @PostMapping("/{id}/preview")
     public ResponseEntity<ApiResponse<Map<String, String>>> previewTemplate(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestBody(required = false) Map<String, String> sampleData) {
 
         EmailTemplate template = templateService.findById(id);
@@ -202,7 +202,7 @@ public class TemplateController {
     @GetMapping("/{id}/variables")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTemplateVariables(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailTemplate template = templateService.findById(id);
 

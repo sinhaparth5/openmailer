@@ -14,7 +14,7 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for email provider management.
  */
 @Repository
-public interface EmailProviderRepository extends JpaRepository<EmailProvider, Long> {
+public interface EmailProviderRepository extends JpaRepository<EmailProvider, String> {
 
   /**
    * Find all providers for a specific user.
@@ -22,7 +22,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param userId the user ID
    * @return list of email providers
    */
-  List<EmailProvider> findByUserId(Long userId);
+  List<EmailProvider> findByUserId(String userId);
 
   /**
    * Find all providers for a specific user with pagination.
@@ -31,7 +31,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param pageable pagination information
    * @return page of email providers
    */
-  Page<EmailProvider> findByUserId(Long userId, Pageable pageable);
+  Page<EmailProvider> findByUserId(String userId, Pageable pageable);
 
   /**
    * Find provider by ID and user ID.
@@ -40,7 +40,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param userId the user ID
    * @return Optional containing the provider if found
    */
-  Optional<EmailProvider> findByIdAndUserId(Long id, Long userId);
+  Optional<EmailProvider> findByIdAndUserId(String id, String userId);
 
   /**
    * Find provider by name and user ID.
@@ -49,7 +49,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param userId the user ID
    * @return Optional containing the provider if found
    */
-  Optional<EmailProvider> findByNameAndUserId(String name, Long userId);
+  Optional<EmailProvider> findByNameAndUserId(String name, String userId);
 
   /**
    * Find providers by type.
@@ -59,7 +59,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param pageable pagination information
    * @return page of providers
    */
-  Page<EmailProvider> findByUserIdAndProviderType(Long userId, String providerType, Pageable pageable);
+  Page<EmailProvider> findByUserIdAndProviderType(String userId, String providerType, Pageable pageable);
 
   /**
    * Find all active providers for a user.
@@ -68,7 +68,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param isActive active status
    * @return list of active providers
    */
-  List<EmailProvider> findByUserIdAndIsActive(Long userId, Boolean isActive);
+  List<EmailProvider> findByUserIdAndIsActive(String userId, Boolean isActive);
 
   /**
    * Find providers by type and active status.
@@ -78,7 +78,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param isActive active status
    * @return list of providers
    */
-  List<EmailProvider> findByUserIdAndProviderTypeAndIsActive(Long userId, String providerType, Boolean isActive);
+  List<EmailProvider> findByUserIdAndProviderTypeAndIsActive(String userId, String providerType, Boolean isActive);
 
   /**
    * Find default provider for a user.
@@ -87,7 +87,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param isDefault default flag
    * @return Optional containing the default provider if found
    */
-  Optional<EmailProvider> findByUserIdAndIsDefault(Long userId, Boolean isDefault);
+  Optional<EmailProvider> findByUserIdAndIsDefault(String userId, Boolean isDefault);
 
   /**
    * Count providers for a specific user.
@@ -95,7 +95,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param userId the user ID
    * @return count of providers
    */
-  long countByUserId(Long userId);
+  long countByUserId(String userId);
 
   /**
    * Count active providers for a user.
@@ -104,12 +104,12 @@ public interface EmailProviderRepository extends JpaRepository<EmailProvider, Lo
    * @param isActive active status
    * @return count of active providers
    */
-  long countByUserIdAndIsActive(Long userId, Boolean isActive);
+  long countByUserIdAndIsActive(String userId, Boolean isActive);
 
   /**
    * Delete all providers for a specific user.
    *
    * @param userId the user ID
    */
-  void deleteByUserId(Long userId);
+  void deleteByUserId(String userId);
 }

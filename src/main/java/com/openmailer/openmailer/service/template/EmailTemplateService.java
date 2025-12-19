@@ -43,12 +43,12 @@ public class EmailTemplateService {
   /**
    * Find template by ID.
    *
-   * @param id the template ID
+   * @param id the ID (String)
    * @return the template
    * @throws ResourceNotFoundException if template not found
    */
   @Transactional(readOnly = true)
-  public EmailTemplate findById(Long id) {
+  public EmailTemplate findById(String id) {
     return templateRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("EmailTemplate", "id", id));
   }
@@ -56,14 +56,14 @@ public class EmailTemplateService {
   /**
    * Find template by ID and verify user ownership.
    *
-   * @param id the template ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @return the template
    * @throws ResourceNotFoundException if template not found
    * @throws UnauthorizedException if user doesn't own the template
    */
   @Transactional(readOnly = true)
-  public EmailTemplate findByIdAndUserId(Long id, Long userId) {
+  public EmailTemplate findByIdAndUserId(String id, String userId) {
     return templateRepository.findByIdAndUserId(id, userId)
         .orElseThrow(() -> new ResourceNotFoundException("EmailTemplate", "id", id));
   }
@@ -71,49 +71,49 @@ public class EmailTemplateService {
   /**
    * Find all templates for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return list of templates
    */
   @Transactional(readOnly = true)
-  public List<EmailTemplate> findByUserId(Long userId) {
+  public List<EmailTemplate> findByUserId(String userId) {
     return templateRepository.findByUserId(userId);
   }
 
   /**
    * Find all templates for a user with pagination.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of templates
    */
   @Transactional(readOnly = true)
-  public Page<EmailTemplate> findByUserId(Long userId, Pageable pageable) {
+  public Page<EmailTemplate> findByUserId(String userId, Pageable pageable) {
     return templateRepository.findByUserId(userId, pageable);
   }
 
   /**
    * Search templates by name.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param name the search term
    * @param pageable pagination information
    * @return page of matching templates
    */
   @Transactional(readOnly = true)
-  public Page<EmailTemplate> searchByName(Long userId, String name, Pageable pageable) {
+  public Page<EmailTemplate> searchByName(String userId, String name, Pageable pageable) {
     return templateRepository.findByUserIdAndNameContainingIgnoreCase(userId, name, pageable);
   }
 
   /**
    * Update an existing template.
    *
-   * @param id the template ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @param updatedTemplate the updated template data
    * @return the updated template
    * @throws ResourceNotFoundException if template not found
    */
-  public EmailTemplate updateTemplate(Long id, Long userId, EmailTemplate updatedTemplate) {
+  public EmailTemplate updateTemplate(String id, String userId, EmailTemplate updatedTemplate) {
     EmailTemplate template = findByIdAndUserId(id, userId);
 
     if (updatedTemplate.getName() != null) {
@@ -136,11 +136,11 @@ public class EmailTemplateService {
   /**
    * Delete a template.
    *
-   * @param id the template ID
-   * @param userId the user ID
+   * @param id the ID (String)
+   * @param userId the ID (String)
    * @throws ResourceNotFoundException if template not found
    */
-  public void deleteTemplate(Long id, Long userId) {
+  public void deleteTemplate(String id, String userId) {
     EmailTemplate template = findByIdAndUserId(id, userId);
     templateRepository.delete(template);
   }
@@ -148,20 +148,20 @@ public class EmailTemplateService {
   /**
    * Delete all templates for a user (GDPR compliance).
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    */
-  public void deleteAllByUserId(Long userId) {
+  public void deleteAllByUserId(String userId) {
     templateRepository.deleteByUserId(userId);
   }
 
   /**
    * Count templates for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of templates
    */
   @Transactional(readOnly = true)
-  public long countByUserId(Long userId) {
+  public long countByUserId(String userId) {
     return templateRepository.countByUserId(userId);
   }
 }

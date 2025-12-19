@@ -40,12 +40,12 @@ public class EmailLogService {
   /**
    * Find log by ID.
    *
-   * @param id the log ID
+   * @param id the ID (String)
    * @return the log
    * @throws ResourceNotFoundException if log not found
    */
   @Transactional(readOnly = true)
-  public EmailLog findById(Long id) {
+  public EmailLog findById(String id) {
     return logRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("EmailLog", "id", id));
   }
@@ -53,7 +53,7 @@ public class EmailLogService {
   /**
    * Find log by provider message ID.
    *
-   * @param providerMessageId the provider message ID
+   * @param providerMessageId the ID (String)
    * @return the log
    * @throws ResourceNotFoundException if log not found
    */
@@ -66,146 +66,146 @@ public class EmailLogService {
   /**
    * Find all logs for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return list of logs
    */
   @Transactional(readOnly = true)
-  public List<EmailLog> findByUser(Long userId) {
+  public List<EmailLog> findByUser(String userId) {
     return logRepository.findByUserId(userId);
   }
 
   /**
    * Find all logs for a user with pagination.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of logs
    */
   @Transactional(readOnly = true)
-  public Page<EmailLog> findByUser(Long userId, Pageable pageable) {
+  public Page<EmailLog> findByUser(String userId, Pageable pageable) {
     return logRepository.findByUserId(userId, pageable);
   }
 
   /**
    * Find all logs for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return list of logs
    */
   @Transactional(readOnly = true)
-  public List<EmailLog> findByCampaign(Long campaignId) {
+  public List<EmailLog> findByCampaign(String campaignId) {
     return logRepository.findByCampaignId(campaignId);
   }
 
   /**
    * Find all logs for a campaign with pagination.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param pageable pagination information
    * @return page of logs
    */
   @Transactional(readOnly = true)
-  public Page<EmailLog> findByCampaign(Long campaignId, Pageable pageable) {
+  public Page<EmailLog> findByCampaign(String campaignId, Pageable pageable) {
     return logRepository.findByCampaignId(campaignId, pageable);
   }
 
   /**
    * Find all logs for a recipient.
    *
-   * @param recipientId the recipient ID
+   * @param recipientId the ID (String)
    * @return list of logs
    */
   @Transactional(readOnly = true)
-  public List<EmailLog> findByRecipient(Long recipientId) {
+  public List<EmailLog> findByRecipient(String recipientId) {
     return logRepository.findByRecipientId(recipientId);
   }
 
   /**
    * Find logs by status.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param status the email status
    * @param pageable pagination information
    * @return page of logs
    */
   @Transactional(readOnly = true)
-  public Page<EmailLog> findByStatus(Long userId, String status, Pageable pageable) {
+  public Page<EmailLog> findByStatus(String userId, String status, Pageable pageable) {
     return logRepository.findByUserIdAndStatus(userId, status, pageable);
   }
 
   /**
    * Find logs by campaign and status.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @param status the email status
    * @param pageable pagination information
    * @return page of logs
    */
   @Transactional(readOnly = true)
-  public Page<EmailLog> findByCampaignAndStatus(Long campaignId, String status, Pageable pageable) {
+  public Page<EmailLog> findByCampaignAndStatus(String campaignId, String status, Pageable pageable) {
     return logRepository.findByCampaignIdAndStatus(campaignId, status, pageable);
   }
 
   /**
    * Find logs by email type.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param emailType the email type
    * @param pageable pagination information
    * @return page of logs
    */
   @Transactional(readOnly = true)
-  public Page<EmailLog> findByEmailType(Long userId, String emailType, Pageable pageable) {
+  public Page<EmailLog> findByEmailType(String userId, String emailType, Pageable pageable) {
     return logRepository.findByEmailType(userId, emailType, pageable);
   }
 
   /**
    * Find logs within a date range.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param startDate start date
    * @param endDate end date
    * @param pageable pagination information
    * @return page of logs
    */
   @Transactional(readOnly = true)
-  public Page<EmailLog> findByDateRange(Long userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+  public Page<EmailLog> findByDateRange(String userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
     return logRepository.findByDateRange(userId, startDate, endDate, pageable);
   }
 
   /**
    * Find logs by recipient email.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param recipientEmail the recipient email
    * @param pageable pagination information
    * @return page of logs
    */
   @Transactional(readOnly = true)
-  public Page<EmailLog> findByRecipientEmail(Long userId, String recipientEmail, Pageable pageable) {
+  public Page<EmailLog> findByRecipientEmail(String userId, String recipientEmail, Pageable pageable) {
     return logRepository.findByRecipientEmail(userId, recipientEmail, pageable);
   }
 
   /**
    * Find failed logs for retry.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param pageable pagination information
    * @return page of failed logs
    */
   @Transactional(readOnly = true)
-  public Page<EmailLog> findFailedLogs(Long userId, Pageable pageable) {
+  public Page<EmailLog> findFailedLogs(String userId, Pageable pageable) {
     return logRepository.findFailedLogs(userId, pageable);
   }
 
   /**
    * Update log status.
    *
-   * @param id the log ID
+   * @param id the ID (String)
    * @param status the new status
    * @return the updated log
    */
-  public EmailLog updateStatus(Long id, String status) {
+  public EmailLog updateStatus(String id, String status) {
     EmailLog log = findById(id);
     log.setStatus(status);
     return logRepository.save(log);
@@ -214,10 +214,10 @@ public class EmailLogService {
   /**
    * Mark log as sent.
    *
-   * @param id the log ID
+   * @param id the ID (String)
    * @return the updated log
    */
-  public EmailLog markAsSent(Long id) {
+  public EmailLog markAsSent(String id) {
     EmailLog log = findById(id);
     log.setStatus("SENT");
     log.setSentAt(LocalDateTime.now());
@@ -227,10 +227,10 @@ public class EmailLogService {
   /**
    * Mark log as delivered.
    *
-   * @param id the log ID
+   * @param id the ID (String)
    * @return the updated log
    */
-  public EmailLog markAsDelivered(Long id) {
+  public EmailLog markAsDelivered(String id) {
     EmailLog log = findById(id);
     log.setStatus("DELIVERED");
     log.setDeliveredAt(LocalDateTime.now());
@@ -240,11 +240,11 @@ public class EmailLogService {
   /**
    * Mark log as failed.
    *
-   * @param id the log ID
+   * @param id the ID (String)
    * @param errorMessage the error message
    * @return the updated log
    */
-  public EmailLog markAsFailed(Long id, String errorMessage) {
+  public EmailLog markAsFailed(String id, String errorMessage) {
     EmailLog log = findById(id);
     log.setStatus("FAILED");
     log.setErrorMessage(errorMessage);
@@ -254,64 +254,64 @@ public class EmailLogService {
   /**
    * Count logs for a user.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @return count of logs
    */
   @Transactional(readOnly = true)
-  public long countByUser(Long userId) {
+  public long countByUser(String userId) {
     return logRepository.countByUserId(userId);
   }
 
   /**
    * Count logs for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    * @return count of logs
    */
   @Transactional(readOnly = true)
-  public long countByCampaign(Long campaignId) {
+  public long countByCampaign(String campaignId) {
     return logRepository.countByCampaignId(campaignId);
   }
 
   /**
    * Count logs by status.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param status the email status
    * @return count of logs
    */
   @Transactional(readOnly = true)
-  public long countByStatus(Long userId, String status) {
+  public long countByStatus(String userId, String status) {
     return logRepository.countByUserIdAndStatus(userId, status);
   }
 
   /**
    * Count logs by email type.
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    * @param emailType the email type
    * @return count of logs
    */
   @Transactional(readOnly = true)
-  public long countByEmailType(Long userId, String emailType) {
+  public long countByEmailType(String userId, String emailType) {
     return logRepository.countByEmailType(userId, emailType);
   }
 
   /**
    * Delete all logs for a user (GDPR compliance).
    *
-   * @param userId the user ID
+   * @param userId the ID (String)
    */
-  public void deleteAllByUser(Long userId) {
+  public void deleteAllByUser(String userId) {
     logRepository.deleteByUserId(userId);
   }
 
   /**
    * Delete all logs for a campaign.
    *
-   * @param campaignId the campaign ID
+   * @param campaignId the ID (String)
    */
-  public void deleteAllByCampaign(Long campaignId) {
+  public void deleteAllByCampaign(String campaignId) {
     logRepository.deleteByCampaignId(campaignId);
   }
 }

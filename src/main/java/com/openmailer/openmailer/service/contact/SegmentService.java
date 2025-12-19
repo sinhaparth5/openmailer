@@ -38,7 +38,7 @@ public class SegmentService {
    */
   public Segment createSegment(Segment segment) {
     // Validate segment name uniqueness for user
-    Long userId = segment.getUser().getId();
+    String userId = segment.getUser().getId();
     if (segmentRepository.findByNameAndUserId(segment.getName(), userId).isPresent()) {
       throw new ValidationException("Segment with this name already exists", "name");
     }
@@ -65,7 +65,7 @@ public class SegmentService {
    * @throws ResourceNotFoundException if segment not found
    */
   @Transactional(readOnly = true)
-  public Segment findById(Long id) {
+  public Segment findById(String id) {
     return segmentRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Segment", "id", id));
   }
@@ -79,7 +79,7 @@ public class SegmentService {
    * @throws ResourceNotFoundException if segment not found
    */
   @Transactional(readOnly = true)
-  public Segment findByIdAndUserId(Long id, Long userId) {
+  public Segment findByIdAndUserId(String id, String userId) {
     return segmentRepository.findByIdAndUserId(id, userId)
         .orElseThrow(() -> new ResourceNotFoundException("Segment", "id", id));
   }
@@ -91,7 +91,7 @@ public class SegmentService {
    * @return list of segments
    */
   @Transactional(readOnly = true)
-  public List<Segment> findByUserId(Long userId) {
+  public List<Segment> findByUserId(String userId) {
     return segmentRepository.findByUserId(userId);
   }
 
@@ -103,7 +103,7 @@ public class SegmentService {
    * @return page of segments
    */
   @Transactional(readOnly = true)
-  public Page<Segment> findByUserId(Long userId, Pageable pageable) {
+  public Page<Segment> findByUserId(String userId, Pageable pageable) {
     return segmentRepository.findByUserId(userId, pageable);
   }
 
@@ -116,7 +116,7 @@ public class SegmentService {
    * @return page of segments
    */
   @Transactional(readOnly = true)
-  public Page<Segment> findByType(Long userId, Boolean isDynamic, Pageable pageable) {
+  public Page<Segment> findByType(String userId, Boolean isDynamic, Pageable pageable) {
     return segmentRepository.findByUserIdAndIsDynamic(userId, isDynamic, pageable);
   }
 
@@ -129,7 +129,7 @@ public class SegmentService {
    * @return page of matching segments
    */
   @Transactional(readOnly = true)
-  public Page<Segment> searchByName(Long userId, String name, Pageable pageable) {
+  public Page<Segment> searchByName(String userId, String name, Pageable pageable) {
     return segmentRepository.findByUserIdAndNameContainingIgnoreCase(userId, name, pageable);
   }
 
@@ -140,7 +140,7 @@ public class SegmentService {
    * @return list of segments
    */
   @Transactional(readOnly = true)
-  public List<Segment> findByContactListId(Long listId) {
+  public List<Segment> findByContactListId(String listId) {
     return segmentRepository.findByContactListId(listId);
   }
 
@@ -153,7 +153,7 @@ public class SegmentService {
    * @return the updated segment
    * @throws ResourceNotFoundException if segment not found
    */
-  public Segment updateSegment(Long id, Long userId, Segment updatedSegment) {
+  public Segment updateSegment(String id, String userId, Segment updatedSegment) {
     Segment segment = findByIdAndUserId(id, userId);
 
     // Check name uniqueness if name is being changed
@@ -192,7 +192,7 @@ public class SegmentService {
    * @param conditions the new conditions
    * @return the updated segment
    */
-  public Segment updateConditions(Long id, Long userId, Map<String, Object> conditions) {
+  public Segment updateConditions(String id, String userId, Map<String, Object> conditions) {
     Segment segment = findByIdAndUserId(id, userId);
     segment.setConditions(conditions);
     segment.setCachedCount(0);
@@ -209,7 +209,7 @@ public class SegmentService {
    * @param count the contact count
    * @return the updated segment
    */
-  public Segment updateCachedCount(Long id, Long userId, Integer count) {
+  public Segment updateCachedCount(String id, String userId, Integer count) {
     Segment segment = findByIdAndUserId(id, userId);
     segment.setCachedCount(count);
     segment.setLastCalculatedAt(LocalDateTime.now());
@@ -224,7 +224,7 @@ public class SegmentService {
    * @param userId the user ID
    * @throws ResourceNotFoundException if segment not found
    */
-  public void deleteSegment(Long id, Long userId) {
+  public void deleteSegment(String id, String userId) {
     Segment segment = findByIdAndUserId(id, userId);
     segmentRepository.delete(segment);
   }
@@ -234,7 +234,7 @@ public class SegmentService {
    *
    * @param userId the user ID
    */
-  public void deleteAllByUserId(Long userId) {
+  public void deleteAllByUserId(String userId) {
     segmentRepository.deleteByUserId(userId);
   }
 
@@ -243,7 +243,7 @@ public class SegmentService {
    *
    * @param listId the contact list ID
    */
-  public void deleteByContactListId(Long listId) {
+  public void deleteByContactListId(String listId) {
     segmentRepository.deleteByContactListId(listId);
   }
 
@@ -254,7 +254,7 @@ public class SegmentService {
    * @return count of segments
    */
   @Transactional(readOnly = true)
-  public long countByUserId(Long userId) {
+  public long countByUserId(String userId) {
     return segmentRepository.countByUserId(userId);
   }
 }

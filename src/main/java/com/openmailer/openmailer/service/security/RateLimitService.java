@@ -49,7 +49,7 @@ public class RateLimitService {
    * @throws ResourceNotFoundException if rate limit not found
    */
   @Transactional(readOnly = true)
-  public RateLimit findById(Long id) {
+  public RateLimit findById(String id) {
     return rateLimitRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("RateLimit", "id", id));
   }
@@ -61,7 +61,7 @@ public class RateLimitService {
    * @return list of rate limits
    */
   @Transactional(readOnly = true)
-  public List<RateLimit> findByUser(Long userId) {
+  public List<RateLimit> findByUser(String userId) {
     return rateLimitRepository.findByUserId(userId);
   }
 
@@ -73,7 +73,7 @@ public class RateLimitService {
    * @return page of rate limits
    */
   @Transactional(readOnly = true)
-  public Page<RateLimit> findByUser(Long userId, Pageable pageable) {
+  public Page<RateLimit> findByUser(String userId, Pageable pageable) {
     return rateLimitRepository.findByUserId(userId, pageable);
   }
 
@@ -86,7 +86,7 @@ public class RateLimitService {
    * @return page of rate limits
    */
   @Transactional(readOnly = true)
-  public Page<RateLimit> findByResourceType(Long userId, String resourceType, Pageable pageable) {
+  public Page<RateLimit> findByResourceType(String userId, String resourceType, Pageable pageable) {
     return rateLimitRepository.findByResourceType(userId, resourceType, pageable);
   }
 
@@ -99,7 +99,7 @@ public class RateLimitService {
    * @param windowDurationMinutes the window duration in minutes
    * @return the active rate limit
    */
-  public RateLimit getOrCreateActiveRateLimit(Long userId, String resourceType, Integer limitValue, Integer windowDurationMinutes) {
+  public RateLimit getOrCreateActiveRateLimit(String userId, String resourceType, Integer limitValue, Integer windowDurationMinutes) {
     LocalDateTime now = LocalDateTime.now();
 
     return rateLimitRepository.findActiveRateLimit(userId, resourceType, now)
@@ -125,7 +125,7 @@ public class RateLimitService {
    * @return true if limit exceeded, false otherwise
    */
   @Transactional(readOnly = true)
-  public boolean isRateLimitExceeded(Long userId, String resourceType, Integer limitValue, Integer windowDurationMinutes) {
+  public boolean isRateLimitExceeded(String userId, String resourceType, Integer limitValue, Integer windowDurationMinutes) {
     LocalDateTime now = LocalDateTime.now();
     RateLimit rateLimit = rateLimitRepository.findActiveRateLimit(userId, resourceType, now).orElse(null);
 
@@ -146,7 +146,7 @@ public class RateLimitService {
    * @return the updated rate limit
    * @throws RateLimitExceededException if rate limit is exceeded
    */
-  public RateLimit incrementRequestCount(Long userId, String resourceType, Integer limitValue, Integer windowDurationMinutes) {
+  public RateLimit incrementRequestCount(String userId, String resourceType, Integer limitValue, Integer windowDurationMinutes) {
     RateLimit rateLimit = getOrCreateActiveRateLimit(userId, resourceType, limitValue, windowDurationMinutes);
 
     if (rateLimit.getRequestCount() >= rateLimit.getLimitValue()) {
@@ -170,7 +170,7 @@ public class RateLimitService {
    * @param userId the user ID
    * @param resourceType the resource type
    */
-  public void resetRateLimit(Long userId, String resourceType) {
+  public void resetRateLimit(String userId, String resourceType) {
     LocalDateTime now = LocalDateTime.now();
     RateLimit rateLimit = rateLimitRepository.findActiveRateLimit(userId, resourceType, now).orElse(null);
 
@@ -189,7 +189,7 @@ public class RateLimitService {
    * @return remaining request count, or limit value if no active limit
    */
   @Transactional(readOnly = true)
-  public int getRemainingRequests(Long userId, String resourceType, Integer limitValue) {
+  public int getRemainingRequests(String userId, String resourceType, Integer limitValue) {
     LocalDateTime now = LocalDateTime.now();
     RateLimit rateLimit = rateLimitRepository.findActiveRateLimit(userId, resourceType, now).orElse(null);
 
@@ -207,7 +207,7 @@ public class RateLimitService {
    * @return list of exceeded rate limits
    */
   @Transactional(readOnly = true)
-  public List<RateLimit> findExceededLimits(Long userId) {
+  public List<RateLimit> findExceededLimits(String userId) {
     return rateLimitRepository.findExceededLimits(userId);
   }
 
@@ -228,7 +228,7 @@ public class RateLimitService {
    * @return count of rate limits
    */
   @Transactional(readOnly = true)
-  public long countByUser(Long userId) {
+  public long countByUser(String userId) {
     return rateLimitRepository.countByUserId(userId);
   }
 
@@ -239,7 +239,7 @@ public class RateLimitService {
    * @return count of active rate limits
    */
   @Transactional(readOnly = true)
-  public long countActiveRateLimits(Long userId) {
+  public long countActiveRateLimits(String userId) {
     LocalDateTime now = LocalDateTime.now();
     return rateLimitRepository.countActiveRateLimits(userId, now);
   }
@@ -249,7 +249,7 @@ public class RateLimitService {
    *
    * @param userId the user ID
    */
-  public void deleteAllByUser(Long userId) {
+  public void deleteAllByUser(String userId) {
     rateLimitRepository.deleteByUserId(userId);
   }
 
@@ -259,7 +259,7 @@ public class RateLimitService {
    * @param userId the user ID
    * @param resourceType the resource type
    */
-  public void deleteByResourceType(Long userId, String resourceType) {
+  public void deleteByResourceType(String userId, String resourceType) {
     rateLimitRepository.deleteByResourceType(userId, resourceType);
   }
 }

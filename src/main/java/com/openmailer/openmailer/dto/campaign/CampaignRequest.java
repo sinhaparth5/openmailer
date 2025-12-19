@@ -12,12 +12,12 @@ public class CampaignRequest {
     private String name;
 
     @NotNull(message = "Template ID is required")
-    private Long templateId;
+    private String templateId;
 
     @NotNull(message = "List ID is required")
-    private Long listId;
+    private String listId;
 
-    private Long segmentId;
+    private String segmentId;
 
     @NotBlank(message = "Subject line is required")
     private String subjectLine;
@@ -33,10 +33,10 @@ public class CampaignRequest {
     private String replyToEmail;
 
     @NotNull(message = "Domain ID is required")
-    private Long domainId;
+    private String domainId;
 
     @NotNull(message = "Provider ID is required")
-    private Long providerId;
+    private String providerId;
 
     private Boolean trackOpens = true;
     private Boolean trackClicks = true;
@@ -45,9 +45,9 @@ public class CampaignRequest {
     public CampaignRequest() {
     }
 
-    public CampaignRequest(String name, Long templateId, Long listId, Long segmentId, String subjectLine,
+    public CampaignRequest(String name, String templateId, String listId, String segmentId, String subjectLine,
                            String previewText, String fromName, String fromEmail, String replyToEmail,
-                           Long domainId, Long providerId, Boolean trackOpens, Boolean trackClicks, Integer sendSpeed) {
+                           String domainId, String providerId, Boolean trackOpens, Boolean trackClicks, Integer sendSpeed) {
         this.name = name;
         this.templateId = templateId;
         this.listId = listId;
@@ -72,27 +72,27 @@ public class CampaignRequest {
         this.name = name;
     }
 
-    public Long getTemplateId() {
+    public String getTemplateId() {
         return templateId;
     }
 
-    public void setTemplateId(Long templateId) {
+    public void setTemplateId(String templateId) {
         this.templateId = templateId;
     }
 
-    public Long getListId() {
+    public String getListId() {
         return listId;
     }
 
-    public void setListId(Long listId) {
+    public void setListId(String listId) {
         this.listId = listId;
     }
 
-    public Long getSegmentId() {
+    public String getSegmentId() {
         return segmentId;
     }
 
-    public void setSegmentId(Long segmentId) {
+    public void setSegmentId(String segmentId) {
         this.segmentId = segmentId;
     }
 
@@ -136,19 +136,19 @@ public class CampaignRequest {
         this.replyToEmail = replyToEmail;
     }
 
-    public Long getDomainId() {
+    public String getDomainId() {
         return domainId;
     }
 
-    public void setDomainId(Long domainId) {
+    public void setDomainId(String domainId) {
         this.domainId = domainId;
     }
 
-    public Long getProviderId() {
+    public String getProviderId() {
         return providerId;
     }
 
-    public void setProviderId(Long providerId) {
+    public void setProviderId(String providerId) {
         this.providerId = providerId;
     }
 

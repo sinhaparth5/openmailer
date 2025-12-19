@@ -91,7 +91,7 @@ public class CampaignController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CampaignResponse>> getCampaign(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailCampaign campaign = campaignService.findById(id);
 
@@ -180,7 +180,7 @@ public class CampaignController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<CampaignResponse>> updateCampaign(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody CampaignRequest request) {
 
         EmailCampaign campaign = campaignService.findById(id);
@@ -237,7 +237,7 @@ public class CampaignController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteCampaign(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailCampaign campaign = campaignService.findById(id);
 
@@ -266,7 +266,7 @@ public class CampaignController {
     @PostMapping("/{id}/schedule")
     public ResponseEntity<ApiResponse<CampaignResponse>> scheduleCampaign(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestBody Map<String, String> request) {
 
         EmailCampaign campaign = campaignService.findById(id);
@@ -313,7 +313,7 @@ public class CampaignController {
     @PostMapping("/{id}/send")
     public ResponseEntity<ApiResponse<CampaignResponse>> sendCampaign(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailCampaign campaign = campaignService.findById(id);
 
@@ -351,7 +351,7 @@ public class CampaignController {
     @PostMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<CampaignResponse>> cancelCampaign(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailCampaign campaign = campaignService.findById(id);
 
@@ -383,7 +383,7 @@ public class CampaignController {
     @GetMapping("/{id}/stats")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getCampaignStats(
             @AuthenticationPrincipal User user,
-            @PathVariable Long id) {
+            @PathVariable String id) {
 
         EmailCampaign campaign = campaignService.findById(id);
 
