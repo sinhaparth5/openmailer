@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title th:text="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">OpenMailer</title>
+    <meta name="description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
+    <meta name="keywords" th:content="${pageKeywords} ?: 'bulk email, email marketing, email templates, open source, email campaigns'">
+    <meta name="author" content="OpenMailer">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" th:content="${pageUrl} ?: 'https://openmailer.com'">
+    <meta property="og:title" th:content="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">
+    <meta property="og:description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
+    <meta property="og:image" th:content="${pageImage} ?: '/images/og-image.png'">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" th:content="${pageUrl} ?: 'https://openmailer.com'">
+    <meta name="twitter:title" th:content="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">
+    <meta name="twitter:description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
+    <meta name="twitter:image" th:content="${pageImage} ?: '/images/og-image.png'">
+
+    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
+
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+
+    <th:block layout:fragment="extra-head"></th:block>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <nav th:replace="~{layout/fragments :: navbar}"></nav>
+
+    <main class="flex-grow" layout:fragment="content">
+        <!-- Page content will be inserted here -->
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{layout/fragments :: footer}"></footer>
+
+    <!-- Additional scripts from child templates -->
+    <th:block layout:fragment="extra-scripts"></th:block>
+</body>
+</html>
