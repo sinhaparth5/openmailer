@@ -80,7 +80,7 @@ public class SecurityConfiguration {
                 )
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico").permitAll()
                 .requestMatchers("/api/auth/**", "/track/**").permitAll()
                 .requestMatchers("/api/webhooks/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
