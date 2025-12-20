@@ -3,7 +3,6 @@ package com.openmailer.openmailer.service.contact;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import com.openmailer.openmailer.model.Contact;
-import com.openmailer.openmailer.model.ContactList;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.repository.ContactRepository;
 import org.apache.commons.validator.routines.EmailValidator;
