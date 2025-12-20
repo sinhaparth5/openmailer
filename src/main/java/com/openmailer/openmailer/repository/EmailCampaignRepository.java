@@ -76,6 +76,16 @@ public interface EmailCampaignRepository extends JpaRepository<EmailCampaign, St
   List<EmailCampaign> findScheduledCampaignsReadyToSend(@Param("status") String status, @Param("now") LocalDateTime now);
 
   /**
+   * Find scheduled campaigns that are ready to send.
+   * Looks for campaigns with status SCHEDULED and scheduledAt <= now.
+   *
+   * @param now current timestamp
+   * @return list of campaigns ready to send
+   */
+  @Query("SELECT c FROM EmailCampaign c WHERE c.status = 'SCHEDULED' AND c.scheduledAt IS NOT NULL AND c.scheduledAt <= :now")
+  List<EmailCampaign> findScheduledCampaigns(@Param("now") LocalDateTime now);
+
+  /**
    * Find campaigns by template ID.
    *
    * @param templateId the template ID
