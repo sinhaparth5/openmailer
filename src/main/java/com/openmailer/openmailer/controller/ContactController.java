@@ -7,18 +7,25 @@ import com.openmailer.openmailer.dto.contact.ContactResponse;
 import com.openmailer.openmailer.model.Contact;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.service.contact.ContactService;
+import com.openmailer.openmailer.service.contact.ContactImportService;
+import com.openmailer.openmailer.service.contact.ContactExportService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -31,9 +38,17 @@ public class ContactController {
     private static final Logger log = LoggerFactory.getLogger(ContactController.class);
 
     private final ContactService contactService;
+    private final ContactImportService importService;
+    private final ContactExportService exportService;
 
-    public ContactController(ContactService contactService) {
+    @Autowired
+    public ContactController(
+            ContactService contactService,
+            ContactImportService importService,
+            ContactExportService exportService) {
         this.contactService = contactService;
+        this.importService = importService;
+        this.exportService = exportService;
     }
 
     /**
@@ -299,5 +314,134 @@ public class ContactController {
         }
 
         return ResponseEntity.ok(ApiResponse.success(ContactResponse.fromEntity(contact), "No tags to remove"));
+    }
+
+    /**
+     * POST /api/v1/contacts/import - Upload CSV file for import
+     */
+    @PostMapping("/import")
+    public ResponseEntity<ApiResponse<Map<String, String>>> importContacts(
+            @AuthenticationPrincipal User user,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(required = false) String listId,
+            @RequestParam(defaultValue = "true") boolean skipDuplicates) {
+
+        log.info("Importing contacts from CSV for user: {}", user.getEmail());
+
+        // Validate file
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("INVALID_FILE", "File is empty", null));
+        }
+
+        if (!file.getOriginalFilename().endsWith(".csv")) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("INVALID_FILE", "File must be CSV format", null));
+        }
+
+        // Start import job
+        String jobId = importService.startImport(file, user, listId, skipDuplicates);
+
+        Map<String, String> response = Map.of(
+                "jobId", jobId,
+                "message", "Import started. Check status using /api/v1/contacts/import/" + jobId
+        );
+
+        return ResponseEntity.accepted()
+                .body(ApiResponse.success(response, "Import started successfully"));
+    }
+
+    /**
+     * GET /api/v1/contacts/import/{jobId} - Check import job status
+     */
+    @GetMapping("/import/{jobId}")
+    public ResponseEntity<ApiResponse<ContactImportService.ImportJob>> getImportStatus(
+            @AuthenticationPrincipal User user,
+            @PathVariable String jobId) {
+
+        log.info("Checking import status for job: {}", jobId);
+
+        ContactImportService.ImportJob job = importService.getImportStatus(jobId);
+
+        // Verify user owns this job
+        if (!job.getUserId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this import job", null));
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(job, "Import status retrieved"));
+    }
+
+    /**
+     * POST /api/v1/contacts/import/validate - Validate CSV without importing
+     */
+    @PostMapping("/import/validate")
+    public ResponseEntity<ApiResponse<ContactImportService.ValidationResult>> validateImport(
+            @AuthenticationPrincipal User user,
+            @RequestParam("file") MultipartFile file) {
+
+        log.info("Validating CSV import for user: {}", user.getEmail());
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("INVALID_FILE", "File is empty", null));
+        }
+
+        ContactImportService.ValidationResult result = importService.validateCSV(file);
+
+        return ResponseEntity.ok(ApiResponse.success(result, "CSV validated"));
+    }
+
+    /**
+     * GET /api/v1/contacts/export - Export contacts to CSV or JSON
+     */
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportContacts(
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "csv") String format,
+            @RequestParam(required = false) String listId,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "true") boolean includeFirstName,
+            @RequestParam(defaultValue = "true") boolean includeLastName,
+            @RequestParam(defaultValue = "true") boolean includeStatus,
+            @RequestParam(defaultValue = "false") boolean includeSource,
+            @RequestParam(defaultValue = "false") boolean includeTags,
+            @RequestParam(defaultValue = "false") boolean includeCustomFields) {
+
+        log.info("Exporting contacts to {} for user: {}", format, user.getEmail());
+
+        // Build export options
+        ContactExportService.ExportOptions options = new ContactExportService.ExportOptions();
+        options.setListId(listId);
+        options.setStatus(status);
+        options.setIncludeFirstName(includeFirstName);
+        options.setIncludeLastName(includeLastName);
+        options.setIncludeStatus(includeStatus);
+        options.setIncludeSource(includeSource);
+        options.setIncludeTags(includeTags);
+        options.setIncludeCustomFields(includeCustomFields);
+
+        byte[] data;
+        String filename;
+        String contentType;
+
+        if ("json".equalsIgnoreCase(format)) {
+            data = exportService.exportToJSON(user.getId(), options);
+            filename = "contacts_export.json";
+            contentType = MediaType.APPLICATION_JSON_VALUE;
+        } else {
+            data = exportService.exportToCSV(user.getId(), options);
+            filename = "contacts_export.csv";
+            contentType = "text/csv";
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(contentType));
+        headers.setContentDispositionFormData("attachment", filename);
+        headers.setContentLength(data.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(data);
     }
 }

@@ -89,6 +89,9 @@ public class Contact {
     @Column(name = "tags", columnDefinition = "TEXT[]")
     private String[] tags;
 
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -340,9 +343,21 @@ public class Contact {
         this.subscribedAt = subscribedAt;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
     // Convenience methods for service layer
     public String getUserId() {
         return this.user != null ? this.user.getId() : null;
+    }
+
+    public LocalDateTime getLastBouncedAt() {
+        return this.lastBounceAt;
     }
 
     public void setLastBouncedAt(LocalDateTime lastBouncedAt) {
