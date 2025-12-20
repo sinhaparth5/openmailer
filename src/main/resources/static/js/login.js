@@ -99,11 +99,23 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     }
 
     try {
+        // Get CSRF token from meta tags
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+        // Prepare headers
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+
+        // Add CSRF token to headers if available
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
+
         const response = await fetch('/api/auth/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: headers,
             body: JSON.stringify(loginData)
         });
 
