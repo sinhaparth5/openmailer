@@ -33,7 +33,6 @@
     <th:block layout:fragment="extra-head"></th:block>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <!-- Skip to main content link for keyboard navigation -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:m-2 focus:rounded">
         Skip to main content
     </a>
@@ -44,10 +43,8 @@
         <!-- Page content will be inserted here -->
     </main>
 
-    <!-- Footer -->
     <footer th:replace="~{layout/fragments :: footer}"></footer>
 
-    <!-- Additional scripts from child templates -->
     <th:block layout:fragment="extra-scripts"></th:block>
 </body>
 </html>

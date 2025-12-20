@@ -6,11 +6,9 @@
     <title>Fragments</title>
 </head>
 <body>
-    <!-- Navbar Fragment -->
     <nav th:fragment="navbar" class="bg-white shadow-lg" role="navigation" aria-label="Main navigation">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
                 <div class="flex items-center space-x-3">
                     <a th:href="@{/}" class="flex items-center space-x-2" aria-label="OpenMailer home">
                         <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center" aria-hidden="true">
@@ -22,14 +20,12 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-6" role="menubar">
                     <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Dashboard</a>
                     <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Campaigns</a>
                     <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Templates</a>
                     <a th:href="@{/subscribers}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Subscribers</a>
 
-                    <!-- User Menu (Authenticated) -->
                     <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
                         <span class="text-gray-600" sec:authentication="name" aria-label="Current user">User</span>
                         <form th:action="@{/logout}" method="post" class="inline">
@@ -39,7 +35,6 @@
                         </form>
                     </div>
 
-                    <!-- Login Button (Not Authenticated) -->
                     <div sec:authorize="!isAuthenticated()">
                         <a th:href="@{/login}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="Sign in to your account">
                             Sign In
@@ -47,7 +42,6 @@
                     </div>
                 </div>
 
-                <!-- Mobile Menu Button -->
                 <div class="md:hidden">
                     <button id="mobileMenuButton" type="button" class="text-gray-700 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobileMenu">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -57,7 +51,6 @@
                 </div>
             </div>
 
-            <!-- Mobile Menu -->
             <div id="mobileMenu" class="hidden md:hidden pb-4" role="menu" aria-label="Mobile navigation">
                 <div class="flex flex-col space-y-3">
                     <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Dashboard</a>
@@ -84,11 +77,9 @@
         </div>
     </nav>
 
-    <!-- Footer Fragment -->
     <footer th:fragment="footer" class="bg-white border-t border-gray-200 mt-auto" role="contentinfo" aria-label="Site footer">
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- About -->
                 <div>
                     <h3 class="font-bold text-gray-900 mb-4">OpenMailer</h3>
                     <p class="text-gray-600 text-sm">
@@ -96,7 +87,6 @@
                     </p>
                 </div>
 
-                <!-- Quick Links -->
                 <nav aria-label="Quick links">
                     <h3 class="font-bold text-gray-900 mb-4">Quick Links</h3>
                     <ul class="space-y-2">
@@ -107,7 +97,6 @@
                     </ul>
                 </nav>
 
-                <!-- Resources -->
                 <nav aria-label="Resources">
                     <h3 class="font-bold text-gray-900 mb-4">Resources</h3>
                     <ul class="space-y-2">
@@ -118,7 +107,6 @@
                     </ul>
                 </nav>
 
-                <!-- Legal -->
                 <nav aria-label="Legal information">
                     <h3 class="font-bold text-gray-900 mb-4">Legal</h3>
                     <ul class="space-y-2">
@@ -130,7 +118,6 @@
                 </nav>
             </div>
 
-            <!-- Bottom Bar -->
             <div class="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between">
                 <p class="text-gray-600 text-sm">
                     &copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> OpenMailer. All rights reserved.
@@ -142,7 +129,6 @@
         </div>
     </footer>
 
-    <!-- Mobile Menu Toggle Script Fragment -->
     <script th:fragment="mobile-menu-script" th:src="@{/js/min/mobile-toggle.min.js}"></script>
 </body>
 </html>

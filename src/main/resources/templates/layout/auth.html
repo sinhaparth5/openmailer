@@ -7,49 +7,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <!-- SEO Meta Tags -->
     <title th:text="${pageTitle} ?: 'OpenMailer - Sign In'">OpenMailer - Sign In</title>
     <meta name="description" th:content="${pageDescription} ?: 'Sign in to your OpenMailer account to manage email campaigns, templates, and subscribers.'">
     <meta name="keywords" th:content="${pageKeywords} ?: 'login, sign in, email marketing, bulk email, openmailer'">
     <meta name="author" content="OpenMailer">
     <meta name="robots" content="noindex, nofollow">
 
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" th:content="${pageUrl} ?: 'https://openmailer.com/login'">
     <meta property="og:title" th:content="${pageTitle} ?: 'OpenMailer - Sign In'">
     <meta property="og:description" th:content="${pageDescription} ?: 'Sign in to your OpenMailer account to manage email campaigns, templates, and subscribers.'">
     <meta property="og:image" th:content="${pageImage} ?: '/images/og-image.png'">
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" th:content="${pageUrl} ?: 'https://openmailer.com/login'">
     <meta name="twitter:title" th:content="${pageTitle} ?: 'OpenMailer - Sign In'">
     <meta name="twitter:description" th:content="${pageDescription} ?: 'Sign in to your OpenMailer account to manage email campaigns, templates, and subscribers.'">
     <meta name="twitter:image" th:content="${pageImage} ?: '/images/og-image.png'">
 
-    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
 
-    <!-- Stylesheets -->
     <link rel="stylesheet" th:href="@{/css/output.css}">
 
-    <!-- Additional head content from child templates -->
     <th:block layout:fragment="extra-head"></th:block>
 </head>
 <body class="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 min-h-screen">
-    <!-- Skip to main content link for keyboard navigation -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:m-2 focus:rounded">
         Skip to main content
     </a>
 
-    <!-- Main Content -->
     <main id="main-content" layout:fragment="content" role="main">
         <!-- Page content will be inserted here -->
     </main>
 
-    <!-- Additional scripts from child templates -->
     <th:block layout:fragment="extra-scripts"></th:block>
 </body>
 </html>
