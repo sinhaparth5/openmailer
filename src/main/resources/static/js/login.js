@@ -3,22 +3,38 @@ function togglePasswordVisibility() {
     const passwordInput = document.getElementById('password');
     const eyeIcon = document.getElementById('eyeIcon');
     const eyeSlashIcon = document.getElementById('eyeSlashIcon');
+    const toggleButton = document.getElementById('togglePasswordButton');
 
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         eyeIcon.classList.add('hidden');
         eyeSlashIcon.classList.remove('hidden');
+        toggleButton.setAttribute('aria-label', 'Hide password');
+        toggleButton.setAttribute('aria-pressed', 'true');
     } else {
         passwordInput.type = 'password';
         eyeIcon.classList.remove('hidden');
         eyeSlashIcon.classList.add('hidden');
+        toggleButton.setAttribute('aria-label', 'Show password');
+        toggleButton.setAttribute('aria-pressed', 'false');
     }
 }
 
 // Toggle Two-Factor authentication section
 function toggleTwoFactor() {
     const section = document.getElementById('twoFactorSection');
+    const toggleButton = document.getElementById('twoFactorToggle');
+    const isHidden = section.classList.contains('hidden');
+
     section.classList.toggle('hidden');
+    toggleButton.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+
+    // Focus on the 2FA input when shown
+    if (isHidden) {
+        setTimeout(() => {
+            document.getElementById('twoFactorCode').focus();
+        }, 100);
+    }
 }
 
 // Show alert message
@@ -74,8 +90,13 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
     // Disable button and show loading
     submitButton.disabled = true;
+    submitButton.setAttribute('aria-busy', 'true');
     buttonText.textContent = 'Signing in...';
     loadingSpinner.classList.remove('hidden');
+    const loadingText = document.getElementById('loadingText');
+    if (loadingText) {
+        loadingText.classList.remove('hidden');
+    }
 
     try {
         const response = await fetch('/api/auth/login', {
@@ -121,7 +142,12 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     } finally {
         // Re-enable button and hide loading
         submitButton.disabled = false;
+        submitButton.setAttribute('aria-busy', 'false');
         buttonText.textContent = 'Sign In';
         loadingSpinner.classList.add('hidden');
+        const loadingText = document.getElementById('loadingText');
+        if (loadingText) {
+            loadingText.classList.add('hidden');
+        }
     }
 });

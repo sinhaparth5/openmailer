@@ -7,14 +7,14 @@
 </head>
 <body>
     <!-- Navbar Fragment -->
-    <nav th:fragment="navbar" class="bg-white shadow-lg">
+    <nav th:fragment="navbar" class="bg-white shadow-lg" role="navigation" aria-label="Main navigation">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3">
-                    <a th:href="@{/}" class="flex items-center space-x-2">
-                        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a th:href="@{/}" class="flex items-center space-x-2" aria-label="OpenMailer home">
+                        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center" aria-hidden="true">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" role="img" aria-label="Email icon">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                             </svg>
                         </div>
@@ -23,17 +23,17 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden md:flex items-center space-x-6">
-                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 font-medium transition">Dashboard</a>
-                    <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition">Campaigns</a>
-                    <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition">Templates</a>
-                    <a th:href="@{/subscribers}" class="text-gray-700 hover:text-blue-600 font-medium transition">Subscribers</a>
+                <div class="hidden md:flex items-center space-x-6" role="menubar">
+                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Dashboard</a>
+                    <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Campaigns</a>
+                    <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Templates</a>
+                    <a th:href="@{/subscribers}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Subscribers</a>
 
                     <!-- User Menu (Authenticated) -->
                     <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
-                        <span class="text-gray-600" sec:authentication="name">User</span>
+                        <span class="text-gray-600" sec:authentication="name" aria-label="Current user">User</span>
                         <form th:action="@{/logout}" method="post" class="inline">
-                            <button type="submit" class="text-gray-700 hover:text-red-600 font-medium transition">
+                            <button type="submit" class="text-gray-700 hover:text-red-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded px-2 py-1" aria-label="Log out of your account">
                                 Logout
                             </button>
                         </form>
@@ -41,7 +41,7 @@
 
                     <!-- Login Button (Not Authenticated) -->
                     <div sec:authorize="!isAuthenticated()">
-                        <a th:href="@{/login}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                        <a th:href="@{/login}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="Sign in to your account">
                             Sign In
                         </a>
                     </div>
@@ -49,8 +49,8 @@
 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button id="mobileMenuButton" type="button" class="text-gray-700 hover:text-blue-600 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button id="mobileMenuButton" type="button" class="text-gray-700 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobileMenu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
@@ -58,24 +58,24 @@
             </div>
 
             <!-- Mobile Menu -->
-            <div id="mobileMenu" class="hidden md:hidden pb-4">
+            <div id="mobileMenu" class="hidden md:hidden pb-4" role="menu" aria-label="Mobile navigation">
                 <div class="flex flex-col space-y-3">
-                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 font-medium transition">Dashboard</a>
-                    <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition">Campaigns</a>
-                    <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition">Templates</a>
-                    <a th:href="@{/subscribers}" class="text-gray-700 hover:text-blue-600 font-medium transition">Subscribers</a>
+                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Dashboard</a>
+                    <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Campaigns</a>
+                    <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Templates</a>
+                    <a th:href="@{/subscribers}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Subscribers</a>
 
                     <div sec:authorize="isAuthenticated()" class="pt-3 border-t">
-                        <span class="text-gray-600 block mb-2" sec:authentication="name">User</span>
+                        <span class="text-gray-600 block mb-2" sec:authentication="name" aria-label="Current user">User</span>
                         <form th:action="@{/logout}" method="post">
-                            <button type="submit" class="text-gray-700 hover:text-red-600 font-medium transition">
+                            <button type="submit" class="text-gray-700 hover:text-red-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1" aria-label="Log out of your account">
                                 Logout
                             </button>
                         </form>
                     </div>
 
                     <div sec:authorize="!isAuthenticated()" class="pt-3 border-t">
-                        <a th:href="@{/login}" class="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center">
+                        <a th:href="@{/login}" class="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Sign in to your account">
                             Sign In
                         </a>
                     </div>
@@ -85,7 +85,7 @@
     </nav>
 
     <!-- Footer Fragment -->
-    <footer th:fragment="footer" class="bg-white border-t border-gray-200 mt-auto">
+    <footer th:fragment="footer" class="bg-white border-t border-gray-200 mt-auto" role="contentinfo" aria-label="Site footer">
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- About -->
@@ -97,37 +97,37 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div>
+                <nav aria-label="Quick links">
                     <h3 class="font-bold text-gray-900 mb-4">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a th:href="@{/}" class="text-gray-600 hover:text-blue-600 text-sm transition">Dashboard</a></li>
-                        <li><a th:href="@{/campaigns}" class="text-gray-600 hover:text-blue-600 text-sm transition">Campaigns</a></li>
-                        <li><a th:href="@{/templates}" class="text-gray-600 hover:text-blue-600 text-sm transition">Templates</a></li>
-                        <li><a th:href="@{/subscribers}" class="text-gray-600 hover:text-blue-600 text-sm transition">Subscribers</a></li>
+                        <li><a th:href="@{/}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Dashboard</a></li>
+                        <li><a th:href="@{/campaigns}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Campaigns</a></li>
+                        <li><a th:href="@{/templates}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Templates</a></li>
+                        <li><a th:href="@{/subscribers}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Subscribers</a></li>
                     </ul>
-                </div>
+                </nav>
 
                 <!-- Resources -->
-                <div>
+                <nav aria-label="Resources">
                     <h3 class="font-bold text-gray-900 mb-4">Resources</h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-blue-600 text-sm transition">Documentation</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-blue-600 text-sm transition">API Reference</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-blue-600 text-sm transition">Support</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-blue-600 text-sm transition">GitHub</a></li>
+                        <li><a href="/documentation" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Documentation</a></li>
+                        <li><a href="/api-reference" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">API Reference</a></li>
+                        <li><a href="/support" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Support</a></li>
+                        <li><a href="https://github.com/openmailer" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1" target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> (opens in new window)</span></a></li>
                     </ul>
-                </div>
+                </nav>
 
                 <!-- Legal -->
-                <div>
+                <nav aria-label="Legal information">
                     <h3 class="font-bold text-gray-900 mb-4">Legal</h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-blue-600 text-sm transition">Privacy Policy</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-blue-600 text-sm transition">Terms of Service</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-blue-600 text-sm transition">Cookie Policy</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-blue-600 text-sm transition">License</a></li>
+                        <li><a href="/privacy" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Privacy Policy</a></li>
+                        <li><a href="/terms" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Terms of Service</a></li>
+                        <li><a href="/cookies" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Cookie Policy</a></li>
+                        <li><a href="/license" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">License</a></li>
                     </ul>
-                </div>
+                </nav>
             </div>
 
             <!-- Bottom Bar -->
@@ -143,17 +143,6 @@
     </footer>
 
     <!-- Mobile Menu Toggle Script Fragment -->
-    <script th:fragment="mobile-menu-script">
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuButton = document.getElementById('mobileMenuButton');
-            const mobileMenu = document.getElementById('mobileMenu');
-
-            if (mobileMenuButton && mobileMenu) {
-                mobileMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                });
-            }
-        });
-    </script>
+    <script th:fragment="mobile-menu-script" th:src="@{/js/min/mobile-toggle.min.js}"></script>
 </body>
 </html>
