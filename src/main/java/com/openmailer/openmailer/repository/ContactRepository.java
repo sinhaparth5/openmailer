@@ -184,4 +184,20 @@ public interface ContactRepository extends JpaRepository<Contact, String> {
       WHERE m.listId = :listId AND c.status = :status
   """)
   long countByListAndStatus(@Param("listId") String listId, @Param("status") String status);
+
+  /**
+   * Find contact by confirmation token.
+   *
+   * @param confirmationToken the confirmation token
+   * @return Optional containing the contact if found
+   */
+  Optional<Contact> findByConfirmationToken(String confirmationToken);
+
+  /**
+   * Find contact by unsubscribe token.
+   *
+   * @param unsubscribeToken the unsubscribe token
+   * @return Optional containing the contact if found
+   */
+  Optional<Contact> findByUnsubscribeToken(String unsubscribeToken);
 }

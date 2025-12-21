@@ -37,7 +37,7 @@ public class ContactListService {
    */
   public ContactList createContactList(ContactList contactList) {
     // Validate list name uniqueness for user
-    if (contactListRepository.findByNameAndUserId(contactList.getName(), contactList.getUserId()).isPresent()) {
+    if (contactListRepository.findByNameAndUser_Id(contactList.getName(), contactList.getUserId()).isPresent()) {
       throw new ValidationException("Contact list with this name already exists", "name");
     }
 
@@ -70,7 +70,7 @@ public class ContactListService {
    */
   @Transactional(readOnly = true)
   public ContactList findByIdAndUserId(String id, String userId) {
-    return contactListRepository.findByIdAndUserId(id, userId)
+    return contactListRepository.findByIdAndUser_Id(id, userId)
         .orElseThrow(() -> new ResourceNotFoundException("ContactList", "id", id));
   }
 
@@ -82,7 +82,7 @@ public class ContactListService {
    */
   @Transactional(readOnly = true)
   public List<ContactList> findByUserId(String userId) {
-    return contactListRepository.findByUserId(userId);
+    return contactListRepository.findByUser_Id(userId);
   }
 
   /**
@@ -94,7 +94,7 @@ public class ContactListService {
    */
   @Transactional(readOnly = true)
   public Page<ContactList> findByUserId(String userId, Pageable pageable) {
-    return contactListRepository.findByUserId(userId, pageable);
+    return contactListRepository.findByUser_Id(userId, pageable);
   }
 
   /**
@@ -107,7 +107,7 @@ public class ContactListService {
    */
   @Transactional(readOnly = true)
   public Page<ContactList> searchByName(String userId, String name, Pageable pageable) {
-    return contactListRepository.findByUserIdAndNameContainingIgnoreCase(userId, name, pageable);
+    return contactListRepository.findByUser_IdAndNameContainingIgnoreCase(userId, name, pageable);
   }
 
   /**
@@ -124,7 +124,7 @@ public class ContactListService {
 
     // Check name uniqueness if name is being changed
     if (updatedList.getName() != null && !updatedList.getName().equals(contactList.getName())) {
-      if (contactListRepository.findByNameAndUserId(updatedList.getName(), userId).isPresent()) {
+      if (contactListRepository.findByNameAndUser_Id(updatedList.getName(), userId).isPresent()) {
         throw new ValidationException("Contact list with this name already exists", "name");
       }
       contactList.setName(updatedList.getName());
@@ -182,7 +182,7 @@ public class ContactListService {
    * @param userId the user ID
    */
   public void deleteAllByUserId(String userId) {
-    contactListRepository.deleteByUserId(userId);
+    contactListRepository.deleteByUser_Id(userId);
   }
 
   /**
@@ -193,6 +193,6 @@ public class ContactListService {
    */
   @Transactional(readOnly = true)
   public long countByUserId(String userId) {
-    return contactListRepository.countByUserId(userId);
+    return contactListRepository.countByUser_Id(userId);
   }
 }

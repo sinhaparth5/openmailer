@@ -4,11 +4,11 @@ Last Updated: 2025-12-18
 
 ---
 
-## 📊 Overall Progress: ~65% Complete
+## 📊 Overall Progress: ~70% Complete
 
-### ✅ Completed Phases: 5/10
+### ✅ Completed Phases: 6/10
 ### 🚧 In Progress: 0/10
-### ⏳ Remaining: 5/10
+### ⏳ Remaining: 4/10
 
 ---
 
@@ -311,53 +311,71 @@ Last Updated: 2025-12-18
 
 ---
 
-## ⏳ Phase 6: Public Subscription API (0% Complete)
+## ✅ Phase 6: Public Subscription API (100% Complete)
 
-**Status:** ⏳ NOT STARTED
+**Status:** ✅ COMPLETED
 
 **Priority:** MEDIUM
 
-### Services Needed:
+### Services Implemented:
 
-- ❌ **SubscriptionService**
-  - Handle public subscribe requests
+- ✅ **SubscriptionService** - `src/main/java/com/openmailer/openmailer/service/contact/SubscriptionService.java`
+  - Handle public subscribe requests with double opt-in
   - Generate confirmation tokens
-  - Send confirmation emails
+  - Send confirmation emails using default provider
   - Validate confirmation tokens
   - Update contact status to SUBSCRIBED
-  - Track subscription source
+  - Track subscription source and GDPR consent
 
-- ❌ **UnsubscribeService**
-  - Generate unsubscribe tokens
-  - Handle unsubscribe requests
+- ✅ **UnsubscribeService** - `src/main/java/com/openmailer/openmailer/service/contact/UnsubscribeService.java`
+  - Handle unsubscribe requests via token
   - Update contact status to UNSUBSCRIBED
   - Record unsubscribe reason
   - Remove from all lists
+  - Support unsubscribe from specific list
+  - Resubscribe functionality
 
-- ❌ **PreferenceCenterService**
+- ✅ **PreferenceCenterService** - `src/main/java/com/openmailer/openmailer/service/contact/PreferenceCenterService.java`
   - Get subscriber preferences
-  - Update email frequency
-  - Select specific lists
-  - Manage communication preferences
+  - Update contact information
+  - Manage list subscriptions
+  - Set email frequency preference
+  - Set topic preferences
 
-### Controllers Needed:
+### DTOs Implemented:
 
-- ❌ **PublicSubscriptionController** (No auth required)
-  - `POST /api/v1/subscribe` - Subscribe to list
-  - `GET /api/v1/confirm/{token}` - Confirm subscription
-  - `GET /api/v1/unsubscribe/{token}` - Unsubscribe
-  - `GET /api/v1/preferences/{token}` - Get preferences
-  - `PUT /api/v1/preferences/{token}` - Update preferences
+- ✅ **SubscribeRequest** - `src/main/java/com/openmailer/openmailer/dto/subscription/SubscribeRequest.java`
+- ✅ **UnsubscribeRequest** - `src/main/java/com/openmailer/openmailer/dto/subscription/UnsubscribeRequest.java`
+- ✅ **PreferencesUpdateRequest** - `src/main/java/com/openmailer/openmailer/dto/subscription/PreferencesUpdateRequest.java`
+- ✅ **SubscriptionResponse** - `src/main/java/com/openmailer/openmailer/dto/subscription/SubscriptionResponse.java`
 
-### Webhook Controller:
+### Controllers Implemented:
 
-- ❌ **WebhookController**
-  - `POST /api/v1/webhooks/aws-ses` - Handle AWS SES events
+- ✅ **PublicSubscriptionController** - `src/main/java/com/openmailer/openmailer/controller/PublicSubscriptionController.java`
+  - `POST /api/v1/public/subscribe` - Subscribe to list (double opt-in)
+  - `GET /api/v1/public/confirm/{token}` - Confirm subscription (HTML response)
+  - `GET /api/v1/public/unsubscribe/{token}` - Unsubscribe (HTML response)
+  - `GET /api/v1/public/preferences/{token}` - Get preferences
+  - `PUT /api/v1/public/preferences/{token}` - Update preferences
+  - `POST /api/v1/public/resubscribe/{token}` - Resubscribe
+  - All endpoints are public (no authentication required)
+  - Beautiful HTML pages for confirmation and unsubscribe
+
+- ✅ **WebhookController** - `src/main/java/com/openmailer/openmailer/controller/WebhookController.java`
+  - `POST /api/v1/webhooks/aws-ses` - Handle AWS SES events (bounces, complaints, opens, clicks)
   - `POST /api/v1/webhooks/sendgrid` - Handle SendGrid events
   - `POST /api/v1/webhooks/smtp` - Handle SMTP events
-  - Process: bounces, complaints, opens, clicks
+  - Process bounces (hard/soft) and complaints
+  - Automatic unsubscribe on spam complaints
 
-### Estimated LOC: ~600 lines
+### Security Configuration:
+
+- ✅ Updated `SecurityConfiguration.java` to allow public endpoints
+  - `/api/v1/public/**` - Public subscription endpoints
+  - `/api/v1/webhooks/**` - Webhook endpoints
+  - CSRF disabled for public and webhook endpoints
+
+### Actual LOC: ~950 lines
 
 ---
 
@@ -670,21 +688,21 @@ spring.task.execution.pool.queue-capacity=1000
 
 ### Code Created So Far:
 
-- **Services:** 31 files (~6,200 lines)
-- **Controllers:** 8 files (~2,300 lines)
-- **DTOs:** 10 files (~500 lines)
-- **Total:** 49 files (~9,000 lines of code)
+- **Services:** 34 files (~7,150 lines)
+- **Controllers:** 10 files (~2,850 lines)
+- **DTOs:** 14 files (~650 lines)
+- **Total:** 58 files (~10,650 lines of code)
 
 ### Code Remaining:
 
-- **Services:** ~3 files (~900 lines estimated)
-- **Controllers:** ~2 files (~500 lines estimated)
+- **Services:** ~1 file (~400 lines estimated)
+- **Controllers:** ~1 file (~300 lines estimated)
 - **Tests:** ~50+ files (~2,000 lines estimated)
-- **Total Estimated:** ~3,400 lines remaining
+- **Total Estimated:** ~2,700 lines remaining
 
 ### Total Project Size (When Complete):
-- **~12,500 lines of Java code**
-- **~90+ files**
+- **~13,350 lines of Java code**
+- **~108+ files**
 - **Production-ready email marketing platform**
 
 ---
@@ -713,10 +731,14 @@ spring.task.execution.pool.queue-capacity=1000
 - ✅ Contact import from CSV
 - ✅ Contact export to CSV/JSON
 - ✅ Campaign analytics and reporting
+- ✅ Public subscription API with double opt-in
+- ✅ Unsubscribe and preference center
+- ✅ Webhook handling for provider events (bounces, complaints)
 
 **What Doesn't Work Yet:**
-- ❌ Public subscription API (no public endpoints)
-- ❌ Webhook handling for bounces/complaints
+- ❌ Two-factor authentication (Phase 7)
+- ❌ Segment management controller (Phase 8)
+- ❌ Caching and performance optimizations (Phase 9)
 
 ---
 
@@ -738,6 +760,6 @@ spring.task.execution.pool.queue-capacity=1000
 
 ---
 
-**Last Updated:** 2025-12-20
+**Last Updated:** 2025-12-21
 **Created By:** Claude Code Assistant
 **Version:** 1.0

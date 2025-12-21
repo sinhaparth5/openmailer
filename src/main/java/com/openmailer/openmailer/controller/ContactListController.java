@@ -8,6 +8,7 @@ import com.openmailer.openmailer.dto.list.ContactListResponse;
 import com.openmailer.openmailer.model.Contact;
 import com.openmailer.openmailer.model.ContactList;
 import com.openmailer.openmailer.model.User;
+import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.contact.ContactListMembershipService;
 import com.openmailer.openmailer.service.contact.ContactListService;
 import com.openmailer.openmailer.service.contact.ContactService;
@@ -52,10 +53,11 @@ public class ContactListController {
      */
     @GetMapping
     public ResponseEntity<PaginatedResponse<ContactListResponse>> listContactLists(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
 
+        User user = userDetails.getUser();
         Pageable pageable = PageRequest.of(page, size);
         Page<ContactList> lists = listService.findByUserId(user.getId(), pageable);
 
@@ -75,9 +77,10 @@ public class ContactListController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ContactListResponse>> getContactList(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable String id) {
 
+        User user = userDetails.getUser();
         ContactList list = listService.findById(id);
 
         // Check ownership
@@ -94,9 +97,10 @@ public class ContactListController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<ContactListResponse>> createContactList(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody ContactListRequest request) {
 
+        User user = userDetails.getUser();
         ContactList list = new ContactList();
         list.setName(request.getName());
         list.setDescription(request.getDescription());
@@ -118,10 +122,11 @@ public class ContactListController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ContactListResponse>> updateContactList(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable String id,
             @Valid @RequestBody ContactListRequest request) {
 
+        User user = userDetails.getUser();
         ContactList list = listService.findById(id);
 
         // Check ownership
@@ -146,9 +151,10 @@ public class ContactListController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteContactList(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable String id) {
 
+        User user = userDetails.getUser();
         ContactList list = listService.findById(id);
 
         // Check ownership
@@ -169,11 +175,12 @@ public class ContactListController {
      */
     @GetMapping("/{id}/contacts")
     public ResponseEntity<PaginatedResponse<ContactResponse>> getListContacts(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable String id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
 
+        User user = userDetails.getUser();
         ContactList list = listService.findById(id);
 
         // Check ownership
@@ -201,10 +208,11 @@ public class ContactListController {
      */
     @PostMapping("/{id}/contacts")
     public ResponseEntity<ApiResponse<Map<String, Object>>> addContactsToList(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable String id,
             @RequestBody Map<String, List<String>> request) {
 
+        User user = userDetails.getUser();
         ContactList list = listService.findById(id);
 
         // Check ownership
@@ -275,10 +283,11 @@ public class ContactListController {
      */
     @DeleteMapping("/{id}/contacts/{contactId}")
     public ResponseEntity<ApiResponse<Void>> removeContactFromList(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable String id,
             @PathVariable String contactId) {
 
+        User user = userDetails.getUser();
         ContactList list = listService.findById(id);
 
         // Check ownership
@@ -312,9 +321,10 @@ public class ContactListController {
      */
     @GetMapping("/{id}/stats")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getListStats(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable String id) {
 
+        User user = userDetails.getUser();
         ContactList list = listService.findById(id);
 
         // Check ownership

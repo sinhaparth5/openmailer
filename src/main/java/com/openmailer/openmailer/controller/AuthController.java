@@ -5,10 +5,12 @@ import com.openmailer.openmailer.dto.request.auth.RegisterRequest;
 import com.openmailer.openmailer.dto.response.auth.LoginResponse;
 import com.openmailer.openmailer.dto.response.common.ApiResponse;
 import com.openmailer.openmailer.model.User;
+import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -65,14 +67,12 @@ public class AuthController {
   /**
    * Get current authenticated user.
    *
+   * @param userDetails the authenticated user details
    * @return the current user
    */
   @GetMapping("/me")
-  public ResponseEntity<ApiResponse<User>> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
-    // Extract token from Authorization header
-    String token = authHeader.substring(7); // Remove "Bearer " prefix
-    User user = authenticationService.validateAccessToken(token);
-
+  public ResponseEntity<ApiResponse<User>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    User user = userDetails.getUser();
     return ResponseEntity.ok(ApiResponse.success(user));
   }
 

@@ -50,8 +50,7 @@ public class SecurityConfiguration {
                 .csrfTokenRequestHandler(requestHandler)
                 // Disable CSRF for API endpoints that use JWT (stateless authentication)
                 .ignoringRequestMatchers(
-                    "/api/auth/**",
-                    "/api/webhooks/**",
+                    "/api/**",
                     "/actuator/**"
                 )
             )
@@ -82,7 +81,8 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico").permitAll()
                 .requestMatchers("/api/auth/**", "/track/**").permitAll()
-                .requestMatchers("/api/webhooks/**").permitAll()
+                .requestMatchers("/api/v1/public/**").permitAll()
+                .requestMatchers("/api/webhooks/**", "/api/v1/webhooks/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/login").permitAll()
                 // Swagger/OpenAPI endpoints

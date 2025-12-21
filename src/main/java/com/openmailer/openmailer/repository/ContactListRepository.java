@@ -22,7 +22,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, String
    * @param userId the user ID
    * @return list of contact lists
    */
-  List<ContactList> findByUserId(String userId);
+  List<ContactList> findByUser_Id(String userId);
 
   /**
    * Find all contact lists for a specific user with pagination.
@@ -31,7 +31,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, String
    * @param pageable pagination information
    * @return page of contact lists
    */
-  Page<ContactList> findByUserId(String userId, Pageable pageable);
+  Page<ContactList> findByUser_Id(String userId, Pageable pageable);
 
   /**
    * Find contact list by ID and user ID.
@@ -40,7 +40,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, String
    * @param userId the user ID
    * @return Optional containing the list if found
    */
-  Optional<ContactList> findByIdAndUserId(String id, String userId);
+  Optional<ContactList> findByIdAndUser_Id(String id, String userId);
 
   /**
    * Find contact list by name and user ID.
@@ -49,7 +49,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, String
    * @param userId the user ID
    * @return Optional containing the list if found
    */
-  Optional<ContactList> findByNameAndUserId(String name, String userId);
+  Optional<ContactList> findByNameAndUser_Id(String name, String userId);
 
   /**
    * Search contact lists by name.
@@ -59,7 +59,7 @@ public interface ContactListRepository extends JpaRepository<ContactList, String
    * @param pageable pagination information
    * @return page of matching contact lists
    */
-  Page<ContactList> findByUserIdAndNameContainingIgnoreCase(String userId, String name, Pageable pageable);
+  Page<ContactList> findByUser_IdAndNameContainingIgnoreCase(String userId, String name, Pageable pageable);
 
   /**
    * Count contact lists for a specific user.
@@ -67,12 +67,12 @@ public interface ContactListRepository extends JpaRepository<ContactList, String
    * @param userId the user ID
    * @return count of contact lists
    */
-  long countByUserId(String userId);
+  long countByUser_Id(String userId);
 
   /**
    * Delete all contact lists for a specific user.
    *
    * @param userId the user ID
    */
-  void deleteByUserId(String userId);
+  void deleteByUser_Id(String userId);
 }
