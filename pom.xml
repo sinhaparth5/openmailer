@@ -178,6 +178,13 @@
         <artifactId>commons-validator</artifactId>
         <version>1.8.0</version>
     </dependency>
+
+    <!-- Two-Factor Authentication -->
+    <dependency>
+        <groupId>dev.samstevens.totp</groupId>
+        <artifactId>totp</artifactId>
+        <version>1.7.1</version>
+    </dependency>
 	</dependencies>
 
 	<build>

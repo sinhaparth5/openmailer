@@ -69,6 +69,9 @@ public class User {
     @Column(name = "two_factor_secret")
     private String twoFactorSecret;
 
+    @Column(name = "two_factor_backup_codes", columnDefinition = "TEXT")
+    private String twoFactorBackupCodes;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -282,5 +285,13 @@ public class User {
 
     public void setTwoFactorSecret(String twoFactorSecret) {
         this.twoFactorSecret = twoFactorSecret;
+    }
+
+    public String getTwoFactorBackupCodes() {
+        return twoFactorBackupCodes;
+    }
+
+    public void setTwoFactorBackupCodes(String twoFactorBackupCodes) {
+        this.twoFactorBackupCodes = twoFactorBackupCodes;
     }
 }

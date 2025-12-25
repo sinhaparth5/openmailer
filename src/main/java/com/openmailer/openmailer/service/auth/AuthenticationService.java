@@ -25,16 +25,19 @@ public class AuthenticationService {
   private final UserService userService;
   private final PasswordEncoderService passwordEncoderService;
   private final JwtService jwtService;
+  private final TwoFactorAuthService twoFactorAuthService;
 
   @Autowired
   public AuthenticationService(
       UserService userService,
       PasswordEncoderService passwordEncoderService,
-      JwtService jwtService
+      JwtService jwtService,
+      TwoFactorAuthService twoFactorAuthService
   ) {
     this.userService = userService;
     this.passwordEncoderService = passwordEncoderService;
     this.jwtService = jwtService;
+    this.twoFactorAuthService = twoFactorAuthService;
   }
 
   /**
@@ -80,10 +83,11 @@ public class AuthenticationService {
 
   /**
    * Authenticate user and generate tokens.
+   * Supports two-factor authentication if enabled.
    *
    * @param request the login request
    * @return the login response with tokens
-   * @throws UnauthorizedException if credentials are invalid
+   * @throws UnauthorizedException if credentials are invalid or 2FA code is required/invalid
    */
   public LoginResponse login(LoginRequest request) {
     // Find user by email
@@ -97,6 +101,28 @@ public class AuthenticationService {
     // Check if user is enabled
     if (!user.getEnabled()) {
       throw new UnauthorizedException("Account is disabled");
+    }
+
+    // Check 2FA if enabled
+    if (user.getTwoFactorEnabled() != null && user.getTwoFactorEnabled()) {
+      if (request.getTwoFactorCode() == null || request.getTwoFactorCode().isBlank()) {
+        throw new UnauthorizedException("Two-factor authentication code is required");
+      }
+
+      // Verify 2FA code (try both TOTP and backup code)
+      boolean isValidTotp = twoFactorAuthService.verifyCode(user.getId(), request.getTwoFactorCode());
+      boolean isValidBackup = false;
+
+      if (!isValidTotp) {
+        // Check if it's a backup code (8 characters)
+        if (request.getTwoFactorCode().length() == 8) {
+          isValidBackup = twoFactorAuthService.verifyBackupCode(user.getId(), request.getTwoFactorCode());
+        }
+      }
+
+      if (!isValidTotp && !isValidBackup) {
+        throw new UnauthorizedException("Invalid two-factor authentication code");
+      }
     }
 
     // Update last login
