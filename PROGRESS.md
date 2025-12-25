@@ -556,125 +556,229 @@ spring.cache.redis.time-to-live=600000
 
 ---
 
-## ⏳ Phase 10: Email Provider Setup & Configuration (0% Complete)
+## ⏳ Phase 10: Email Infrastructure Setup (0% Complete)
 
 **Status:** ⏳ NOT STARTED
 
 **Priority:** HIGH - Required for sending emails
 
-### Overview:
-While the email infrastructure code exists (Phase 1), actual email sending requires configuring at least one email provider. This phase covers setting up three different email sending methods with a custom domain.
+### Architecture Overview:
 
-### Email Providers to Configure:
+OpenMailer uses a **dual email system** architecture:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    OpenMailer Platform                  │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌──────────────────────┐  ┌──────────────────────────┐│
+│  │  Transactional Email │  │   Campaign Email         ││
+│  │  (System Emails)     │  │   (Bulk Marketing)       ││
+│  └──────────────────────┘  └──────────────────────────┘│
+│           │                           │                 │
+│           ▼                           ▼                 │
+│  ┌──────────────────────┐  ┌──────────────────────────┐│
+│  │  Custom SMTP Server  │  │  SendGrid / AWS SES      ││
+│  │  (mail.domain.com)   │  │  (Campaign Providers)    ││
+│  └──────────────────────┘  └──────────────────────────┘│
+│           │                           │                 │
+└───────────┼───────────────────────────┼─────────────────┘
+            │                           │
+            ▼                           ▼
+    ┌──────────────┐          ┌──────────────┐
+    │ User Inboxes │          │ User Inboxes │
+    └──────────────┘          └──────────────┘
+```
+
+**Why Two Systems?**
+1. **Custom SMTP** - Full control, reliability, no per-email cost for system emails
+2. **SendGrid/SES** - Scalability, reputation management, high-volume bulk sending
+
+---
+
+### Phase 10a: Custom SMTP Server (Transactional Emails) - 0% Complete
+
+**Purpose:** Send system/transactional emails
+- ✉️ User registration confirmation
+- 🔑 Password reset emails
+- 📧 Account notifications
+- ⚙️ System alerts
+
+**Difficulty:** ⭐⭐⭐⭐ Advanced
+**Time Estimate:** 8-12 hours
+**Cost:** $6/month (VPS hosting)
+
+#### Tasks:
+- [ ] **VPS Setup** (30 minutes)
+  - [ ] Choose provider (DigitalOcean/Hetzner/Vultr)
+  - [ ] Create Ubuntu 22.04 server (1-2GB RAM)
+  - [ ] Configure SSH access
+  - [ ] Set hostname to `mail.yourdomain.com`
+
+- [ ] **DNS Configuration** (30 minutes)
+  - [ ] Add A record: `mail.yourdomain.com` → Server IP
+  - [ ] Add MX record: `@` → `mail.yourdomain.com`
+  - [ ] Add SPF record: `v=spf1 mx a ip4:SERVER_IP ~all`
+  - [ ] Add DMARC record: `v=DMARC1; p=quarantine`
+  - [ ] Set PTR (reverse DNS) with VPS provider
+
+- [ ] **Mail Server Installation** (1 hour)
+  - [ ] Install Postfix
+  - [ ] Configure main.cf settings
+  - [ ] Configure master.cf for submission port
+
+- [ ] **SSL/TLS Certificates** (30 minutes)
+  - [ ] Install Certbot
+  - [ ] Get Let's Encrypt certificate for mail subdomain
+  - [ ] Configure auto-renewal
+
+- [ ] **SMTP Authentication** (45 minutes)
+  - [ ] Install Dovecot
+  - [ ] Configure SASL authentication
+  - [ ] Create SMTP user credentials
+  - [ ] Set up authentication socket
+
+- [ ] **DKIM Email Signing** (45 minutes)
+  - [ ] Install OpenDKIM
+  - [ ] Generate DKIM keys
+  - [ ] Configure OpenDKIM with Postfix
+  - [ ] Add DKIM public key to DNS
+
+- [ ] **Testing & Verification** (1 hour)
+  - [ ] Test local mail sending
+  - [ ] Test SMTP authentication
+  - [ ] Send test email via telnet
+  - [ ] Verify deliverability (mail-tester.com > 8/10)
+  - [ ] Test Gmail/Outlook delivery
+  - [ ] Check SPF/DKIM/DMARC passing
+
+- [ ] **OpenMailer Integration** (30 minutes)
+  - [ ] Configure SMTP provider in OpenMailer
+  - [ ] Test confirmation email sending
+  - [ ] Test password reset emails
+  - [ ] Set as default for transactional emails
+
+- [ ] **Security Hardening** (30 minutes)
+  - [ ] Configure UFW firewall
+  - [ ] Install Fail2Ban
+  - [ ] Set up monitoring
+
+#### Documentation:
+- ✅ **CUSTOM_SMTP_SETUP.md** - Complete step-by-step guide
+  - VPS setup and server configuration
+  - Postfix, Dovecot, OpenDKIM installation
+  - DNS configuration with examples
+  - Security hardening steps
+  - Troubleshooting common issues
+
+#### DNS Records Required:
+```dns
+Type  Name                      Content
+────────────────────────────────────────────────────────────
+A     mail.yourdomain.com       YOUR_SERVER_IP
+MX    @                         10 mail.yourdomain.com
+TXT   @                         v=spf1 mx a ip4:SERVER_IP ~all
+TXT   default._domainkey        v=DKIM1; k=rsa; p=YOUR_PUBLIC_KEY
+TXT   _dmarc                    v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com
+PTR   YOUR_SERVER_IP            mail.yourdomain.com (set with VPS provider)
+```
+
+#### Success Criteria:
+- ✅ Mail server accessible and responding on port 587
+- ✅ TLS encryption working
+- ✅ SMTP authentication successful
+- ✅ Test email delivered to Gmail inbox (not spam)
+- ✅ Mail-tester.com score ≥ 8/10
+- ✅ SPF: PASS
+- ✅ DKIM: PASS
+- ✅ DMARC: PASS
+- ✅ No reverse DNS warnings
+- ✅ OpenMailer sending confirmation emails successfully
+
+---
+
+### Phase 10b: Campaign Email Providers (Bulk Marketing) - 0% Complete
+
+**Purpose:** Send high-volume email campaigns
+- 📨 Newsletter campaigns
+- 🎯 Marketing emails to segments
+- 📊 Promotional campaigns
+- 📧 Bulk email to contact lists
+
+**Providers to Configure:**
 
 #### Option 1: SendGrid (Recommended First)
 - **Difficulty:** ⭐ Easy
 - **Time:** 1-2 hours
-- **Cost:** Free tier (100 emails/day)
-- **Best For:** Quick start, immediate results
+- **Cost:** Free tier (100 emails/day), $19.95/month (50k emails)
+- **Best For:** Quick start, medium volume
 
 **Tasks:**
 - [ ] Create SendGrid account
 - [ ] Verify custom domain
-- [ ] Configure DNS records in Cloudflare (CNAME for domain verification)
+- [ ] Add CNAME records to Cloudflare (3 records)
 - [ ] Get API key
-- [ ] Configure provider in OpenMailer via API
-- [ ] Test confirmation emails
+- [ ] Configure in OpenMailer
+- [ ] Test campaign sending
 
-#### Option 2: AWS SES (Production Ready)
-- **Difficulty:** ⭐⭐ Moderate
-- **Time:** 2-4 hours
-- **Cost:** $0.10 per 1,000 emails
-- **Best For:** Production, high volume
-
-**Tasks:**
-- [ ] Create/access AWS account
-- [ ] Request production access (move out of sandbox)
-- [ ] Verify domain in AWS SES
-- [ ] Configure DNS records (SPF, DKIM, DMARC)
-- [ ] Create IAM user with SES permissions
-- [ ] Get AWS access keys
-- [ ] Configure provider in OpenMailer
-- [ ] Test and monitor deliverability
-
-#### Option 3: Custom SMTP Server (Learning Project)
-- **Difficulty:** ⭐⭐⭐⭐ Advanced
-- **Time:** 8-16 hours
-- **Cost:** $5-20/month (VPS)
-- **Best For:** Learning, full control
-
-**Tasks:**
-- [ ] Set up VPS (DigitalOcean, AWS EC2, or Hetzner)
-- [ ] Install Postfix mail server
-- [ ] Configure SMTP authentication
-- [ ] Install and configure OpenDKIM
-- [ ] Set up TLS/SSL with Let's Encrypt
-- [ ] Configure DNS records (A, MX, SPF, DKIM, DMARC, PTR)
-- [ ] Install Dovecot for SASL authentication
-- [ ] Test deliverability (mail-tester.com)
-- [ ] Configure provider in OpenMailer
-- [ ] Monitor and maintain
-
-### DNS Configuration Required:
-All options require adding DNS records in Cloudflare:
-
-**For SendGrid:**
+**DNS Records:**
 ```dns
 em1234.yourdomain.com    CNAME    u1234567.wl001.sendgrid.net
 s1._domainkey           CNAME    s1.domainkey.u1234567.wl001.sendgrid.net
 s2._domainkey           CNAME    s2.domainkey.u1234567.wl001.sendgrid.net
 ```
 
-**For AWS SES:**
+#### Option 2: AWS SES (Production Scale)
+- **Difficulty:** ⭐⭐ Moderate
+- **Time:** 2-4 hours
+- **Cost:** $0.10 per 1,000 emails
+- **Best For:** High volume, production
+
+**Tasks:**
+- [ ] Create/access AWS account
+- [ ] Request production access (move out of sandbox)
+- [ ] Verify domain in AWS SES
+- [ ] Add DKIM records to Cloudflare (3 CNAME records)
+- [ ] Create IAM user with SES permissions
+- [ ] Get AWS access keys
+- [ ] Configure in OpenMailer
+- [ ] Test and monitor
+
+**DNS Records:**
 ```dns
-# DKIM (3 records provided by AWS)
 abc._domainkey.yourdomain.com    CNAME    abc.dkim.amazonses.com
-# SPF
-yourdomain.com    TXT    "v=spf1 include:amazonses.com ~all"
-# DMARC
-_dmarc.yourdomain.com    TXT    "v=DMARC1; p=quarantine"
+def._domainkey.yourdomain.com    CNAME    def.dkim.amazonses.com
+ghi._domainkey.yourdomain.com    CNAME    ghi.dkim.amazonses.com
 ```
 
-**For Custom SMTP:**
-```dns
-mail.yourdomain.com          A      YOUR_SERVER_IP
-yourdomain.com              MX     10 mail.yourdomain.com
-yourdomain.com              TXT    "v=spf1 mx a ~all"
-default._domainkey          TXT    "v=DKIM1; k=rsa; p=..."
-_dmarc.yourdomain.com       TXT    "v=DMARC1; p=quarantine"
-```
+#### Recommended Order:
+1. ✅ **Start with Custom SMTP** - Get transactional emails working first
+2. ⏭️ **Add SendGrid** - Quick campaign capability
+3. ⏭️ **Add AWS SES** - Scale to high volume
 
-### Documentation Created:
-- ✅ **EMAIL_PROVIDER_SETUP_PLAN.md** - Comprehensive setup guide
-  - Detailed steps for all three providers
-  - DNS configuration examples
-  - Cost analysis
-  - Success criteria
-  - Troubleshooting tips
-
-### Additional Documentation Needed:
-- [ ] EMAIL_SETUP_SENDGRID.md - SendGrid specific guide with screenshots
-- [ ] EMAIL_SETUP_AWS_SES.md - AWS SES specific guide
-- [ ] EMAIL_SETUP_SMTP.md - Custom SMTP server guide
-- [ ] DNS_CONFIGURATION.md - Detailed DNS setup guide
-
-### Recommended Implementation Order:
-1. **Start with SendGrid** (1-2 hours) - Get emails working quickly
-2. **Set up AWS SES** (2-4 hours) - Production-ready solution
-3. **Build Custom SMTP** (8-16 hours) - Learning and full control
+---
 
 ### Testing Checklist:
-- [ ] Email sent successfully
+
+#### Transactional Emails (Custom SMTP):
+- [ ] User registration confirmation sent
 - [ ] Email arrives in inbox (not spam)
-- [ ] SPF check passes
-- [ ] DKIM signature valid
-- [ ] DMARC policy configured
-- [ ] Confirmation emails working
-- [ ] Unsubscribe emails working
-- [ ] Mail-tester.com score > 8/10
+- [ ] Password reset email works
+- [ ] 2FA setup email works
+- [ ] SPF/DKIM/DMARC all pass
+
+#### Campaign Emails (SendGrid/SES):
+- [ ] Test campaign sends successfully
+- [ ] Bulk sending works (100+ emails)
+- [ ] Open tracking works
+- [ ] Click tracking works
+- [ ] Unsubscribe link works
+- [ ] Bounce handling configured
+
+---
 
 ### Estimated LOC: ~200 lines
-(Helper endpoints, testing utilities, documentation)
+(Configuration utilities, testing endpoints, documentation)
 
 ---
 
