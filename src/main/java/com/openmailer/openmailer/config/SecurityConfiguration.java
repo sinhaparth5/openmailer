@@ -81,6 +81,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/images/**").permitAll()
                 .requestMatchers("/api/auth/**", "/track/**").permitAll()
+                .requestMatchers("/api/test/**").permitAll()  // Allow email test endpoints
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/webhooks/**", "/api/v1/webhooks/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
