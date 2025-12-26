@@ -5,6 +5,9 @@ import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.Segment;
 import com.openmailer.openmailer.repository.SegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,10 @@ public class SegmentService {
    * @return the created segment
    * @throws ValidationException if segment name already exists for user
    */
+  @Caching(evict = {
+      @CacheEvict(value = "segmentCounts", allEntries = true),
+      @CacheEvict(value = "segments", allEntries = true)
+  })
   public Segment createSegment(Segment segment) {
     // Validate segment name uniqueness for user
     String userId = segment.getUser().getId();
@@ -64,6 +71,7 @@ public class SegmentService {
    * @return the segment
    * @throws ResourceNotFoundException if segment not found
    */
+  @Cacheable(value = "segmentCounts", key = "'segment:' + #id")
   @Transactional(readOnly = true)
   public Segment findById(String id) {
     return segmentRepository.findById(id)
@@ -78,6 +86,7 @@ public class SegmentService {
    * @return the segment
    * @throws ResourceNotFoundException if segment not found
    */
+  @Cacheable(value = "segmentCounts", key = "'segment:' + #id + ':user:' + #userId")
   @Transactional(readOnly = true)
   public Segment findByIdAndUserId(String id, String userId) {
     return segmentRepository.findByIdAndUserId(id, userId)
@@ -153,6 +162,10 @@ public class SegmentService {
    * @return the updated segment
    * @throws ResourceNotFoundException if segment not found
    */
+  @Caching(evict = {
+      @CacheEvict(value = "segmentCounts", allEntries = true),
+      @CacheEvict(value = "segments", allEntries = true)
+  })
   public Segment updateSegment(String id, String userId, Segment updatedSegment) {
     Segment segment = findByIdAndUserId(id, userId);
 
@@ -192,6 +205,10 @@ public class SegmentService {
    * @param conditions the new conditions
    * @return the updated segment
    */
+  @Caching(evict = {
+      @CacheEvict(value = "segmentCounts", allEntries = true),
+      @CacheEvict(value = "segments", allEntries = true)
+  })
   public Segment updateConditions(String id, String userId, Map<String, Object> conditions) {
     Segment segment = findByIdAndUserId(id, userId);
     segment.setConditions(conditions);
@@ -209,6 +226,10 @@ public class SegmentService {
    * @param count the contact count
    * @return the updated segment
    */
+  @Caching(evict = {
+      @CacheEvict(value = "segmentCounts", allEntries = true),
+      @CacheEvict(value = "segments", allEntries = true)
+  })
   public Segment updateCachedCount(String id, String userId, Integer count) {
     Segment segment = findByIdAndUserId(id, userId);
     segment.setCachedCount(count);
@@ -224,6 +245,10 @@ public class SegmentService {
    * @param userId the user ID
    * @throws ResourceNotFoundException if segment not found
    */
+  @Caching(evict = {
+      @CacheEvict(value = "segmentCounts", allEntries = true),
+      @CacheEvict(value = "segments", allEntries = true)
+  })
   public void deleteSegment(String id, String userId) {
     Segment segment = findByIdAndUserId(id, userId);
     segmentRepository.delete(segment);
@@ -234,6 +259,10 @@ public class SegmentService {
    *
    * @param userId the user ID
    */
+  @Caching(evict = {
+      @CacheEvict(value = "segmentCounts", allEntries = true),
+      @CacheEvict(value = "segments", allEntries = true)
+  })
   public void deleteAllByUserId(String userId) {
     segmentRepository.deleteByUserId(userId);
   }
@@ -243,6 +272,10 @@ public class SegmentService {
    *
    * @param listId the contact list ID
    */
+  @Caching(evict = {
+      @CacheEvict(value = "segmentCounts", allEntries = true),
+      @CacheEvict(value = "segments", allEntries = true)
+  })
   public void deleteByContactListId(String listId) {
     segmentRepository.deleteByContactListId(listId);
   }

@@ -5,6 +5,9 @@ import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.Domain;
 import com.openmailer.openmailer.repository.DomainRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ public class DomainService {
    * @return the created domain
    * @throws ValidationException if domain name already exists
    */
+  @CacheEvict(value = "domainVerification", allEntries = true)
   public Domain createDomain(Domain domain) {
     // Validate domain name uniqueness
     if (domainRepository.existsByDomainName(domain.getDomainName())) {
@@ -59,6 +63,7 @@ public class DomainService {
    * @return the domain
    * @throws ResourceNotFoundException if domain not found
    */
+  @Cacheable(value = "domainVerification", key = "'domain:' + #id")
   @Transactional(readOnly = true)
   public Domain findById(String id) {
     return domainRepository.findById(id)
@@ -73,6 +78,7 @@ public class DomainService {
    * @return the domain
    * @throws ResourceNotFoundException if domain not found
    */
+  @Cacheable(value = "domainVerification", key = "'domain:' + #id + ':user:' + #userId")
   @Transactional(readOnly = true)
   public Domain findByIdAndUserId(String id, String userId) {
     return domainRepository.findByIdAndUserId(id, userId)
@@ -86,6 +92,7 @@ public class DomainService {
    * @return the domain
    * @throws ResourceNotFoundException if domain not found
    */
+  @Cacheable(value = "domainVerification", key = "'domainName:' + #domainName")
   @Transactional(readOnly = true)
   public Domain findByDomainName(String domainName) {
     return domainRepository.findByDomainName(domainName)
@@ -134,6 +141,7 @@ public class DomainService {
    * @param userId the ID (String)
    * @return list of verified domains
    */
+  @Cacheable(value = "domainVerification", key = "'verifiedDomains:' + #userId")
   @Transactional(readOnly = true)
   public List<Domain> findVerifiedDomains(String userId) {
     return domainRepository.findByUserIdAndStatus(userId, "VERIFIED");
@@ -172,6 +180,7 @@ public class DomainService {
    * @param dmarcVerified DMARC verification result
    * @return the updated domain
    */
+  @CacheEvict(value = "domainVerification", allEntries = true)
   public Domain updateVerificationStatus(String id, String userId, String status,
                                           Boolean spfVerified, Boolean dkimVerified, Boolean dmarcVerified) {
     Domain domain = findByIdAndUserId(id, userId);
@@ -201,6 +210,7 @@ public class DomainService {
    * @param dmarcRecord DMARC record value
    * @return the updated domain
    */
+  @CacheEvict(value = "domainVerification", allEntries = true)
   public Domain updateDnsRecords(String id, String userId, String spfRecord, String dkimRecord, String dmarcRecord) {
     Domain domain = findByIdAndUserId(id, userId);
 
@@ -221,6 +231,7 @@ public class DomainService {
    * @param dkimPrivateKey the encrypted private key
    * @return the updated domain
    */
+  @CacheEvict(value = "domainVerification", allEntries = true)
   public Domain updateDkimKeys(String id, String userId, String dkimPublicKey, String dkimPrivateKey) {
     Domain domain = findByIdAndUserId(id, userId);
 
@@ -238,6 +249,7 @@ public class DomainService {
    * @param userId the ID (String)
    * @throws ResourceNotFoundException if domain not found
    */
+  @CacheEvict(value = "domainVerification", allEntries = true)
   public void deleteDomain(String id, String userId) {
     Domain domain = findByIdAndUserId(id, userId);
     domainRepository.delete(domain);
@@ -248,6 +260,7 @@ public class DomainService {
    *
    * @param userId the ID (String)
    */
+  @CacheEvict(value = "domainVerification", allEntries = true)
   public void deleteAllByUserId(String userId) {
     domainRepository.deleteByUserId(userId);
   }

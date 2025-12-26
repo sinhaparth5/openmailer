@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Table Components</title>
+</head>
+<body>
+
+<!-- Basic Data Table -->
+<div th:fragment="data-table" class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th th:each="header : ${headers}" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span th:text="${header}">Header</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr th:each="row : ${data}" class="hover:bg-gray-50">
+                <td th:each="cell : ${row}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span th:text="${cell}">Cell</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Table with Checkbox Selection -->
+<div th:fragment="selectable-table" class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
+                    <input type="checkbox" id="select-all" onclick="toggleAllCheckboxes(this)" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 sm:left-6">
+                </th>
+                <th th:each="header : ${headers}" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span th:text="${header}">Header</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr th:each="row, iterStat : ${data}" class="hover:bg-gray-50">
+                <td class="relative w-12 px-6 sm:w-16 sm:px-8">
+                    <input type="checkbox" th:name="'selected[]'" th:value="${row.id}" class="row-checkbox absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 sm:left-6">
+                </td>
+                <td th:each="cell : ${row.cells}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span th:text="${cell}">Cell</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Sortable Table -->
+<div th:fragment="sortable-table" class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th th:each="header : ${headers}" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" th:onclick="'sortTable(' + ${iterStat.index} + ')'">
+                    <div class="flex items-center space-x-1">
+                        <span th:text="${header}">Header</span>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                        </svg>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr th:each="row : ${data}" class="hover:bg-gray-50">
+                <td th:each="cell : ${row}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span th:text="${cell}">Cell</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Table with Actions -->
+<div th:fragment="action-table" class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th th:each="header : ${headers}" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span th:text="${header}">Header</span>
+                </th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr th:each="row : ${data}" class="hover:bg-gray-50">
+                <td th:each="cell : ${row.cells}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span th:text="${cell}">Cell</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex justify-end space-x-2">
+                        <a th:href="${row.viewUrl}" class="text-blue-600 hover:text-blue-900">View</a>
+                        <a th:href="${row.editUrl}" class="text-gray-600 hover:text-gray-900">Edit</a>
+                        <button th:onclick="${row.deleteAction}" class="text-red-600 hover:text-red-900">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Contact List Table -->
+<div th:fragment="contact-table" class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
+                    <input type="checkbox" id="select-all-contacts" onclick="toggleAllCheckboxes(this)" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 sm:left-6">
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added</th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr th:each="contact : ${contacts}" class="hover:bg-gray-50">
+                <td class="relative w-12 px-6 sm:w-16 sm:px-8">
+                    <input type="checkbox" th:name="'selected[]'" th:value="${contact.id}" class="row-checkbox absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 sm:left-6">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                <span class="text-blue-600 font-semibold" th:text="${contact.initial}">A</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900" th:text="${contact.name}">John Doe</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900" th:text="${contact.email}">john@example.com</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span th:replace="~{components/badges :: status-badge}"></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex flex-wrap gap-1">
+                        <span th:each="tag : ${contact.tags}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800" th:text="${tag}">Tag</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${contact.createdAt}">
+                    2024-01-15
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex justify-end space-x-2">
+                        <a th:href="@{/contacts/{id}(id=${contact.id})}" class="text-blue-600 hover:text-blue-900">View</a>
+                        <a th:href="@{/contacts/{id}/edit(id=${contact.id})}" class="text-gray-600 hover:text-gray-900">Edit</a>
+                        <button onclick="deleteContact(this.dataset.id)" th:attr="data-id=${contact.id}" class="text-red-600 hover:text-red-900">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Campaign Table -->
+<div th:fragment="campaign-table" class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campaign</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipients</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Open Rate</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Click Rate</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr th:each="campaign : ${campaigns}" class="hover:bg-gray-50">
+                <td class="px-6 py-4">
+                    <div class="text-sm font-medium text-gray-900" th:text="${campaign.name}">Campaign Name</div>
+                    <div class="text-sm text-gray-500" th:text="${campaign.subject}">Email subject line</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span th:replace="~{components/badges :: status-badge}"></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${campaign.totalRecipients}">
+                    1,234
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${campaign.sent}">
+                    1,200
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <span class="text-sm text-gray-900" th:text="${campaign.openRate} + '%'">45%</span>
+                        <div class="ml-2 w-16 bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" th:style="'width: ' + ${campaign.openRate} + '%'"></div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <span class="text-sm text-gray-900" th:text="${campaign.clickRate} + '%'">12%</span>
+                        <div class="ml-2 w-16 bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" th:style="'width: ' + ${campaign.clickRate} + '%'"></div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${campaign.createdAt}">
+                    2024-01-15
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex justify-end space-x-2">
+                        <a th:href="@{/campaigns/{id}(id=${campaign.id})}" class="text-blue-600 hover:text-blue-900">View</a>
+                        <a th:href="@{/campaigns/{id}/edit(id=${campaign.id})}" class="text-gray-600 hover:text-gray-900">Edit</a>
+                        <button onclick="duplicateCampaign(this.dataset.id)" th:attr="data-id=${campaign.id}" class="text-green-600 hover:text-green-900">Duplicate</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div th:fragment="pagination" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+    <div class="flex-1 flex justify-between sm:hidden">
+        <a th:href="${prevUrl}" th:classappend="${!hasPrev ? 'pointer-events-none opacity-50' : ''}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+        </a>
+        <a th:href="${nextUrl}" th:classappend="${!hasNext ? 'pointer-events-none opacity-50' : ''}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+        </a>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm text-gray-700">
+                Showing
+                <span class="font-medium" th:text="${start}">1</span>
+                to
+                <span class="font-medium" th:text="${end}">10</span>
+                of
+                <span class="font-medium" th:text="${total}">97</span>
+                results
+            </p>
+        </div>
+        <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <a th:href="${prevUrl}" th:classappend="${!hasPrev ? 'pointer-events-none opacity-50' : ''}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <a th:each="page : ${pages}" th:href="${page.url}" th:classappend="${page.active ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}" class="relative inline-flex items-center px-4 py-2 border text-sm font-medium" th:text="${page.number}">
+                    1
+                </a>
+                <a th:href="${nextUrl}" th:classappend="${!hasNext ? 'pointer-events-none opacity-50' : ''}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Empty State for Tables -->
+<div th:fragment="table-empty" class="text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900" th:text="${title} ?: 'No data'">No data</h3>
+    <p class="mt-1 text-sm text-gray-500" th:text="${message} ?: 'Get started by creating a new item.'">Get started by creating a new item.</p>
+    <div th:if="${showButton}" class="mt-6">
+        <button th:replace="~{components/buttons :: btn-primary}"></button>
+    </div>
+</div>
+
+<!-- Alpine.js data components for table functionality -->
+<script>
+    // Table selection component
+    function tableSelection() {
+        return {
+            selectedAll: false,
+            selectedRows: [],
+
+            toggleAll() {
+                this.selectedAll = !this.selectedAll;
+                const checkboxes = document.querySelectorAll('.row-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.selectedAll;
+                });
+            },
+
+            updateSelection() {
+                const checkboxes = document.querySelectorAll('.row-checkbox');
+                this.selectedAll = Array.from(checkboxes).every(cb => cb.checked);
+                this.selectedRows = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+            }
+        };
+    }
+</script>
+
+</body>
+</html>

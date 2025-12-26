@@ -5,6 +5,9 @@ import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,7 @@ public class UserService {
    * @return the created user
    * @throws ValidationException if email or username already exists
    */
+  @CacheEvict(value = "users", allEntries = true)
   public User createUser(User user) {
     // Validate email uniqueness
     if (userRepository.existsByEmail(user.getEmail())) {
@@ -58,6 +62,7 @@ public class UserService {
    * @return the user
    * @throws ResourceNotFoundException if user not found
    */
+  @Cacheable(value = "users", key = "#id")
   @Transactional(readOnly = true)
   public User findById(String id) {
     return userRepository.findById(id)
@@ -70,6 +75,7 @@ public class UserService {
    * @param email the email address
    * @return Optional containing the user if found
    */
+  @Cacheable(value = "users", key = "'email:' + #email")
   @Transactional(readOnly = true)
   public Optional<User> findByEmail(String email) {
     return userRepository.findByEmail(email);
@@ -82,6 +88,7 @@ public class UserService {
    * @return the user
    * @throws ResourceNotFoundException if user not found
    */
+  @Cacheable(value = "users", key = "'email:' + #email")
   @Transactional(readOnly = true)
   public User findByEmailOrThrow(String email) {
     return userRepository.findByEmail(email)
@@ -94,6 +101,7 @@ public class UserService {
    * @param username the username
    * @return Optional containing the user if found
    */
+  @Cacheable(value = "users", key = "'username:' + #username")
   @Transactional(readOnly = true)
   public Optional<User> findByUsername(String username) {
     return userRepository.findByUsername(username);
@@ -107,6 +115,7 @@ public class UserService {
    * @return the updated user
    * @throws ResourceNotFoundException if user not found
    */
+  @CacheEvict(value = "users", allEntries = true)
   public User updateUser(String id, User updatedUser) {
     User user = findById(id);
 
@@ -144,6 +153,7 @@ public class UserService {
    * @param id the user ID
    * @throws ResourceNotFoundException if user not found
    */
+  @CacheEvict(value = "users", allEntries = true)
   public void deleteUser(String id) {
     User user = findById(id);
     userRepository.delete(user);

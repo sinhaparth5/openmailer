@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>UI Components</title>
+</head>
+<body>
+
+<main layout:fragment="content" class="container mx-auto px-4 py-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">UI Component Library</h1>
+            <p class="text-lg text-gray-600">Browse and explore all available components built with Thymeleaf, Tailwind CSS, and Alpine.js</p>
+        </div>
+
+        <!-- Component Categories Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <a th:each="category : ${categories}"
+               th:href="@{/components/{type}(type=${category.id})}"
+               class="block bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-blue-500 transition-all duration-200">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <span class="text-4xl" th:text="${category.icon}">🔘</span>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1" th:text="${category.name}">Component Name</h3>
+                        <p class="text-sm text-gray-600" th:text="${category.description}">Component description</p>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </a>
+        </div>
+
+        <!-- Info Section -->
+        <div class="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">About This Component Library</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <p>This component library is built with modern web technologies:</p>
+                        <ul class="list-disc list-inside mt-2 space-y-1">
+                            <li><strong>Thymeleaf</strong> - Server-side templating with fragment support</li>
+                            <li><strong>Tailwind CSS v4</strong> - Utility-first CSS framework</li>
+                            <li><strong>Alpine.js v3</strong> - Lightweight JavaScript framework for interactivity</li>
+                            <li><strong>Chart.js</strong> - Beautiful charts and data visualization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+                <div class="text-3xl font-bold text-blue-600">10</div>
+                <div class="text-sm text-gray-600 mt-1">Component Categories</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+                <div class="text-3xl font-bold text-green-600">80+</div>
+                <div class="text-sm text-gray-600 mt-1">Total Components</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+                <div class="text-3xl font-bold text-purple-600">100%</div>
+                <div class="text-sm text-gray-600 mt-1">Responsive</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+                <div class="text-3xl font-bold text-orange-600">A11y</div>
+                <div class="text-sm text-gray-600 mt-1">Accessible</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

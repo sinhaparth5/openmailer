@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chart Components</title>
+</head>
+<body>
+
+<!-- Line Chart Container -->
+<div th:fragment="line-chart" class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900" th:text="${title} ?: 'Line Chart'">Line Chart</h3>
+        <div th:if="${showLegend}" class="flex items-center space-x-4 text-sm">
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                <span th:text="${legend1} ?: 'Dataset 1'">Dataset 1</span>
+            </div>
+            <div th:if="${legend2}" class="flex items-center">
+                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                <span th:text="${legend2}">Dataset 2</span>
+            </div>
+        </div>
+    </div>
+    <div class="relative h-64">
+        <canvas th:id="${chartId} ?: 'lineChart'"></canvas>
+    </div>
+</div>
+
+<!-- Bar Chart Container -->
+<div th:fragment="bar-chart" class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900" th:text="${title} ?: 'Bar Chart'">Bar Chart</h3>
+    </div>
+    <div class="relative h-64">
+        <canvas th:id="${chartId} ?: 'barChart'"></canvas>
+    </div>
+</div>
+
+<!-- Pie/Donut Chart Container -->
+<div th:fragment="pie-chart" class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900" th:text="${title} ?: 'Pie Chart'">Pie Chart</h3>
+    </div>
+    <div class="relative h-64 flex items-center justify-center">
+        <canvas th:id="${chartId} ?: 'pieChart'"></canvas>
+    </div>
+    <div th:if="${showLegend}" class="mt-4 grid grid-cols-2 gap-2 text-sm">
+        <div th:each="item : ${legendItems}" class="flex items-center">
+            <div class="w-3 h-3 rounded-full mr-2" th:style="'background-color: ' + ${item.color}"></div>
+            <span th:text="${item.label}">Label</span>
+        </div>
+    </div>
+</div>
+
+<!-- Donut Chart with Center Text -->
+<div th:fragment="donut-chart" class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900" th:text="${title} ?: 'Donut Chart'">Donut Chart</h3>
+    </div>
+    <div class="relative h-64 flex items-center justify-center">
+        <canvas th:id="${chartId} ?: 'donutChart'"></canvas>
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div class="text-3xl font-bold text-gray-900" th:text="${centerValue}">85%</div>
+            <div class="text-sm text-gray-600" th:text="${centerLabel}">Total</div>
+        </div>
+    </div>
+    <div th:if="${showLegend}" class="mt-4 grid grid-cols-2 gap-2 text-sm">
+        <div th:each="item : ${legendItems}" class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full mr-2" th:style="'background-color: ' + ${item.color}"></div>
+                <span th:text="${item.label}">Label</span>
+            </div>
+            <span class="font-medium" th:text="${item.value}">0</span>
+        </div>
+    </div>
+</div>
+
+<!-- Area Chart Container -->
+<div th:fragment="area-chart" class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900" th:text="${title} ?: 'Area Chart'">Area Chart</h3>
+    </div>
+    <div class="relative h-64">
+        <canvas th:id="${chartId} ?: 'areaChart'"></canvas>
+    </div>
+</div>
+
+<!-- Simple Stats Chart (Mini line chart) -->
+<div th:fragment="mini-chart" class="bg-white rounded-lg shadow p-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-sm text-gray-600" th:text="${label}">Metric</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1" th:text="${value}">1,234</p>
+            <p class="text-sm mt-1" th:classappend="${trend == 'up' ? 'text-green-600' : 'text-red-600'}">
+                <span th:if="${trend == 'up'}">↑</span>
+                <span th:if="${trend == 'down'}">↓</span>
+                <span th:text="${change}">12%</span>
+            </p>
+        </div>
+        <div class="w-24 h-16">
+            <canvas th:id="${chartId} ?: 'miniChart'"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Initialization Scripts -->
+<script th:fragment="chart-scripts">
+    // Include Chart.js from CDN
+    if (typeof Chart === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+        document.head.appendChild(script);
+    }
+
+    // Line Chart Example
+    function initLineChart(chartId, labels, data, label = 'Dataset') {
+        const ctx = document.getElementById(chartId);
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Bar Chart Example
+    function initBarChart(chartId, labels, data, label = 'Dataset') {
+        const ctx = document.getElementById(chartId);
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Pie Chart Example
+    function initPieChart(chartId, labels, data) {
+        const ctx = document.getElementById(chartId);
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(139, 92, 246, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(59, 130, 246)',
+                        'rgb(16, 185, 129)',
+                        'rgb(251, 191, 36)',
+                        'rgb(239, 68, 68)',
+                        'rgb(139, 92, 246)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Donut Chart Example
+    function initDonutChart(chartId, labels, data) {
+        const ctx = document.getElementById(chartId);
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(59, 130, 246)',
+                        'rgb(16, 185, 129)',
+                        'rgb(251, 191, 36)',
+                        'rgb(239, 68, 68)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Area Chart Example
+    function initAreaChart(chartId, labels, data, label = 'Dataset') {
+        const ctx = document.getElementById(chartId);
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Mini Sparkline Chart
+    function initMiniChart(chartId, data) {
+        const ctx = document.getElementById(chartId);
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(data.length).fill(''),
+                datasets: [{
+                    data: data,
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                },
+                scales: {
+                    y: {
+                        display: false
+                    },
+                    x: {
+                        display: false
+                    }
+                },
+                elements: {
+                    line: {
+                        borderWidth: 2
+                    }
+                }
+            }
+        });
+    }
+
+    // Multi-line Chart Example
+    function initMultiLineChart(chartId, labels, datasets) {
+        const ctx = document.getElementById(chartId);
+        if (!ctx) return;
+
+        const colors = [
+            { border: 'rgb(59, 130, 246)', bg: 'rgba(59, 130, 246, 0.1)' },
+            { border: 'rgb(16, 185, 129)', bg: 'rgba(16, 185, 129, 0.1)' },
+            { border: 'rgb(251, 191, 36)', bg: 'rgba(251, 191, 36, 0.1)' }
+        ];
+
+        const chartDatasets = datasets.map((dataset, index) => ({
+            label: dataset.label,
+            data: dataset.data,
+            borderColor: colors[index].border,
+            backgroundColor: colors[index].bg,
+            tension: 0.4,
+            fill: true
+        }));
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: chartDatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+<!-- Example Usage Documentation -->
+<!--
+Usage Examples:
+
+1. Line Chart:
+<div th:replace="~{components/charts :: line-chart(title='Emails Sent', chartId='emailsChart', showLegend=true, legend1='Sent Emails')}"></div>
+<script th:replace="~{components/charts :: chart-scripts}"></script>
+<script>
+    initLineChart('emailsChart', ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], [120, 150, 180, 160, 200, 170, 190]);
+</script>
+
+2. Bar Chart:
+<div th:replace="~{components/charts :: bar-chart(title='Campaign Performance', chartId='performanceChart')}"></div>
+<script>
+    initBarChart('performanceChart', ['Campaign 1', 'Campaign 2', 'Campaign 3'], [450, 320, 580]);
+</script>
+
+3. Donut Chart:
+<div th:replace="~{components/charts :: donut-chart(title='Email Status', chartId='statusChart', centerValue='85%', centerLabel='Delivered')}"></div>
+<script>
+    initDonutChart('statusChart', ['Delivered', 'Opened', 'Clicked', 'Bounced'], [850, 450, 120, 30]);
+</script>
+
+4. Mini Chart:
+<div th:replace="~{components/charts :: mini-chart(label='Total Clicks', value='1,234', trend='up', change='+12%', chartId='clicksChart')}"></div>
+<script>
+    initMiniChart('clicksChart', [10, 15, 12, 18, 20, 17, 22, 25]);
+</script>
+-->
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Loading Components</title>
+</head>
+<body>
+
+<!-- Spinner (Small) -->
+<div th:fragment="spinner-sm" class="inline-block">
+    <svg class="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+</div>
+
+<!-- Spinner (Medium) -->
+<div th:fragment="spinner-md" class="inline-block">
+    <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+</div>
+
+<!-- Spinner (Large) -->
+<div th:fragment="spinner-lg" class="inline-block">
+    <svg class="animate-spin h-12 w-12 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+</div>
+
+<!-- Loading Overlay (Full Screen) -->
+<div th:fragment="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 flex flex-col items-center">
+        <svg class="animate-spin h-12 w-12 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-gray-700 font-medium" th:text="${message} ?: 'Loading...'">Loading...</p>
+    </div>
+</div>
+
+<!-- Dots Loader -->
+<div th:fragment="dots-loader" class="flex space-x-2">
+    <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+    <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+    <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+</div>
+
+<!-- Pulse Loader -->
+<div th:fragment="pulse-loader" class="inline-block">
+    <div class="w-12 h-12 rounded-full bg-blue-600 opacity-75 animate-ping"></div>
+</div>
+
+<!-- Progress Bar -->
+<div th:fragment="progress-bar" class="w-full bg-gray-200 rounded-full h-2.5">
+    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" th:style="'width: ' + ${progress} + '%'" th:attr="style='width: ' + ${progress} + '%'">
+    </div>
+</div>
+
+<!-- Progress Bar with Label -->
+<div th:fragment="progress-bar-labeled" class="w-full">
+    <div class="flex justify-between mb-1">
+        <span class="text-sm font-medium text-gray-700" th:text="${label} ?: 'Progress'">Progress</span>
+        <span class="text-sm font-medium text-gray-700" th:text="${progress} + '%'">0%</span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-2.5">
+        <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" th:style="'width: ' + ${progress} + '%'"></div>
+    </div>
+</div>
+
+<!-- Indeterminate Progress Bar -->
+<div th:fragment="progress-indeterminate" class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+    <div class="h-full bg-blue-600 rounded-full animate-pulse" style="width: 40%; animation: slide 1.5s ease-in-out infinite;">
+    </div>
+</div>
+
+<!-- Skeleton Loader - Card -->
+<div th:fragment="skeleton-card" class="bg-white rounded-lg shadow p-6 animate-pulse">
+    <div class="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+    <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+    <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+</div>
+
+<!-- Skeleton Loader - Table Row -->
+<div th:fragment="skeleton-row" class="animate-pulse">
+    <div class="flex space-x-4 py-4">
+        <div class="h-10 w-10 bg-gray-200 rounded-full"></div>
+        <div class="flex-1 space-y-2 py-1">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Skeleton Loader - List -->
+<div th:fragment="skeleton-list" class="space-y-4 animate-pulse">
+    <div class="flex space-x-4">
+        <div class="h-12 w-12 bg-gray-200 rounded"></div>
+        <div class="flex-1 space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+    </div>
+    <div class="flex space-x-4">
+        <div class="h-12 w-12 bg-gray-200 rounded"></div>
+        <div class="flex-1 space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+    </div>
+    <div class="flex space-x-4">
+        <div class="h-12 w-12 bg-gray-200 rounded"></div>
+        <div class="flex-1 space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Skeleton Loader - Text Block -->
+<div th:fragment="skeleton-text" class="animate-pulse space-y-3">
+    <div class="h-4 bg-gray-200 rounded w-full"></div>
+    <div class="h-4 bg-gray-200 rounded w-full"></div>
+    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+</div>
+
+<!-- Button Loading State -->
+<div th:fragment="button-loading">
+    <button disabled class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg opacity-50 cursor-not-allowed">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span th:text="${text} ?: 'Loading...'">Loading...</span>
+    </button>
+</div>
+
+<!-- Content Loading State -->
+<div th:fragment="content-loading" class="flex flex-col items-center justify-center py-12">
+    <svg class="animate-spin h-10 w-10 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <p class="text-gray-600 text-sm" th:text="${message} ?: 'Loading content...'">Loading content...</p>
+</div>
+
+<!-- Circular Progress -->
+<div th:fragment="circular-progress" class="relative inline-flex items-center justify-center">
+    <svg class="w-16 h-16 transform -rotate-90">
+        <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="4" fill="transparent" class="text-gray-200"></circle>
+        <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="4" fill="transparent" class="text-blue-600"
+                th:attr="stroke-dasharray='175.93', stroke-dashoffset=${175.93 * (1 - progress/100)}"></circle>
+    </svg>
+    <span class="absolute text-sm font-semibold text-gray-700" th:text="${progress} + '%'">0%</span>
+</div>
+
+<!-- Bar Loader (Horizontal) -->
+<div th:fragment="bar-loader" class="w-full h-1 bg-gray-200 overflow-hidden">
+    <div class="h-full bg-blue-600 animate-pulse" style="width: 30%; animation: slide 2s ease-in-out infinite;"></div>
+</div>
+
+<!-- Skeleton Loader - Dashboard Stats -->
+<div th:fragment="skeleton-stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div class="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-200 rounded w-1/3"></div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div class="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-200 rounded w-1/3"></div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div class="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-200 rounded w-1/3"></div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div class="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-200 rounded w-1/3"></div>
+    </div>
+</div>
+
+<style>
+    @keyframes slide {
+        0% {
+            transform: translateX(-100%);
+        }
+        50% {
+            transform: translateX(250%);
+        }
+        100% {
+            transform: translateX(-100%);
+        }
+    }
+</style>
+
+</body>
+</html>

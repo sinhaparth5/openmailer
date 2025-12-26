@@ -5,6 +5,8 @@ import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.EmailCampaign;
 import com.openmailer.openmailer.repository.EmailCampaignRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class CampaignService {
    * @param campaign the campaign to create
    * @return the created campaign
    */
+  @CacheEvict(value = "campaignStats", allEntries = true)
   public EmailCampaign createCampaign(EmailCampaign campaign) {
     // Set default status if not provided
     if (campaign.getStatus() == null) {
@@ -52,6 +55,7 @@ public class CampaignService {
    * @return the campaign
    * @throws ResourceNotFoundException if campaign not found
    */
+  @Cacheable(value = "campaignStats", key = "'campaign:' + #id")
   @Transactional(readOnly = true)
   public EmailCampaign findById(String id) {
     return campaignRepository.findById(id)
@@ -66,6 +70,7 @@ public class CampaignService {
    * @return the campaign
    * @throws ResourceNotFoundException if campaign not found
    */
+  @Cacheable(value = "campaignStats", key = "'campaign:' + #id + ':user:' + #userId")
   @Transactional(readOnly = true)
   public EmailCampaign findByIdAndUserId(String id, String userId) {
     return campaignRepository.findByIdAndUserId(id, userId)
@@ -141,6 +146,7 @@ public class CampaignService {
    * @throws ResourceNotFoundException if campaign not found
    * @throws ValidationException if campaign is not in editable state
    */
+  @CacheEvict(value = "campaignStats", allEntries = true)
   public EmailCampaign updateCampaign(String id, String userId, EmailCampaign updatedCampaign) {
     EmailCampaign campaign = findByIdAndUserId(id, userId);
 
@@ -180,6 +186,7 @@ public class CampaignService {
    * @param newStatus the new status
    * @return the updated campaign
    */
+  @CacheEvict(value = "campaignStats", allEntries = true)
   public EmailCampaign updateStatus(String id, String userId, String newStatus) {
     EmailCampaign campaign = findByIdAndUserId(id, userId);
     campaign.setStatus(newStatus);
@@ -195,6 +202,7 @@ public class CampaignService {
    * @param scheduledAt the scheduled time
    * @return the updated campaign
    */
+  @CacheEvict(value = "campaignStats", allEntries = true)
   public EmailCampaign scheduleCampaign(String id, String userId, LocalDateTime scheduledAt) {
     EmailCampaign campaign = findByIdAndUserId(id, userId);
 
@@ -216,6 +224,7 @@ public class CampaignService {
    * @throws ResourceNotFoundException if campaign not found
    * @throws ValidationException if campaign is already sent
    */
+  @CacheEvict(value = "campaignStats", allEntries = true)
   public void deleteCampaign(String id, String userId) {
     EmailCampaign campaign = findByIdAndUserId(id, userId);
 
@@ -232,6 +241,7 @@ public class CampaignService {
    *
    * @param userId the ID (String)
    */
+  @CacheEvict(value = "campaignStats", allEntries = true)
   public void deleteAllByUserId(String userId) {
     campaignRepository.deleteByUserId(userId);
   }

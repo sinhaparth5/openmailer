@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Badge Components</title>
+</head>
+<body>
+
+<!-- Status Badge -->
+<span th:fragment="status-badge"
+      th:class="${
+        status == 'DRAFT' ? 'bg-gray-100 text-gray-800' :
+        status == 'SCHEDULED' ? 'bg-blue-100 text-blue-800' :
+        status == 'SENDING' ? 'bg-yellow-100 text-yellow-800' :
+        status == 'SENT' ? 'bg-green-100 text-green-800' :
+        status == 'PAUSED' ? 'bg-orange-100 text-orange-800' :
+        status == 'FAILED' ? 'bg-red-100 text-red-800' :
+        status == 'VERIFIED' ? 'bg-green-100 text-green-800' :
+        status == 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+        status == 'SUBSCRIBED' ? 'bg-green-100 text-green-800' :
+        status == 'UNSUBSCRIBED' ? 'bg-red-100 text-red-800' :
+        status == 'BOUNCED' ? 'bg-orange-100 text-orange-800' :
+        'bg-gray-100 text-gray-800'
+      }"
+      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+    <span th:text="${status}">Status</span>
+</span>
+
+<!-- Success Badge -->
+<span th:fragment="badge-success" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+    <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
+        <circle cx="4" cy="4" r="3" />
+    </svg>
+    <span th:text="${text} ?: 'Success'">Success</span>
+</span>
+
+<!-- Warning Badge -->
+<span th:fragment="badge-warning" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+    <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
+        <circle cx="4" cy="4" r="3" />
+    </svg>
+    <span th:text="${text} ?: 'Warning'">Warning</span>
+</span>
+
+<!-- Danger Badge -->
+<span th:fragment="badge-danger" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+    <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
+        <circle cx="4" cy="4" r="3" />
+    </svg>
+    <span th:text="${text} ?: 'Error'">Error</span>
+</span>
+
+<!-- Info Badge -->
+<span th:fragment="badge-info" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+    <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
+        <circle cx="4" cy="4" r="3" />
+    </svg>
+    <span th:text="${text} ?: 'Info'">Info</span>
+</span>
+
+<!-- Count Badge -->
+<span th:fragment="count-badge" class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full">
+    <span th:text="${count} ?: '0'">0</span>
+</span>
+
+<!-- Large Count Badge -->
+<span th:fragment="count-badge-lg" class="inline-flex items-center justify-center min-w-[2rem] px-2.5 py-1 text-sm font-bold text-white bg-blue-600 rounded-full">
+    <span th:text="${count} ?: '0'">0</span>
+</span>
+
+<!-- Removable Badge (Tag) -->
+<span th:fragment="tag-badge" class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+    <span th:text="${text}">Tag</span>
+    <button type="button" class="flex-shrink-0 ml-1.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-gray-400 hover:bg-gray-200 hover:text-gray-500 focus:outline-none focus:bg-gray-500 focus:text-white">
+        <svg class="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
+            <path stroke-linecap="round" stroke-width="1.5" d="M1 1l6 6m0-6L1 7" />
+        </svg>
+    </button>
+</span>
+
+<!-- Notification Badge (Dot) -->
+<span th:fragment="notification-dot" class="relative">
+    <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+</span>
+
+<!-- Percentage Badge -->
+<span th:fragment="percentage-badge"
+      th:class="${
+        percentage >= 70 ? 'bg-green-100 text-green-800' :
+        percentage >= 40 ? 'bg-yellow-100 text-yellow-800' :
+        'bg-red-100 text-red-800'
+      }"
+      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+    <span th:text="${percentage} + '%'">0%</span>
+</span>
+
+<!-- New Badge -->
+<span th:fragment="badge-new" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 text-white">
+    NEW
+</span>
+
+<!-- Beta Badge -->
+<span th:fragment="badge-beta" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-600 text-white">
+    BETA
+</span>
+
+</body>
+</html>

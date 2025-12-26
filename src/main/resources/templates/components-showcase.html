@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${title}">Components</title>
+</head>
+<body>
+
+<main layout:fragment="content" class="container mx-auto px-4 py-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="/components" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Components
+            </a>
+        </div>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2" th:text="${title}">Component Title</h1>
+            <p class="text-lg text-gray-600" th:text="${description}">Component description</p>
+        </div>
+
+        <!-- Components Showcase -->
+        <div class="space-y-12">
+
+            <!-- BUTTONS -->
+            <div th:if="${componentType == 'buttons'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Primary Buttons</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap gap-4">
+                            <div th:replace="~{components/buttons :: btn-primary(text='Primary Button')}"></div>
+                            <div th:replace="~{components/buttons :: btn-secondary(text='Secondary Button')}"></div>
+                            <div th:replace="~{components/buttons :: btn-outline(text='Outline Button')}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">State Buttons</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap gap-4">
+                            <div th:replace="~{components/buttons :: btn-success(text='Success')}"></div>
+                            <div th:replace="~{components/buttons :: btn-warning(text='Warning')}"></div>
+                            <div th:replace="~{components/buttons :: btn-danger(text='Danger')}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Button Sizes & States</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div th:replace="~{components/buttons :: btn-sm(text='Small')}"></div>
+                            <div th:replace="~{components/buttons :: btn-primary(text='Default')}"></div>
+                            <div th:replace="~{components/buttons :: btn-lg(text='Large')}"></div>
+                            <div th:replace="~{components/buttons :: btn-loading(text='Loading...')}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Other Variants</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap gap-4">
+                            <div th:replace="~{components/buttons :: btn-ghost(text='Ghost Button')}"></div>
+                            <div th:replace="~{components/buttons :: btn-link(text='Link Button')}"></div>
+                            <div th:replace="~{components/buttons :: btn-icon}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARDS -->
+            <div th:if="${componentType == 'cards'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Stat Cards</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div th:replace="~{components/cards :: stat-card(label='Total Emails', value='12,345', trend='up', change='+12.5%', icon='mail', iconBg='bg-blue-100', iconColor='text-blue-600')}"></div>
+                        <div th:replace="~{components/cards :: stat-card(label='Open Rate', value='45.2%', trend='up', change='+5.1%', icon='chart', iconBg='bg-green-100', iconColor='text-green-600')}"></div>
+                        <div th:replace="~{components/cards :: stat-card(label='Click Rate', value='12.8%', trend='down', change='-2.3%', icon='cursor', iconBg='bg-orange-100', iconColor='text-orange-600')}"></div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8" th:if="${sampleCampaign != null}">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Campaign Card</h2>
+                    <div class="max-w-md">
+                        <div th:replace="~{components/cards :: campaign-card}"></div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8" th:if="${sampleContact != null}">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Contact Card</h2>
+                    <div class="max-w-md">
+                        <div th:replace="~{components/cards :: contact-card}"></div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Empty State</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div th:replace="~{components/cards :: empty-state(title='No campaigns yet', description='Create your first campaign to get started', icon='inbox', showButton=false)}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMS -->
+            <div th:if="${componentType == 'forms'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Text Inputs</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="max-w-md space-y-4">
+                            <div th:replace="~{components/forms :: input-text(id='email', label='Email Address', placeholder='you@example.com', type='email')}"></div>
+                            <div th:replace="~{components/forms :: input-with-icon(id='search', label='Search', icon='search', placeholder='Search...')}"></div>
+                            <div th:replace="~{components/forms :: textarea(id='message', label='Message', placeholder='Enter your message...', rows=4)}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8" th:if="${sampleOptions != null}">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Selects & Choices</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="max-w-md space-y-4">
+                            <div th:replace="~{components/forms :: select(id='category', label='Category', placeholder='Select a category')}"></div>
+                            <div th:replace="~{components/forms :: checkbox(id='terms', label='I agree to the terms and conditions')}"></div>
+                            <div th:replace="~{components/forms :: toggle(id='notifications', label='Enable notifications')}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Special Inputs</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="max-w-md space-y-4">
+                            <div th:replace="~{components/forms :: date-input(id='start-date', label='Start Date')}"></div>
+                            <div th:replace="~{components/forms :: time-input(id='send-time', label='Send Time')}"></div>
+                            <div th:replace="~{components/forms :: file-upload(id='csv-file', label='Upload CSV')}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BADGES -->
+            <div th:if="${componentType == 'badges'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Status Badges</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap gap-3">
+                            <span th:each="status : ${statuses}" th:replace="~{components/badges :: status-badge}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">State Badges</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap gap-3">
+                            <div th:replace="~{components/badges :: badge-success(text='Success')}"></div>
+                            <div th:replace="~{components/badges :: badge-warning(text='Warning')}"></div>
+                            <div th:replace="~{components/badges :: badge-danger(text='Error')}"></div>
+                            <div th:replace="~{components/badges :: badge-info(text='Info')}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Count Badges & Others</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div th:replace="~{components/badges :: count-badge(count='5')}"></div>
+                            <div th:replace="~{components/badges :: count-badge-lg(count='125')}"></div>
+                            <div th:replace="~{components/badges :: tag-badge(text='Marketing')}"></div>
+                            <div th:replace="~{components/badges :: percentage-badge(percentage=85)}"></div>
+                            <div th:replace="~{components/badges :: badge-new}"></div>
+                            <div th:replace="~{components/badges :: badge-beta}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALERTS -->
+            <div th:if="${componentType == 'alerts'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Alert Messages</h2>
+                    <div class="space-y-4">
+                        <div th:replace="~{components/alerts :: alert-success(title='Success!', message='Your campaign has been scheduled successfully.', dismissible=true)}"></div>
+                        <div th:replace="~{components/alerts :: alert-error(title='Error', message='Failed to send campaign. Please try again.', dismissible=true)}"></div>
+                        <div th:replace="~{components/alerts :: alert-warning(title='Warning', message='You are approaching your monthly email limit.', dismissible=true)}"></div>
+                        <div th:replace="~{components/alerts :: alert-info(title='Information', message='New features have been added to the template editor.', dismissible=true)}"></div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Toast Notifications</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-600 mb-4">Click the buttons below to trigger toast notifications:</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="showToast('success', 'Success!', 'Operation completed successfully')" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Show Success Toast</button>
+                            <button onclick="showToast('error', 'Error', 'Something went wrong')" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Show Error Toast</button>
+                            <button onclick="showToast('warning', 'Warning', 'Please review your settings')" class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700">Show Warning Toast</button>
+                            <button onclick="showToast('info', 'Info', 'New update available')" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Show Info Toast</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toast Container -->
+                <div th:replace="~{components/alerts :: toast-container}"></div>
+            </div>
+
+            <!-- MODALS -->
+            <div th:if="${componentType == 'modals'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Modal Dialogs</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-600 mb-4">Click the buttons below to open different modal types:</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button @click="$refs.confirmModal.open = true" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Confirm Modal</button>
+                            <button @click="$refs.infoModal.open = true" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Info Modal</button>
+                            <button @click="$refs.deleteModal.open = true" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Delete Modal</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Components -->
+                <div x-ref="confirmModal" th:replace="~{components/modals :: modal-confirm(title='Confirm Action', message='Are you sure you want to proceed?', confirmText='Confirm', onConfirm='alert(\'Confirmed!\')')}"></div>
+                <div x-ref="infoModal" th:replace="~{components/modals :: modal-info(title='Information', message='This is an informational modal dialog.')}"></div>
+                <div x-ref="deleteModal" th:replace="~{components/modals :: modal-delete(title='Delete Campaign', message='Are you sure you want to delete this campaign? This action cannot be undone.', onDelete='alert(\'Deleted!\')')}"></div>
+            </div>
+
+            <!-- TABLES -->
+            <div th:if="${componentType == 'tables' && sampleContacts != null}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Contact Table</h2>
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                        <div th:replace="~{components/tables :: contact-table}"></div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Pagination</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div th:replace="~{components/tables :: pagination(start=1, end=10, total=97, hasPrev=false, hasNext=true, pages=${pages})}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DROPDOWNS -->
+            <div th:if="${componentType == 'dropdowns'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Dropdown Menus</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap gap-4">
+                            <div th:replace="~{components/dropdowns :: dropdown-menu(buttonText='Options')}"></div>
+                            <div th:replace="~{components/dropdowns :: dropdown-icons(buttonText='With Icons')}"></div>
+                            <div th:replace="~{components/dropdowns :: action-menu(viewUrl='#', editUrl='#', duplicateUrl='#', deleteAction='alert(\'Delete\')')}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Special Dropdowns</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex flex-wrap gap-4">
+                            <div th:replace="~{components/dropdowns :: user-dropdown(userInitial='JD', userName='John Doe', userEmail='john@example.com')}"></div>
+                            <div th:replace="~{components/dropdowns :: filter-dropdown(filterLabel='Filters')}"></div>
+                            <div th:replace="~{components/dropdowns :: sort-dropdown(currentSort='Date')}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHARTS -->
+            <div th:if="${componentType == 'charts'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Line Chart</h2>
+                    <div th:replace="~{components/charts :: line-chart(title='Emails Sent', chartId='emailsChart', showLegend=true, legend1='Sent Emails')}"></div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Bar Chart</h2>
+                    <div th:replace="~{components/charts :: bar-chart(title='Campaign Performance', chartId='performanceChart')}"></div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Donut Chart</h2>
+                    <div th:replace="~{components/charts :: donut-chart(title='Email Status', chartId='statusChart', centerValue='85%', centerLabel='Delivered')}"></div>
+                </div>
+
+                <!-- Chart.js Scripts -->
+                <script th:replace="~{components/charts :: chart-scripts}"></script>
+                <script>
+                    // Initialize charts
+                    initLineChart('emailsChart', ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], [120, 150, 180, 160, 200, 170, 190], 'Sent Emails');
+                    initBarChart('performanceChart', ['Campaign 1', 'Campaign 2', 'Campaign 3', 'Campaign 4'], [450, 320, 580, 290], 'Opens');
+                    initDonutChart('statusChart', ['Delivered', 'Opened', 'Clicked', 'Bounced'], [850, 450, 120, 30]);
+                </script>
+            </div>
+
+            <!-- LOADING -->
+            <div th:if="${componentType == 'loading'}">
+                <div class="component-section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Spinners</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="flex items-center gap-8">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Small</p>
+                                <div th:replace="~{components/loading :: spinner-sm}"></div>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Medium</p>
+                                <div th:replace="~{components/loading :: spinner-md}"></div>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Large</p>
+                                <div th:replace="~{components/loading :: spinner-lg}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Progress Bars</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200 space-y-6">
+                        <div th:replace="~{components/loading :: progress-bar(progress=45)}"></div>
+                        <div th:replace="~{components/loading :: progress-bar-labeled(label='Uploading', progress=75)}"></div>
+                        <div th:replace="~{components/loading :: progress-indeterminate}"></div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Skeleton Loaders</h2>
+                    <div class="space-y-4">
+                        <div th:replace="~{components/loading :: skeleton-card}"></div>
+                        <div th:replace="~{components/loading :: skeleton-list}"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+</body>
+</html>
