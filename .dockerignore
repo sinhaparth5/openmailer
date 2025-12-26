@@ -1,0 +1,54 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+ARCHITECTURE.md
+CUSTOM_SMTP_SETUP.md
+DATABASE_SCHEMA.md
+DNS_CONFIGURATION.md
+EMAIL_PROVIDER_SETUP_PLAN.md
+EMAIL_SETUP_AWS_SES.md
+EMAIL_SETUP_SENDGRID.md
+EMAIL_SETUP_SMTP.md
+FRONTEND_IMPLEMENTATION_PLAN.md
+FUTURE_IMPLEMENTATION.md
+IMPLEMENTATION_GUIDE.md
+PROGRESS.md
+README.md
+
+# Build artifacts
+target/
+*.class
+*.jar
+*.war
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules (will be installed during build)
+node_modules/
+
+# Generated CSS (will be built during Docker build)
+src/main/resources/static/css/output.css
+
+# Environment files
+*.env
+.env.*
+
+# Logs
+*.log
+
+# Railway specific
+railway.yaml
+.railway/
