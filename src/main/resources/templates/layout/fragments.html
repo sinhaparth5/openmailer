@@ -10,21 +10,16 @@
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
-                    <a th:href="@{/}" class="flex items-center space-x-2" aria-label="OpenMailer home">
-                        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center" aria-hidden="true">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" role="img" aria-label="Email icon">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                        </div>
-                        <span class="text-xl font-bold text-gray-900">OpenMailer</span>
+                    <a th:href="@{/}" class="flex items-center" aria-label="OpenMailer home">
+                        <img th:src="@{/images/hero.png}" alt="OpenMailer" class="h-10" />
                     </a>
                 </div>
 
                 <div class="hidden md:flex items-center space-x-6" role="menubar">
-                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Dashboard</a>
+                    <a th:href="@{/dashboard}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Dashboard</a>
                     <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Campaigns</a>
+                    <a th:href="@{/contacts}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Contacts</a>
                     <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Templates</a>
-                    <a th:href="@{/subscribers}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Subscribers</a>
 
                     <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
                         <span class="text-gray-600" sec:authentication="name" aria-label="Current user">User</span>
@@ -53,10 +48,10 @@
 
             <div id="mobileMenu" class="hidden md:hidden pb-4" role="menu" aria-label="Mobile navigation">
                 <div class="flex flex-col space-y-3">
-                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Dashboard</a>
+                    <a th:href="@{/dashboard}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Dashboard</a>
                     <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Campaigns</a>
+                    <a th:href="@{/contacts}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Contacts</a>
                     <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Templates</a>
-                    <a th:href="@{/subscribers}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Subscribers</a>
 
                     <div sec:authorize="isAuthenticated()" class="pt-3 border-t">
                         <span class="text-gray-600 block mb-2" sec:authentication="name" aria-label="Current user">User</span>
@@ -81,7 +76,9 @@
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
-                    <h3 class="font-bold text-gray-900 mb-4">OpenMailer</h3>
+                    <a th:href="@{/}" class="flex items-center" aria-label="OpenMailer home">
+                        <img th:src="@{/images/hero.png}" alt="OpenMailer" class="h-10" />
+                    </a>
                     <p class="text-gray-600 text-sm">
                         Open source bulk email system with templates for efficient email campaign management.
                     </p>
@@ -90,10 +87,10 @@
                 <nav aria-label="Quick links">
                     <h3 class="font-bold text-gray-900 mb-4">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a th:href="@{/}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Dashboard</a></li>
+                        <li><a th:href="@{/dashboard}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Dashboard</a></li>
                         <li><a th:href="@{/campaigns}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Campaigns</a></li>
+                        <li><a th:href="@{/contacts}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Contacts</a></li>
                         <li><a th:href="@{/templates}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Templates</a></li>
-                        <li><a th:href="@{/subscribers}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Subscribers</a></li>
                     </ul>
                 </nav>
 

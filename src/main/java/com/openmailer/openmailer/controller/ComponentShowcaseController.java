@@ -142,19 +142,25 @@ public class ComponentShowcaseController {
         model.addAttribute("description", "Data tables with sorting, filtering, and pagination.");
 
         // Sample table data
-        List<Map<String, String>> contacts = new ArrayList<>();
-        for (int i = 1; i <= 5; i++) {
-            Map<String, String> contact = new HashMap<>();
+        List<Map<String, Object>> contacts = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            Map<String, Object> contact = new HashMap<>();
             contact.put("id", String.valueOf(i));
             contact.put("name", "Contact " + i);
             contact.put("email", "contact" + i + "@example.com");
             contact.put("status", i % 2 == 0 ? "SUBSCRIBED" : "PENDING");
             contact.put("createdAt", "2024-01-" + (10 + i));
             contact.put("initial", "C" + i);
-            contact.put("tags", "Tag" + i);
+            // Add tags as a list
+            contact.put("tags", Arrays.asList("Tag" + i, "Marketing"));
             contacts.add(contact);
         }
         model.addAttribute("sampleContacts", contacts);
+        model.addAttribute("contacts", contacts); // Also add as "contacts" for the table fragment
+
+        // Sample pagination pages
+        List<Integer> pages = Arrays.asList(1, 2, 3, 4, 5);
+        model.addAttribute("pages", pages);
     }
 
     private void addDropdownsData(Model model) {

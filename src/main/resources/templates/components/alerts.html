@@ -227,56 +227,7 @@
     </template>
 </div>
 
-<script>
-    // Alpine.js Toast Manager Component
-    function toastManager() {
-        return {
-            toasts: [],
-            nextId: 1,
-
-            addToast(type, title, message = '', duration = 5000) {
-                const id = this.nextId++;
-                const toast = { id, type, title, message, show: true };
-                this.toasts.push(toast);
-
-                if (duration > 0) {
-                    setTimeout(() => this.removeToast(id), duration);
-                }
-            },
-
-            removeToast(id) {
-                const index = this.toasts.findIndex(t => t.id === id);
-                if (index > -1) {
-                    this.toasts[index].show = false;
-                    setTimeout(() => {
-                        this.toasts.splice(index, 1);
-                    }, 300);
-                }
-            }
-        };
-    }
-
-    // Global helper function to show toasts
-    window.showToast = function(type, title, message = '', duration = 5000) {
-        const event = new CustomEvent('show-toast', {
-            detail: { type, title, message, duration }
-        });
-        window.dispatchEvent(event);
-    };
-
-    // Listen for toast events
-    window.addEventListener('show-toast', (event) => {
-        const container = document.querySelector('[x-data*="toastManager"]');
-        if (container && container.__x) {
-            container.__x.$data.addToast(
-                event.detail.type,
-                event.detail.title,
-                event.detail.message,
-                event.detail.duration
-            );
-        }
-    });
-</script>
+<!-- Alpine.js component functions are now loaded from /js/alpine-components.js -->
 
 </body>
 </html>

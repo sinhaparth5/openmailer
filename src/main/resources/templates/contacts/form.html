@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${pageTitle}">Add Contact</title>
+</head>
+<body>
+
+<main layout:fragment="content" class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900" th:text="${mode == 'edit'} ? 'Edit Contact' : 'Add Contact'">Add Contact</h1>
+                    <p class="mt-2 text-sm text-gray-600">
+                        <span th:if="${mode == 'edit'}">Update contact information and preferences.</span>
+                        <span th:unless="${mode == 'edit'}">Add a new contact to your subscriber list.</span>
+                    </p>
+                </div>
+                <a href="/contacts" class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 font-medium">
+                    Cancel
+                </a>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <form action="/contacts" method="post" class="space-y-6">
+            <!-- Personal Information -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Personal Information</h2>
+                </div>
+                <div class="p-6 space-y-6">
+                    <!-- Name -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">
+                                First Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text"
+                                   id="firstName"
+                                   name="firstName"
+                                   required
+                                   th:value="${contact?.firstName}"
+                                   placeholder="John"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">
+                                Last Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text"
+                                   id="lastName"
+                                   name="lastName"
+                                   required
+                                   th:value="${contact?.lastName}"
+                                   placeholder="Doe"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            Email Address <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               required
+                               th:value="${contact?.email}"
+                               placeholder="john.doe@example.com"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="mt-1 text-sm text-gray-500">Primary email address for communication</p>
+                    </div>
+
+                    <!-- Phone -->
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                            Phone Number
+                        </label>
+                        <input type="tel"
+                               id="phone"
+                               name="phone"
+                               th:value="${contact?.phone}"
+                               placeholder="+1 (555) 123-4567"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Details -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Additional Details</h2>
+                </div>
+                <div class="p-6 space-y-6">
+                    <!-- Company -->
+                    <div>
+                        <label for="company" class="block text-sm font-medium text-gray-700 mb-1">
+                            Company
+                        </label>
+                        <input type="text"
+                               id="company"
+                               name="company"
+                               th:value="${contact?.company}"
+                               placeholder="Acme Inc."
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Job Title -->
+                    <div>
+                        <label for="jobTitle" class="block text-sm font-medium text-gray-700 mb-1">
+                            Job Title
+                        </label>
+                        <input type="text"
+                               id="jobTitle"
+                               name="jobTitle"
+                               th:value="${contact?.jobTitle}"
+                               placeholder="Marketing Manager"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Country -->
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-gray-700 mb-1">
+                            Country
+                        </label>
+                        <select id="country"
+                                name="country"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select a country...</option>
+                            <option value="USA" th:selected="${contact?.country == 'USA'}">United States</option>
+                            <option value="UK" th:selected="${contact?.country == 'UK'}">United Kingdom</option>
+                            <option value="Canada" th:selected="${contact?.country == 'Canada'}">Canada</option>
+                            <option value="Australia" th:selected="${contact?.country == 'Australia'}">Australia</option>
+                            <option value="Germany" th:selected="${contact?.country == 'Germany'}">Germany</option>
+                            <option value="France" th:selected="${contact?.country == 'France'}">France</option>
+                            <option value="Spain" th:selected="${contact?.country == 'Spain'}">Spain</option>
+                            <option value="Italy" th:selected="${contact?.country == 'Italy'}">Italy</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subscription & Tags -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Subscription & Tags</h2>
+                </div>
+                <div class="p-6 space-y-6">
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            Subscription Status <span class="text-red-500">*</span>
+                        </label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio"
+                                       name="status"
+                                       value="SUBSCRIBED"
+                                       th:checked="${contact?.status == 'SUBSCRIBED' || contact == null}"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <span class="ml-2 text-sm text-gray-700">Subscribed - Can receive emails</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio"
+                                       name="status"
+                                       value="UNSUBSCRIBED"
+                                       th:checked="${contact?.status == 'UNSUBSCRIBED'}"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <span class="ml-2 text-sm text-gray-700">Unsubscribed - Will not receive emails</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio"
+                                       name="status"
+                                       value="PENDING"
+                                       th:checked="${contact?.status == 'PENDING'}"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <span class="ml-2 text-sm text-gray-700">Pending - Awaiting confirmation</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            Tags
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center">
+                                <input type="checkbox"
+                                       name="tags"
+                                       value="VIP"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <span class="ml-2 text-sm text-gray-700">VIP</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox"
+                                       name="tags"
+                                       value="Newsletter"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <span class="ml-2 text-sm text-gray-700">Newsletter</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox"
+                                       name="tags"
+                                       value="Customer"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <span class="ml-2 text-sm text-gray-700">Customer</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox"
+                                       name="tags"
+                                       value="Lead"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <span class="ml-2 text-sm text-gray-700">Lead</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox"
+                                       name="tags"
+                                       value="Partner"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <span class="ml-2 text-sm text-gray-700">Partner</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox"
+                                       name="tags"
+                                       value="Prospect"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <span class="ml-2 text-sm text-gray-700">Prospect</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Custom Fields -->
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
+                            Notes
+                        </label>
+                        <textarea id="notes"
+                                  name="notes"
+                                  rows="4"
+                                  th:text="${contact?.notes}"
+                                  placeholder="Add any additional notes about this contact..."
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GDPR Consent -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Consent & Preferences</h2>
+                </div>
+                <div class="p-6 space-y-4">
+                    <label class="flex items-start">
+                        <input type="checkbox"
+                               name="emailConsent"
+                               checked
+                               class="h-4 w-4 mt-1 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <span class="ml-2 text-sm text-gray-700">
+                            <span class="font-medium">Email Marketing Consent</span><br>
+                            <span class="text-gray-500">This contact has consented to receive marketing emails</span>
+                        </span>
+                    </label>
+                    <label class="flex items-start">
+                        <input type="checkbox"
+                               name="dataProcessing"
+                               checked
+                               class="h-4 w-4 mt-1 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <span class="ml-2 text-sm text-gray-700">
+                            <span class="font-medium">Data Processing Agreement</span><br>
+                            <span class="text-gray-500">Contact has agreed to data processing terms (GDPR)</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="/contacts"
+                   class="px-6 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 font-medium">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
+                    <span th:text="${mode == 'edit'} ? 'Update Contact' : 'Add Contact'">Add Contact</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+</body>
+</html>

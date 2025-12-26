@@ -219,17 +219,53 @@
                     <div class="bg-white p-8 rounded-lg border border-gray-200">
                         <p class="text-sm text-gray-600 mb-4">Click the buttons below to open different modal types:</p>
                         <div class="flex flex-wrap gap-3">
-                            <button @click="$refs.confirmModal.open = true" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Confirm Modal</button>
-                            <button @click="$refs.infoModal.open = true" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Info Modal</button>
-                            <button @click="$refs.deleteModal.open = true" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Delete Modal</button>
+                            <button onclick="openModal('confirmModal')" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Confirmation Modal</button>
+                            <button onclick="openModal('infoModal')" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Info Modal</button>
+                            <button onclick="openModal('deleteModal')" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Delete Modal</button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function openModal(id) {
+                        // Wait for Alpine.js to initialize if needed
+                        const tryOpen = () => {
+                            const modalWrapper = document.getElementById(id);
+                            if (modalWrapper) {
+                                const modalElement = modalWrapper.querySelector('[x-data]');
+                                if (modalElement && modalElement._x_dataStack) {
+                                    modalElement._x_dataStack[0].open = true;
+                                } else if (modalElement && modalElement.__x) {
+                                    modalElement.__x.$data.open = true;
+                                } else {
+                                    // Alpine not ready, wait a bit
+                                    setTimeout(tryOpen, 50);
+                                }
+                            }
+                        };
+                        tryOpen();
+                    }
+                </script>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Modal Features</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="prose max-w-none">
+                            <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                                <li><strong>Backdrop Click</strong> - Click outside the modal to close it</li>
+                                <li><strong>Escape Key</strong> - Press ESC to close the modal</li>
+                                <li><strong>Smooth Animations</strong> - Enter and exit transitions using Alpine.js</li>
+                                <li><strong>Accessible</strong> - Proper ARIA attributes and focus management</li>
+                                <li><strong>Responsive</strong> - Works on all screen sizes</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
                 <!-- Modal Components -->
-                <div x-ref="confirmModal" th:replace="~{components/modals :: modal-confirm(title='Confirm Action', message='Are you sure you want to proceed?', confirmText='Confirm', onConfirm='alert(\'Confirmed!\')')}"></div>
-                <div x-ref="infoModal" th:replace="~{components/modals :: modal-info(title='Information', message='This is an informational modal dialog.')}"></div>
-                <div x-ref="deleteModal" th:replace="~{components/modals :: modal-delete(title='Delete Campaign', message='Are you sure you want to delete this campaign? This action cannot be undone.', onDelete='alert(\'Deleted!\')')}"></div>
+                <div id="confirmModal" th:insert="~{components/modals :: modal-confirm(title='Confirm Action', message='Are you sure you want to proceed? This action will be executed immediately.', confirmText='Confirm', onConfirm='alert(\'Confirmed!\')')}"></div>
+                <div id="infoModal" th:insert="~{components/modals :: modal-info(title='Information', message='This is an informational modal dialog. You can use it to display important messages or notifications to users.')}"></div>
+                <div id="deleteModal" th:insert="~{components/modals :: modal-delete(title='Delete Campaign', message='Are you sure you want to delete this campaign? This action cannot be undone and all associated data will be permanently removed.', onDelete='alert(\'Deleted!\')')}"></div>
             </div>
 
             <!-- TABLES -->
@@ -254,10 +290,11 @@
                 <div class="component-section">
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Dropdown Menus</h2>
                     <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-600 mb-4">Click the dropdown buttons to see the menu options</p>
                         <div class="flex flex-wrap gap-4">
-                            <div th:replace="~{components/dropdowns :: dropdown-menu(buttonText='Options')}"></div>
-                            <div th:replace="~{components/dropdowns :: dropdown-icons(buttonText='With Icons')}"></div>
-                            <div th:replace="~{components/dropdowns :: action-menu(viewUrl='#', editUrl='#', duplicateUrl='#', deleteAction='alert(\'Delete\')')}"></div>
+                            <div th:replace="~{components/dropdowns :: dropdown-menu(buttonText='Simple Menu', items=${sampleItems})}"></div>
+                            <div th:replace="~{components/dropdowns :: dropdown-icons(buttonText='Menu with Icons', items=${sampleItems})}"></div>
+                            <div th:replace="~{components/dropdowns :: action-menu(viewUrl='#view', editUrl='#edit', duplicateUrl='#duplicate', deleteAction='alert(\'Deleted!\')')}"></div>
                         </div>
                     </div>
                 </div>
@@ -265,10 +302,26 @@
                 <div class="component-section mt-8">
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Special Dropdowns</h2>
                     <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-600 mb-4">User profile, filter, and sort dropdowns</p>
                         <div class="flex flex-wrap gap-4">
                             <div th:replace="~{components/dropdowns :: user-dropdown(userInitial='JD', userName='John Doe', userEmail='john@example.com')}"></div>
-                            <div th:replace="~{components/dropdowns :: filter-dropdown(filterLabel='Filters')}"></div>
-                            <div th:replace="~{components/dropdowns :: sort-dropdown(currentSort='Date')}"></div>
+                            <div th:replace="~{components/dropdowns :: filter-dropdown(filterLabel='Filter Options')}"></div>
+                            <div th:replace="~{components/dropdowns :: sort-dropdown(currentSort='Most Recent')}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-section mt-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Dropdown Features</h2>
+                    <div class="bg-white p-8 rounded-lg border border-gray-200">
+                        <div class="prose max-w-none">
+                            <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                                <li><strong>Click Outside</strong> - Dropdown closes when clicking outside</li>
+                                <li><strong>Smooth Animations</strong> - Transition effects using Alpine.js</li>
+                                <li><strong>Keyboard Accessible</strong> - Can be navigated with keyboard</li>
+                                <li><strong>Z-Index Handling</strong> - Properly stacks above other content</li>
+                                <li><strong>Flexible Positioning</strong> - Automatically adjusts position</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -294,10 +347,12 @@
                 <!-- Chart.js Scripts -->
                 <script th:replace="~{components/charts :: chart-scripts}"></script>
                 <script>
-                    // Initialize charts
-                    initLineChart('emailsChart', ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], [120, 150, 180, 160, 200, 170, 190], 'Sent Emails');
-                    initBarChart('performanceChart', ['Campaign 1', 'Campaign 2', 'Campaign 3', 'Campaign 4'], [450, 320, 580, 290], 'Opens');
-                    initDonutChart('statusChart', ['Delivered', 'Opened', 'Clicked', 'Bounced'], [850, 450, 120, 30]);
+                    // Wait for Chart.js to load, then initialize charts
+                    loadChartJs().then(() => {
+                        initLineChart('emailsChart', ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], [120, 150, 180, 160, 200, 170, 190], 'Sent Emails');
+                        initBarChart('performanceChart', ['Campaign 1', 'Campaign 2', 'Campaign 3', 'Campaign 4'], [450, 320, 580, 290], 'Opens');
+                        initDonutChart('statusChart', ['Delivered', 'Opened', 'Clicked', 'Bounced'], [850, 450, 120, 30]);
+                    });
                 </script>
             </div>
 

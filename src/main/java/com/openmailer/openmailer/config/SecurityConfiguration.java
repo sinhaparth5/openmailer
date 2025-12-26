@@ -58,11 +58,11 @@ public class SecurityConfiguration {
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp
                     .policyDirectives("default-src 'self'; " +
-                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+                        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; " +
                         "style-src 'self' 'unsafe-inline'; " +
                         "img-src 'self' data: https:; " +
                         "font-src 'self' data:; " +
-                        "connect-src 'self'; " +
+                        "connect-src 'self' https://cdn.jsdelivr.net; " +
                         "frame-ancestors 'none';")
                 )
                 .xssProtection(xss -> xss
@@ -79,7 +79,7 @@ public class SecurityConfiguration {
                 )
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico").permitAll()
+                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/images/**").permitAll()
                 .requestMatchers("/api/auth/**", "/track/**").permitAll()
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/webhooks/**", "/api/v1/webhooks/**").permitAll()
@@ -87,6 +87,10 @@ public class SecurityConfiguration {
                 .requestMatchers("/login").permitAll()
                 // Component showcase pages
                 .requestMatchers("/components", "/components/**").permitAll()
+                // Main application pages
+                .requestMatchers("/dashboard").permitAll()
+                .requestMatchers("/campaigns", "/campaigns/**").permitAll()
+                .requestMatchers("/contacts", "/contacts/**").permitAll()
                 // Swagger/OpenAPI endpoints
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()

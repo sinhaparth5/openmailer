@@ -105,11 +105,18 @@
 
 <!-- Chart.js Initialization Scripts -->
 <script th:fragment="chart-scripts">
-    // Include Chart.js from CDN
-    if (typeof Chart === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-        document.head.appendChild(script);
+    // Load Chart.js if not already loaded
+    function loadChartJs() {
+        return new Promise((resolve) => {
+            if (typeof Chart !== 'undefined') {
+                resolve();
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+            script.onload = () => resolve();
+            document.head.appendChild(script);
+        });
     }
 
     // Line Chart Example

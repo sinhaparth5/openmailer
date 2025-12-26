@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${pageTitle}">Dashboard</title>
+</head>
+<body>
+
+<main layout:fragment="content" class="container mx-auto px-4 py-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p class="mt-2 text-sm text-gray-600">Welcome back! Here's an overview of your email campaigns.</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mb-8">
+            <div class="flex flex-wrap gap-3">
+                <a href="/campaigns/create" th:replace="~{components/buttons :: btn-primary(text='Create Campaign')}"></a>
+                <a href="/contacts/import" th:replace="~{components/buttons :: btn-secondary(text='Import Contacts')}"></a>
+                <a href="/templates" th:replace="~{components/buttons :: btn-outline(text='Browse Templates')}"></a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Campaigns -->
+            <div th:replace="~{components/cards :: stat-card(
+                label='Total Campaigns',
+                value=${totalCampaigns},
+                trend='up',
+                change=${campaignsTrend},
+                icon='mail',
+                iconBg='bg-blue-100',
+                iconColor='text-blue-600'
+            )}"></div>
+
+            <!-- Total Emails Sent -->
+            <div th:replace="~{components/cards :: stat-card(
+                label='Emails Sent',
+                value=${totalEmailsSent},
+                trend='up',
+                change=${emailsTrend},
+                icon='send',
+                iconBg='bg-green-100',
+                iconColor='text-green-600'
+            )}"></div>
+
+            <!-- Average Open Rate -->
+            <div th:replace="~{components/cards :: stat-card(
+                label='Avg Open Rate',
+                value=${avgOpenRate},
+                trend='up',
+                change=${openRateTrend},
+                icon='chart',
+                iconBg='bg-purple-100',
+                iconColor='text-purple-600'
+            )}"></div>
+
+            <!-- Average Click Rate -->
+            <div th:replace="~{components/cards :: stat-card(
+                label='Avg Click Rate',
+                value=${avgClickRate},
+                trend='down',
+                change=${clickRateTrend},
+                icon='cursor',
+                iconBg='bg-orange-100',
+                iconColor='text-orange-600'
+            )}"></div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Email Activity Chart -->
+            <div th:replace="~{components/charts :: line-chart(
+                title='Email Activity (Last 7 Days)',
+                chartId='activityChart',
+                showLegend=true,
+                legend1='Emails Sent'
+            )}"></div>
+
+            <!-- Campaign Performance Chart -->
+            <div th:replace="~{components/charts :: bar-chart(
+                title='Top Campaigns by Open Rate',
+                chartId='performanceChart'
+            )}"></div>
+        </div>
+
+        <!-- Email Status Chart -->
+        <div class="mb-8">
+            <div th:replace="~{components/charts :: donut-chart(
+                title='Email Status Distribution',
+                chartId='statusChart',
+                centerValue='85.6%',
+                centerLabel='Delivery Rate'
+            )}"></div>
+        </div>
+
+        <!-- Recent Campaigns -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-900">Recent Campaigns</h2>
+                    <a href="/campaigns" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View All →</a>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campaign</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opens</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clicks</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="campaign : ${recentCampaigns}" class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900" th:text="${campaign.name}">Campaign Name</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:with="status=${campaign.status}"
+                                      th:classappend="${status == 'SENT'} ? 'bg-green-100 text-green-800' : (${status == 'SENDING'} ? 'bg-blue-100 text-blue-800' : (${status == 'SCHEDULED'} ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'))"
+                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                                    <span th:text="${campaign.status}">Status</span>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${campaign.sent}">0</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${campaign.opens}">0</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${campaign.clicks}">0</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${campaign.sentDate}">Date</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end space-x-2">
+                                    <a th:href="@{/campaigns/{id}(id=${campaign.id})}" class="text-blue-600 hover:text-blue-900">View</a>
+                                    <a th:if="${campaign.status == 'DRAFT'}" th:href="@{/campaigns/{id}/edit(id=${campaign.id})}" class="text-gray-600 hover:text-gray-900">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Chart Initialization -->
+<th:block layout:fragment="extra-scripts">
+    <script th:replace="~{components/charts :: chart-scripts}"></script>
+    <script th:inline="javascript">
+        // Wait for Chart.js to load
+        loadChartJs().then(() => {
+            // Initialize activity chart
+            initLineChart(
+                'activityChart',
+                /*[[${activityLabels}]]*/,
+                /*[[${activityData}]]*/,
+                'Emails Sent'
+            );
+
+            // Initialize performance chart
+            initBarChart(
+                'performanceChart',
+                /*[[${campaignLabels}]]*/,
+                /*[[${campaignOpenRates}]]*/,
+                'Open Rate (%)'
+            );
+
+            // Initialize status chart
+            initDonutChart(
+                'statusChart',
+                /*[[${statusLabels}]]*/,
+                /*[[${statusData}]]*/
+            );
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

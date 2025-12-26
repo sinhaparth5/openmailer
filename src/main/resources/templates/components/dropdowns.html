@@ -67,7 +67,7 @@
             <a th:href="${editUrl}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Edit</a>
             <a th:href="${duplicateUrl}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Duplicate</a>
             <hr class="my-1 border-gray-200">
-            <button th:onclick="${deleteAction}" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50" role="menuitem">Delete</button>
+            <button @click="open = false" th:data-action="${deleteAction}" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50" role="menuitem">Delete</button>
         </div>
     </div>
 </div>
