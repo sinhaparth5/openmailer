@@ -389,19 +389,131 @@ public class CampaignsController {
     ) {}
 
     public static class CampaignForm {
-        public String id;
-        public String name;
-        public String templateId;
-        public String listId;
-        public String segmentId;
-        public String subjectLine;
-        public String previewText;
-        public String fromName;
-        public String fromEmail;
-        public String replyToEmail;
-        public String domainId;
-        public String providerId;
-        public boolean trackOpens = true;
-        public boolean trackClicks = true;
+        private String id;
+        private String name;
+        private String templateId;
+        private String listId;
+        private String segmentId;
+        private String subjectLine;
+        private String previewText;
+        private String fromName;
+        private String fromEmail;
+        private String replyToEmail;
+        private String domainId;
+        private String providerId;
+        private boolean trackOpens = true;
+        private boolean trackClicks = true;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getTemplateId() {
+            return templateId;
+        }
+
+        public void setTemplateId(String templateId) {
+            this.templateId = templateId;
+        }
+
+        public String getListId() {
+            return listId;
+        }
+
+        public void setListId(String listId) {
+            this.listId = listId;
+        }
+
+        public String getSegmentId() {
+            return segmentId;
+        }
+
+        public void setSegmentId(String segmentId) {
+            this.segmentId = segmentId;
+        }
+
+        public String getSubjectLine() {
+            return subjectLine;
+        }
+
+        public void setSubjectLine(String subjectLine) {
+            this.subjectLine = subjectLine;
+        }
+
+        public String getPreviewText() {
+            return previewText;
+        }
+
+        public void setPreviewText(String previewText) {
+            this.previewText = previewText;
+        }
+
+        public String getFromName() {
+            return fromName;
+        }
+
+        public void setFromName(String fromName) {
+            this.fromName = fromName;
+        }
+
+        public String getFromEmail() {
+            return fromEmail;
+        }
+
+        public void setFromEmail(String fromEmail) {
+            this.fromEmail = fromEmail;
+        }
+
+        public String getReplyToEmail() {
+            return replyToEmail;
+        }
+
+        public void setReplyToEmail(String replyToEmail) {
+            this.replyToEmail = replyToEmail;
+        }
+
+        public String getDomainId() {
+            return domainId;
+        }
+
+        public void setDomainId(String domainId) {
+            this.domainId = domainId;
+        }
+
+        public String getProviderId() {
+            return providerId;
+        }
+
+        public void setProviderId(String providerId) {
+            this.providerId = providerId;
+        }
+
+        public boolean isTrackOpens() {
+            return trackOpens;
+        }
+
+        public void setTrackOpens(boolean trackOpens) {
+            this.trackOpens = trackOpens;
+        }
+
+        public boolean isTrackClicks() {
+            return trackClicks;
+        }
+
+        public void setTrackClicks(boolean trackClicks) {
+            this.trackClicks = trackClicks;
+        }
     }
 }

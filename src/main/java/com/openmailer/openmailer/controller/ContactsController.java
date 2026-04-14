@@ -338,16 +338,104 @@ public class ContactsController {
     ) {}
 
     public static class ContactForm {
-        public String id;
-        public String firstName;
-        public String lastName;
-        public String email;
-        public String company;
-        public String phone;
-        public String country;
-        public String status = "SUBSCRIBED";
-        public List<String> tags = Collections.emptyList();
-        public String notes;
-        public boolean gdprConsent;
+        private String id;
+        private String firstName;
+        private String lastName;
+        private String email;
+        private String company;
+        private String phone;
+        private String country;
+        private String status = "SUBSCRIBED";
+        private List<String> tags = Collections.emptyList();
+        private String notes;
+        private boolean gdprConsent;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getCompany() {
+            return company;
+        }
+
+        public void setCompany(String company) {
+            this.company = company;
+        }
+
+        public String getPhone() {
+            return phone;
+        }
+
+        public void setPhone(String phone) {
+            this.phone = phone;
+        }
+
+        public String getCountry() {
+            return country;
+        }
+
+        public void setCountry(String country) {
+            this.country = country;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public List<String> getTags() {
+            return tags;
+        }
+
+        public void setTags(List<String> tags) {
+            this.tags = tags != null ? tags : Collections.emptyList();
+        }
+
+        public String getNotes() {
+            return notes;
+        }
+
+        public void setNotes(String notes) {
+            this.notes = notes;
+        }
+
+        public boolean isGdprConsent() {
+            return gdprConsent;
+        }
+
+        public void setGdprConsent(boolean gdprConsent) {
+            this.gdprConsent = gdprConsent;
+        }
     }
 }

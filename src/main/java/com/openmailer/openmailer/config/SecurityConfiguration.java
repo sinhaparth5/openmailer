@@ -58,7 +58,11 @@ public class SecurityConfiguration {
                 // Disable CSRF for API endpoints that use JWT (stateless authentication)
                 .ignoringRequestMatchers(
                     "/api/**",
-                    "/actuator/**"
+                    "/actuator/**",
+                    "/contacts",
+                    "/contacts/*/edit",
+                    "/campaigns",
+                    "/campaigns/*/edit"
                 )
             )
             // Add security headers

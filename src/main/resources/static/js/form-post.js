@@ -25,10 +25,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers[csrfHeader] = csrfToken;
                 }
 
+                const hasFileInput = Array.from(form.querySelectorAll('input[type="file"]'))
+                    .some((input) => input.files && input.files.length > 0);
+
+                let body;
+                if (hasFileInput) {
+                    body = new FormData(form);
+                } else {
+                    headers["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+                    body = new URLSearchParams(new FormData(form));
+                }
+
                 const response = await fetch(form.action, {
                     method: (form.method || "POST").toUpperCase(),
                     headers,
-                    body: new FormData(form),
+                    body,
                     credentials: "same-origin",
                     redirect: "follow"
                 });
