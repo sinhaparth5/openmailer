@@ -20,8 +20,8 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
       CACHE_TYPE: redis
-      ENCRYPTION_KEY: replace_with_a_strong_32_char_secret
-      JWT_SECRET: replace_with_a_long_random_secret
+      ENCRYPTION_KEY: cd18b33b46ab2d5ccced4f4ea20da280
+      JWT_SECRET: hbJkYjW4i9KxlUb9LU7+QjP5UIphJqzWH6IqAP5gYuo=
       JWT_ACCESS_TOKEN_EXPIRATION: 3600000
       JWT_REFRESH_TOKEN_EXPIRATION: 604800000
       MAIL_HOST: ""
@@ -29,6 +29,7 @@ services:
       MAIL_USERNAME: ""
       MAIL_PASSWORD: ""
       APP_TEST_EMAIL_RECIPIENT: ""
+      APP_ASSETS_MINIFIED: "true"
     ports:
       - "8080:8080"
 
@@ -40,7 +41,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

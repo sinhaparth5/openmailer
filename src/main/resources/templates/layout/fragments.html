@@ -6,7 +6,7 @@
     <title>Fragments</title>
 </head>
 <body>
-    <nav th:fragment="navbar" class="bg-white shadow-lg" role="navigation" aria-label="Main navigation">
+    <nav th:fragment="navbar" class="border-b border-slate-200/80 bg-white/88 backdrop-blur-sm" role="navigation" aria-label="Main navigation">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
@@ -16,22 +16,22 @@
                 </div>
 
                 <div class="hidden md:flex items-center space-x-6" role="menubar">
-                    <a th:href="@{/dashboard}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Dashboard</a>
-                    <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Campaigns</a>
-                    <a th:href="@{/contacts}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Contacts</a>
-                    <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Templates</a>
+                    <a th:href="@{/dashboard}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Dashboard</a>
+                    <a th:href="@{/campaigns}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Campaigns</a>
+                    <a th:href="@{/contacts}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Contacts</a>
+                    <a th:href="@{/templates}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Templates</a>
 
                     <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
-                        <span class="text-gray-600" sec:authentication="name" aria-label="Current user">User</span>
-                        <form th:action="@{/logout}" method="post" class="inline">
-                            <button type="submit" class="text-gray-700 hover:text-red-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded px-2 py-1" aria-label="Log out of your account">
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600" sec:authentication="name" aria-label="Current user">User</span>
+                        <form class="inline js-logout-form">
+                            <button type="submit" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2" aria-label="Log out of your account">
                                 Logout
                             </button>
                         </form>
                     </div>
 
                     <div sec:authorize="!isAuthenticated()">
-                        <a th:href="@{/login}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="Sign in to your account">
+                        <a th:href="@{/login}" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2" aria-label="Sign in to your account">
                             Sign In
                         </a>
                     </div>
@@ -48,22 +48,22 @@
 
             <div id="mobileMenu" class="hidden md:hidden pb-4" role="menu" aria-label="Mobile navigation">
                 <div class="flex flex-col space-y-3">
-                    <a th:href="@{/dashboard}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Dashboard</a>
-                    <a th:href="@{/campaigns}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Campaigns</a>
-                    <a th:href="@{/contacts}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Contacts</a>
-                    <a th:href="@{/templates}" class="text-gray-700 hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" role="menuitem">Templates</a>
+                    <a th:href="@{/dashboard}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" role="menuitem">Dashboard</a>
+                    <a th:href="@{/campaigns}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" role="menuitem">Campaigns</a>
+                    <a th:href="@{/contacts}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" role="menuitem">Contacts</a>
+                    <a th:href="@{/templates}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" role="menuitem">Templates</a>
 
                     <div sec:authorize="isAuthenticated()" class="pt-3 border-t">
-                        <span class="text-gray-600 block mb-2" sec:authentication="name" aria-label="Current user">User</span>
-                        <form th:action="@{/logout}" method="post">
-                            <button type="submit" class="text-gray-700 hover:text-red-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1" aria-label="Log out of your account">
+                        <span class="mb-2 block text-sm text-slate-600" sec:authentication="name" aria-label="Current user">User</span>
+                        <form class="js-logout-form">
+                            <button type="submit" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 rounded px-2 py-1" aria-label="Log out of your account">
                                 Logout
                             </button>
                         </form>
                     </div>
 
                     <div sec:authorize="!isAuthenticated()" class="pt-3 border-t">
-                        <a th:href="@{/login}" class="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Sign in to your account">
+                        <a th:href="@{/login}" class="block rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500" aria-label="Sign in to your account">
                             Sign In
                         </a>
                     </div>
@@ -72,60 +72,13 @@
         </div>
     </nav>
 
-    <footer th:fragment="footer" class="bg-white border-t border-gray-200 mt-auto" role="contentinfo" aria-label="Site footer">
-        <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <a th:href="@{/}" class="flex items-center" aria-label="OpenMailer home">
-                        <img th:src="@{/images/hero.png}" alt="OpenMailer" class="h-10" />
-                    </a>
-                    <p class="text-gray-600 text-sm">
-                        Open source bulk email system with templates for efficient email campaign management.
-                    </p>
-                </div>
-
-                <nav aria-label="Quick links">
-                    <h3 class="font-bold text-gray-900 mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a th:href="@{/dashboard}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Dashboard</a></li>
-                        <li><a th:href="@{/campaigns}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Campaigns</a></li>
-                        <li><a th:href="@{/contacts}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Contacts</a></li>
-                        <li><a th:href="@{/templates}" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Templates</a></li>
-                    </ul>
-                </nav>
-
-                <nav aria-label="Resources">
-                    <h3 class="font-bold text-gray-900 mb-4">Resources</h3>
-                    <ul class="space-y-2">
-                        <li><a href="/documentation" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Documentation</a></li>
-                        <li><a href="/api-reference" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">API Reference</a></li>
-                        <li><a href="/support" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Support</a></li>
-                        <li><a href="https://github.com/openmailer" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1" target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> (opens in new window)</span></a></li>
-                    </ul>
-                </nav>
-
-                <nav aria-label="Legal information">
-                    <h3 class="font-bold text-gray-900 mb-4">Legal</h3>
-                    <ul class="space-y-2">
-                        <li><a href="/privacy" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Privacy Policy</a></li>
-                        <li><a href="/terms" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Terms of Service</a></li>
-                        <li><a href="/cookies" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">Cookie Policy</a></li>
-                        <li><a href="/license" class="text-gray-600 hover:text-blue-600 text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1">License</a></li>
-                    </ul>
-                </nav>
-            </div>
-
-            <div class="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between">
-                <p class="text-gray-600 text-sm">
-                    &copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> OpenMailer. All rights reserved.
-                </p>
-                <p class="text-gray-600 text-sm mt-4 md:mt-0">
-                    Built with Spring Boot 4.0 and Tailwind CSS
-                </p>
-            </div>
+    <footer th:fragment="footer" class="mt-auto border-t border-slate-200/80 bg-white/80" role="contentinfo" aria-label="Site footer">
+        <div class="container mx-auto flex flex-col gap-3 px-4 py-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+            <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> OpenMailer</p>
+            <p>Focused on sender setup, audience import, and campaign execution.</p>
         </div>
     </footer>
 
-    <script th:fragment="mobile-menu-script" th:src="@{/js/min/mobile-toggle.min.js}"></script>
+    <script th:fragment="mobile-menu-script" th:src="${assetMinified} ? @{/js/min/mobile-toggle.min.js} : @{/js/mobile-toggle.js}"></script>
 </body>
 </html>

@@ -187,7 +187,7 @@
     </div>
 
     <th:block layout:fragment="extra-scripts">
-        <script th:src="@{/js/min/login.min.js}"></script>
+        <script th:src="${assetMinified} ? @{/js/min/login.min.js} : @{/js/login.js}"></script>
     </th:block>
 </body>
 </html>

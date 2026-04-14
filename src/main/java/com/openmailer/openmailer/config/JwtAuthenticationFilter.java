@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.config;
 
 import com.openmailer.openmailer.service.security.JwtService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,8 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+  public static final String ACCESS_TOKEN_COOKIE = "openmailer_access_token";
+
   private final JwtService jwtService;
   private final UserDetailsService userDetailsService;
 
@@ -38,18 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       HttpServletResponse response,
       FilterChain filterChain
   ) throws ServletException, IOException {
-    final String authHeader = request.getHeader("Authorization");
-    final String jwt;
+    final String jwt = extractToken(request);
     final String userEmail;
 
-    // Check if Authorization header is present and starts with "Bearer "
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+    if (jwt == null || jwt.isBlank()) {
       filterChain.doFilter(request, response);
       return;
     }
-
-    // Extract JWT token
-    jwt = authHeader.substring(7);
 
     try {
       // Extract user email from JWT
@@ -82,5 +80,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
+  }
+
+  private String extractToken(HttpServletRequest request) {
+    final String authHeader = request.getHeader("Authorization");
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      return authHeader.substring(7);
+    }
+
+    Cookie[] cookies = request.getCookies();
+    if (cookies == null) {
+      return null;
+    }
+
+    for (Cookie cookie : cookies) {
+      if (ACCESS_TOKEN_COOKIE.equals(cookie.getName())) {
+        return cookie.getValue();
+      }
+    }
+
+    return null;
   }
 }

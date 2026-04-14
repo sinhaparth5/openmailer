@@ -27,8 +27,8 @@ RUN ./mvnw dependency:go-offline -B
 COPY src ./src
 COPY tailwind.config.js ./
 
-# Build Tailwind CSS for production
-RUN npm run build:css:prod
+# Build production frontend assets
+RUN npm run build:prod
 
 # Build Spring Boot application (skip tests for faster builds)
 RUN ./mvnw clean package -DskipTests

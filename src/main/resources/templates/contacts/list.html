@@ -13,14 +13,14 @@
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Contacts</h1>
-                    <p class="mt-2 text-sm text-gray-600">Manage your email subscribers and contacts.</p>
+                    <h1 class="text-3xl font-semibold text-slate-900">Contacts</h1>
+                    <p class="mt-2 text-sm text-slate-600">Manage real subscribers and filter the records already stored for your account.</p>
                 </div>
                 <div class="flex space-x-3">
-                    <a href="/contacts/import" class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 font-medium">
+                    <a href="/contacts/import" class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                         Import Contacts
                     </a>
-                    <a href="/contacts/add" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
+                    <a href="/contacts/add" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800">
                         Add Contact
                     </a>
                 </div>
@@ -146,35 +146,36 @@
             </div>
         </div>
 
-        <!-- Bulk Actions Bar (shown when contacts selected) -->
-        <div x-data="{ showBulkActions: false }" x-show="showBulkActions" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm font-medium text-blue-900">
-                        <span x-text="selectedCount">0</span> contacts selected
-                    </span>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="alert('Add tags functionality coming soon')"
-                            class="px-3 py-1.5 text-sm bg-white text-gray-700 border border-gray-300 rounded hover:bg-gray-50">
-                        Add Tags
-                    </button>
-                    <button onclick="alert('Export functionality coming soon')"
-                            class="px-3 py-1.5 text-sm bg-white text-gray-700 border border-gray-300 rounded hover:bg-gray-50">
-                        Export
-                    </button>
-                    <button onclick="alert('Delete functionality coming soon')"
-                            class="px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700">
-                        Delete
-                    </button>
+        <div x-data="tableSelection()">
+            <!-- Bulk Actions Bar (shown when contacts selected) -->
+            <div x-show="showBulkActions" x-cloak class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm font-medium text-blue-900">
+                            <span x-text="selectedCount">0</span> contacts selected
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button type="button" disabled
+                                class="cursor-not-allowed rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-400">
+                            Add Tags
+                        </button>
+                        <button type="button" disabled
+                                class="cursor-not-allowed rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-400">
+                            Export
+                        </button>
+                        <button type="button" disabled
+                                class="cursor-not-allowed rounded-lg bg-slate-200 px-3 py-1.5 text-sm text-slate-500">
+                            Delete
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Contacts Table -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200" x-data="tableSelection()">
+            <!-- Contacts Table -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
@@ -237,57 +238,55 @@
                                        class="text-blue-600 hover:text-blue-900">View</a>
                                     <a th:href="@{/contacts/{id}/edit(id=${contact.id})}"
                                        class="text-gray-600 hover:text-gray-900">Edit</a>
-                                    <button onclick="alert('Delete functionality coming soon')"
-                                            class="text-red-600 hover:text-red-900">Delete</button>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
-                </table>
-            </div>
-
-            <!-- Empty State -->
-            <div th:if="${#lists.isEmpty(contacts)}" class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">No contacts found</h3>
-                <p class="mt-1 text-sm text-gray-500">Get started by adding a new contact or importing a list.</p>
-                <div class="mt-6 flex justify-center gap-3">
-                    <a href="/contacts/add" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                        Add Contact
-                    </a>
-                    <a href="/contacts/import" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        Import Contacts
-                    </a>
+                    </table>
                 </div>
-            </div>
 
-            <!-- Pagination -->
-            <div th:if="${!#lists.isEmpty(contacts)}" class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1 flex justify-between sm:hidden">
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Previous
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(contacts)}" class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No contacts found</h3>
+                    <p class="mt-1 text-sm text-gray-500">Get started by adding a new contact or importing a list.</p>
+                    <div class="mt-6 flex justify-center gap-3">
+                        <a href="/contacts/add" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            Add Contact
                         </a>
-                        <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Next
+                        <a href="/contacts/import" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Import Contacts
                         </a>
                     </div>
-                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p class="text-sm text-gray-700">
-                                Showing
-                                <span class="font-medium">1</span>
-                                to
-                                <span class="font-medium" th:text="${#lists.size(contacts)}">20</span>
-                                of
-                                <span class="font-medium" th:text="${totalContacts}">0</span>
-                                contacts
-                            </p>
+                </div>
+
+                <!-- Pagination -->
+                <div th:if="${!#lists.isEmpty(contacts)}" class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 flex justify-between sm:hidden">
+                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Previous
+                            </a>
+                            <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Next
+                            </a>
                         </div>
-                        <div>
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700">
+                                    Showing
+                                    <span class="font-medium">1</span>
+                                    to
+                                    <span class="font-medium" th:text="${#lists.size(contacts)}">20</span>
+                                    of
+                                    <span class="font-medium" th:text="${totalContacts}">0</span>
+                                    contacts
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                                 <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <span class="sr-only">Previous</span>
                                     <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -306,11 +305,13 @@
                                         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                                     </svg>
                                 </a>
-                            </nav>
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </main>

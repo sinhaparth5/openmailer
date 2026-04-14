@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
@@ -29,11 +30,17 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final CsrfCookieFilter csrfCookieFilter;
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+    public SecurityConfiguration(
+        JwtAuthenticationFilter jwtAuthFilter,
+        CsrfCookieFilter csrfCookieFilter,
+        UserDetailsService userDetailsService
+    ) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.csrfCookieFilter = csrfCookieFilter;
         this.userDetailsService = userDetailsService;
     }
 
@@ -84,7 +91,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/webhooks/**", "/api/v1/webhooks/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers("/login").permitAll()
+                .requestMatchers("/login", "/register").permitAll()
                 // Swagger/OpenAPI endpoints
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
@@ -95,6 +102,7 @@ public class SecurityConfiguration {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider())
+            .addFilterAfter(csrfCookieFilter, CsrfFilter.class)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

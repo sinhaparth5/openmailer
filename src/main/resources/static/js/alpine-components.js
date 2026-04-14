@@ -41,6 +41,14 @@ function tableSelection() {
         selectedAll: false,
         selectedRows: [],
 
+        get selectedCount() {
+            return this.selectedRows.length;
+        },
+
+        get showBulkActions() {
+            return this.selectedCount > 0;
+        },
+
         toggleAll() {
             this.selectedAll = !this.selectedAll;
             const checkboxes = document.querySelectorAll('.row-checkbox');

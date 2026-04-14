@@ -21,6 +21,8 @@ import java.util.function.Function;
 public class JwtService {
 
   private static final String DEFAULT_SECRET = "openmailer-secret-key-change-this-in-production-to-a-secure-random-value";
+  private static final String TOKEN_TYPE_ACCESS = "access";
+  private static final String TOKEN_TYPE_REFRESH = "refresh";
 
   private final String secret;
 
@@ -61,11 +63,8 @@ public class JwtService {
    * @param email the user email
    * @return the generated access token
    */
-  public String generateAccessToken(String userId, String email) {
-    Map<String, Object> claims = new HashMap<>();
-    claims.put("userId", userId);
-    claims.put("email", email);
-    return generateToken(claims, email, accessTokenExpiration);
+  public String generateAccessToken(String userId, String email, String username, String role) {
+    return generateToken(buildClaims(userId, email, username, role, TOKEN_TYPE_ACCESS), email, accessTokenExpiration);
   }
 
   /**
@@ -75,11 +74,8 @@ public class JwtService {
    * @param email the user email
    * @return the generated refresh token
    */
-  public String generateRefreshToken(String userId, String email) {
-    Map<String, Object> claims = new HashMap<>();
-    claims.put("userId", userId);
-    claims.put("email", email);
-    return generateToken(claims, email, refreshTokenExpiration);
+  public String generateRefreshToken(String userId, String email, String username, String role) {
+    return generateToken(buildClaims(userId, email, username, role, TOKEN_TYPE_REFRESH), email, refreshTokenExpiration);
   }
 
   /**
@@ -112,6 +108,10 @@ public class JwtService {
     return (tokenEmail.equals(email) && !isTokenExpired(token));
   }
 
+  public boolean validateToken(String token, String email, String expectedTokenType) {
+    return validateToken(token, email) && expectedTokenType.equals(extractTokenType(token));
+  }
+
   /**
    * Extract email from token.
    *
@@ -130,6 +130,18 @@ public class JwtService {
    */
   public String extractUserId(String token) {
     return extractClaim(token, claims -> claims.get("userId", String.class));
+  }
+
+  public String extractUsername(String token) {
+    return extractClaim(token, claims -> claims.get("username", String.class));
+  }
+
+  public String extractRole(String token) {
+    return extractClaim(token, claims -> claims.get("role", String.class));
+  }
+
+  public String extractTokenType(String token) {
+    return extractClaim(token, claims -> claims.get("tokenType", String.class));
   }
 
   /**
@@ -187,5 +199,15 @@ public class JwtService {
   private SecretKey getSigningKey() {
     byte[] keyBytes = secret.getBytes();
     return Keys.hmacShaKeyFor(keyBytes);
+  }
+
+  private Map<String, Object> buildClaims(String userId, String email, String username, String role, String tokenType) {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("userId", userId);
+    claims.put("email", email);
+    claims.put("username", username);
+    claims.put("role", role);
+    claims.put("tokenType", tokenType);
+    return claims;
   }
 }

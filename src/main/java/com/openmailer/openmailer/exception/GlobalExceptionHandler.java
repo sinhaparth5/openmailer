@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * Global exception handler for all REST API endpoints.
@@ -89,6 +90,18 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .body(ApiResponse.error("INVALID_ARGUMENT", ex.getMessage(), null));
+  }
+
+  /**
+   * Handle missing static resources and unmapped asset requests as normal 404s.
+   */
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<ApiResponse<Object>> handleNoResourceFound(
+      NoResourceFoundException ex, WebRequest request) {
+    log.debug("Resource not found: {}", ex.getResourcePath());
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ApiResponse.error("RESOURCE_NOT_FOUND", "The requested resource was not found.", ex.getResourcePath()));
   }
 
   /**
