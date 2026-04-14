@@ -81,17 +81,10 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/images/**").permitAll()
                 .requestMatchers("/api/auth/**", "/track/**").permitAll()
-                .requestMatchers("/api/test/**").permitAll()  // Allow email test endpoints
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/webhooks/**", "/api/v1/webhooks/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers("/login").permitAll()
-                // Component showcase pages
-                .requestMatchers("/components", "/components/**").permitAll()
-                // Main application pages
-                .requestMatchers("/dashboard").permitAll()
-                .requestMatchers("/campaigns", "/campaigns/**").permitAll()
-                .requestMatchers("/contacts", "/contacts/**").permitAll()
                 // Swagger/OpenAPI endpoints
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()

@@ -3,6 +3,7 @@ package com.openmailer.openmailer.service.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -25,6 +26,7 @@ import java.util.Base64;
 public class EncryptionService {
 
     private static final Logger log = LoggerFactory.getLogger(EncryptionService.class);
+    private static final String DEFAULT_DEV_KEY = "OpenMailerDevKey1234567890123456";
 
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_TAG_LENGTH = 128; // bits
@@ -33,11 +35,18 @@ public class EncryptionService {
     private final SecretKey secretKey;
     private final SecureRandom secureRandom;
 
-    public EncryptionService(@Value("${encryption.key:}") String encryptionKey) {
+    public EncryptionService(@Value("${encryption.key:}") String encryptionKey, Environment environment) {
+        boolean prodProfile = environment.matchesProfiles("prod");
         if (encryptionKey == null || encryptionKey.isEmpty()) {
-            log.warn("ENCRYPTION_KEY not set! Using default key (NOT SECURE FOR PRODUCTION)");
-            // Exactly 32 bytes for AES-256
-            encryptionKey = "OpenMailerDevKey1234567890123456"; // 32 characters = 32 bytes
+            if (prodProfile) {
+                throw new IllegalStateException("ENCRYPTION_KEY must be configured in production.");
+            }
+            log.warn("ENCRYPTION_KEY not set. Using development fallback key.");
+            encryptionKey = DEFAULT_DEV_KEY;
+        }
+
+        if (prodProfile && DEFAULT_DEV_KEY.equals(encryptionKey)) {
+            throw new IllegalStateException("ENCRYPTION_KEY cannot use the development default in production.");
         }
 
         byte[] keyBytes = encryptionKey.getBytes();

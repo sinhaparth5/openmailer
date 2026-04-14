@@ -4,7 +4,7 @@ import com.openmailer.openmailer.dto.request.auth.LoginRequest;
 import com.openmailer.openmailer.dto.request.auth.RegisterRequest;
 import com.openmailer.openmailer.dto.request.twofa.TwoFactorVerifyRequest;
 import com.openmailer.openmailer.dto.response.auth.LoginResponse;
-import com.openmailer.openmailer.dto.response.common.ApiResponse;
+import com.openmailer.openmailer.dto.ApiResponse;
 import com.openmailer.openmailer.dto.response.twofa.TwoFactorBackupCodesResponse;
 import com.openmailer.openmailer.dto.response.twofa.TwoFactorSetupResponse;
 import com.openmailer.openmailer.model.User;

@@ -43,3 +43,6 @@ src/main/resources/static/css/output.css
 ### Liquibase ###
 src/main/resources/liquibase.properties
 .env
+.codex/
+.codex
+*.class

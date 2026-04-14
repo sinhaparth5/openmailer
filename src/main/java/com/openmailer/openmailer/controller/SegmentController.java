@@ -1,7 +1,7 @@
 package com.openmailer.openmailer.controller;
 
 import com.openmailer.openmailer.dto.PaginatedResponse;
-import com.openmailer.openmailer.dto.response.common.ApiResponse;
+import com.openmailer.openmailer.dto.ApiResponse;
 import com.openmailer.openmailer.dto.segment.SegmentRequest;
 import com.openmailer.openmailer.dto.segment.SegmentResponse;
 import com.openmailer.openmailer.model.Contact;

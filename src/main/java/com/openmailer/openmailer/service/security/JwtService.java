@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -19,14 +20,39 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-  @Value("${jwt.secret:openmailer-secret-key-change-this-in-production-to-a-secure-random-value}")
-  private String secret;
+  private static final String DEFAULT_SECRET = "openmailer-secret-key-change-this-in-production-to-a-secure-random-value";
 
-  @Value("${jwt.access-token-expiration:3600000}") // 1 hour in milliseconds
-  private Long accessTokenExpiration;
+  private final String secret;
 
-  @Value("${jwt.refresh-token-expiration:604800000}") // 7 days in milliseconds
-  private Long refreshTokenExpiration;
+  private final Long accessTokenExpiration;
+
+  private final Long refreshTokenExpiration;
+
+  public JwtService(
+      @Value("${jwt.secret:}") String secret,
+      @Value("${jwt.access-token-expiration:3600000}") Long accessTokenExpiration,
+      @Value("${jwt.refresh-token-expiration:604800000}") Long refreshTokenExpiration,
+      Environment environment) {
+    boolean prodProfile = environment.matchesProfiles("prod");
+    if (secret == null || secret.isBlank()) {
+      if (prodProfile) {
+        throw new IllegalStateException("JWT_SECRET must be configured in production.");
+      }
+      secret = DEFAULT_SECRET;
+    }
+
+    if (prodProfile && DEFAULT_SECRET.equals(secret)) {
+      throw new IllegalStateException("JWT_SECRET cannot use the development default in production.");
+    }
+
+    if (secret.getBytes().length < 32) {
+      throw new IllegalArgumentException("JWT secret must be at least 32 bytes.");
+    }
+
+    this.secret = secret;
+    this.accessTokenExpiration = accessTokenExpiration;
+    this.refreshTokenExpiration = refreshTokenExpiration;
+  }
 
   /**
    * Generate access token for user.
