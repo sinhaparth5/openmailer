@@ -269,20 +269,6 @@ public class CampaignController {
             @PathVariable String id,
             @RequestBody Map<String, String> request) {
 
-        EmailCampaign campaign = campaignService.findById(id);
-
-        // Check ownership
-        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
-        }
-
-        // Only allow scheduling if campaign is DRAFT
-        if (!"DRAFT".equals(campaign.getStatus())) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("INVALID_STATUS", "Can only schedule campaigns in DRAFT status", "status"));
-        }
-
         String scheduledAtStr = request.get("scheduledAt");
         if (scheduledAtStr == null || scheduledAtStr.isEmpty()) {
             return ResponseEntity.badRequest()
@@ -290,17 +276,7 @@ public class CampaignController {
         }
 
         LocalDateTime scheduledAt = LocalDateTime.parse(scheduledAtStr);
-
-        // Validate scheduled time is in the future
-        if (scheduledAt.isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("INVALID_SCHEDULED_TIME", "Scheduled time must be in the future", "scheduledAt"));
-        }
-
-        campaign.setScheduledAt(scheduledAt);
-        campaign.setStatus("SCHEDULED");
-
-        EmailCampaign updated = campaignService.updateCampaign(id, user.getId(), campaign);
+        EmailCampaign updated = campaignService.scheduleCampaign(id, user.getId(), scheduledAt);
 
         log.info("Campaign scheduled: {} for {} by user: {}", id, scheduledAt, user.getEmail());
 
@@ -315,25 +291,7 @@ public class CampaignController {
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
 
-        EmailCampaign campaign = campaignService.findById(id);
-
-        // Check ownership
-        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
-        }
-
-        // Only allow sending if campaign is DRAFT or SCHEDULED
-        if (!"DRAFT".equals(campaign.getStatus()) &&
-                !"SCHEDULED".equals(campaign.getStatus())) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("INVALID_STATUS", "Campaign is not in a sendable state", "status"));
-        }
-
-        // Update status to SENDING
-        campaign.setStatus("SENDING");
-        campaign.setSentAt(LocalDateTime.now());
-        campaignService.updateCampaign(id, user.getId(), campaign);
+        EmailCampaign campaign = campaignService.startSendingCampaign(id, user.getId());
 
         // Trigger async campaign sending service
         campaignSendingService.sendCampaignAsync(id);
@@ -353,24 +311,7 @@ public class CampaignController {
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
 
-        EmailCampaign campaign = campaignService.findById(id);
-
-        // Check ownership
-        if (!campaign.getCreatedBy().getId().equals(user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this campaign", null));
-        }
-
-        // Only allow cancellation if campaign is SCHEDULED
-        if (!"SCHEDULED".equals(campaign.getStatus())) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("INVALID_STATUS", "Can only cancel scheduled campaigns", "status"));
-        }
-
-        campaign.setStatus("DRAFT");
-        campaign.setScheduledAt(null);
-
-        EmailCampaign updated = campaignService.updateCampaign(id, user.getId(), campaign);
+        EmailCampaign updated = campaignService.cancelScheduledCampaign(id, user.getId());
 
         log.info("Campaign cancelled: {} by user: {}", id, user.getEmail());
 

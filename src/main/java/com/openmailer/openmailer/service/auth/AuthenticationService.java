@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 @Transactional
 public class AuthenticationService {
 
+  private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
+  private static final long ACCOUNT_LOCK_MINUTES = 15;
+
   private final UserService userService;
   private final PasswordEncoderService passwordEncoderService;
   private final JwtService jwtService;
@@ -82,11 +85,16 @@ public class AuthenticationService {
    * @throws UnauthorizedException if credentials are invalid or 2FA code is required/invalid
    */
   public LoginResponse login(LoginRequest request) {
-    // Find user by email
-    User user = userService.findByEmailOrThrow(request.getEmail());
+    User user = userService.findByEmail(request.getEmail())
+        .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
+
+    if (isAccountLocked(user)) {
+      throw new UnauthorizedException("Account is locked. Try again later");
+    }
 
     // Verify password
     if (!passwordEncoderService.matches(request.getPassword(), user.getPassword())) {
+      recordFailedLoginAttempt(user);
       throw new UnauthorizedException("Invalid email or password");
     }
 
@@ -113,13 +121,13 @@ public class AuthenticationService {
       }
 
       if (!isValidTotp && !isValidBackup) {
+        recordFailedLoginAttempt(user);
         throw new UnauthorizedException("Invalid two-factor authentication code");
       }
     }
 
-    // Update last login
-    user.setLastLoginAt(LocalDateTime.now());
-    userService.updateUser(user.getId(), user);
+    // Persist login activity through a dedicated auth-state path.
+    userService.recordSuccessfulLogin(user.getId(), LocalDateTime.now());
 
     String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
     String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
@@ -191,5 +199,17 @@ public class AuthenticationService {
         user.getTwoFactorEnabled(),
         user.getAccountStatus()
     );
+  }
+
+  private boolean isAccountLocked(User user) {
+    return user.getAccountLockedUntil() != null && user.getAccountLockedUntil().isAfter(LocalDateTime.now());
+  }
+
+  private void recordFailedLoginAttempt(User user) {
+    int nextFailedAttempts = (user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts()) + 1;
+    LocalDateTime lockUntil = nextFailedAttempts >= MAX_FAILED_LOGIN_ATTEMPTS
+        ? LocalDateTime.now().plusMinutes(ACCOUNT_LOCK_MINUTES)
+        : null;
+    userService.recordFailedLoginAttempt(user.getId(), lockUntil);
   }
 }

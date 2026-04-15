@@ -85,8 +85,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         rememberMe: rememberMe
     };
 
-    if (twoFactorCode && twoFactorCode.length === 6) {
-        loginData.twoFactorCode = twoFactorCode;
+    if (twoFactorCode) {
+        const normalizedTwoFactorCode = twoFactorCode.trim().toUpperCase();
+        if (normalizedTwoFactorCode.length === 6 || normalizedTwoFactorCode.length === 8) {
+            loginData.twoFactorCode = normalizedTwoFactorCode;
+        }
     }
 
     // Disable button and show loading

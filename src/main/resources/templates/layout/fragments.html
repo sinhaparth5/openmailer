@@ -24,6 +24,7 @@
                     <a th:href="@{/campaigns}" class="rounded-full px-4 py-2 text-sm font-medium text-white/55 transition hover:bg-white/10 hover:text-white focus:outline-none" role="menuitem">Campaigns</a>
                     <a th:href="@{/contacts}" class="rounded-full px-4 py-2 text-sm font-medium text-white/55 transition hover:bg-white/10 hover:text-white focus:outline-none" role="menuitem">Contacts</a>
                     <a th:href="@{/templates}" class="rounded-full px-4 py-2 text-sm font-medium text-white/55 transition hover:bg-white/10 hover:text-white focus:outline-none" role="menuitem">Templates</a>
+                    <a th:href="@{/settings/security}" class="rounded-full px-4 py-2 text-sm font-medium text-white/55 transition hover:bg-white/10 hover:text-white focus:outline-none" role="menuitem">Security</a>
                 </div>
             </div>
 
@@ -64,6 +65,7 @@
                 <a th:href="@{/campaigns}" class="rounded-xl px-3 py-2.5 text-sm font-medium text-white/60 transition hover:bg-white/9 hover:text-white" role="menuitem">Campaigns</a>
                 <a th:href="@{/contacts}" class="rounded-xl px-3 py-2.5 text-sm font-medium text-white/60 transition hover:bg-white/9 hover:text-white" role="menuitem">Contacts</a>
                 <a th:href="@{/templates}" class="rounded-xl px-3 py-2.5 text-sm font-medium text-white/60 transition hover:bg-white/9 hover:text-white" role="menuitem">Templates</a>
+                <a th:href="@{/settings/security}" class="rounded-xl px-3 py-2.5 text-sm font-medium text-white/60 transition hover:bg-white/9 hover:text-white" role="menuitem">Security</a>
 
                 <div sec:authorize="isAuthenticated()" class="mt-2 border-t border-white/8 pt-3">
                     <span class="mb-2 block text-xs text-white/40" sec:authentication="name" aria-label="Current user">User</span>

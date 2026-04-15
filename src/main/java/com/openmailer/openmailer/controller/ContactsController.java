@@ -1,14 +1,22 @@
 package com.openmailer.openmailer.controller;
 
+import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.Contact;
+import com.openmailer.openmailer.model.ContactList;
+import com.openmailer.openmailer.model.ContactListMembership;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.repository.ContactListRepository;
 import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.contact.ContactImportService;
+import com.openmailer.openmailer.service.contact.ContactListMembershipService;
 import com.openmailer.openmailer.service.contact.ContactService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,15 +49,18 @@ public class ContactsController {
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
     private final ContactService contactService;
     private final ContactImportService contactImportService;
+    private final ContactListMembershipService membershipService;
     private final ContactListRepository contactListRepository;
 
     public ContactsController(
         ContactService contactService,
         ContactImportService contactImportService,
+        ContactListMembershipService membershipService,
         ContactListRepository contactListRepository
     ) {
         this.contactService = contactService;
         this.contactImportService = contactImportService;
+        this.membershipService = membershipService;
         this.contactListRepository = contactListRepository;
     }
 
@@ -96,8 +107,7 @@ public class ContactsController {
 
     @GetMapping("/add")
     public String add(Model model) {
-        model.addAttribute("pageTitle", "Add Contact - OpenMailer");
-        model.addAttribute("mode", "add");
+        populateFormMetadata(model, "Add Contact - OpenMailer", "add");
         model.addAttribute("contactForm", new ContactForm());
         return "contacts/form";
     }
@@ -105,10 +115,25 @@ public class ContactsController {
     @PostMapping
     public String create(
         @AuthenticationPrincipal CustomUserDetails userDetails,
-        @ModelAttribute ContactForm contactForm,
+        @Valid @ModelAttribute("contactForm") ContactForm contactForm,
+        BindingResult bindingResult,
+        Model model,
         RedirectAttributes redirectAttributes
     ) {
-        Contact saved = contactService.createContact(toEntity(contactForm, userDetails.getUser()));
+        if (bindingResult.hasErrors()) {
+            populateFormMetadata(model, "Add Contact - OpenMailer", "add");
+            return "contacts/form";
+        }
+
+        Contact saved;
+        try {
+            saved = contactService.createContact(toEntity(contactForm, userDetails.getUser()));
+            syncContactLists(saved.getId(), userDetails.getUser().getId(), contactForm.getSelectedListIds());
+        } catch (ValidationException ex) {
+            bindValidationError(bindingResult, ex);
+            populateFormMetadata(model, "Add Contact - OpenMailer", "add");
+            return "contacts/form";
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Contact created successfully.");
         return "redirect:/contacts/" + saved.getId();
     }
@@ -142,8 +167,7 @@ public class ContactsController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         Model model
     ) {
-        model.addAttribute("pageTitle", "Edit Contact - OpenMailer");
-        model.addAttribute("mode", "edit");
+        populateFormMetadata(model, "Edit Contact - OpenMailer", "edit");
         model.addAttribute("contactForm", toForm(contactService.findByIdAndUserId(id, userDetails.getUser().getId())));
         return "contacts/form";
     }
@@ -152,12 +176,36 @@ public class ContactsController {
     public String update(
         @PathVariable String id,
         @AuthenticationPrincipal CustomUserDetails userDetails,
-        @ModelAttribute ContactForm contactForm,
+        @Valid @ModelAttribute("contactForm") ContactForm contactForm,
+        BindingResult bindingResult,
+        Model model,
         RedirectAttributes redirectAttributes
     ) {
-        contactService.updateContact(id, userDetails.getUser().getId(), toEntity(contactForm, userDetails.getUser()));
+        if (bindingResult.hasErrors()) {
+            populateFormMetadata(model, "Edit Contact - OpenMailer", "edit");
+            return "contacts/form";
+        }
+
+        try {
+            contactService.updateContact(id, userDetails.getUser().getId(), toEntity(contactForm, userDetails.getUser()));
+            syncContactLists(id, userDetails.getUser().getId(), contactForm.getSelectedListIds());
+        } catch (ValidationException ex) {
+            bindValidationError(bindingResult, ex);
+            populateFormMetadata(model, "Edit Contact - OpenMailer", "edit");
+            return "contacts/form";
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Contact updated successfully.");
         return "redirect:/contacts/" + id;
+    }
+
+    @ModelAttribute
+    public void populateFormOptions(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if (userDetails == null) {
+            return;
+        }
+        String userId = userDetails.getUser().getId();
+        model.addAttribute("tagFilters", buildTagFilters(contactService.findByUserId(userId)));
+        model.addAttribute("listOptions", contactListRepository.findByUser_Id(userId));
     }
 
     private List<Map<String, String>> buildTagFilters(List<Contact> contacts) {
@@ -233,6 +281,9 @@ public class ContactsController {
         form.country = extractCustomField(contact, "country");
         form.status = contact.getStatus();
         form.tags = normalizeTags(contact.getTags());
+        form.selectedListIds = membershipService.findByContact(contact.getId()).stream()
+            .map(ContactListMembership::getListId)
+            .toList();
         form.notes = contact.getNotes();
         form.gdprConsent = Boolean.TRUE.equals(contact.getGdprConsent());
         return form;
@@ -265,6 +316,45 @@ public class ContactsController {
             contact.setCustomFields(customFields);
         }
         return contact;
+    }
+
+    private void populateFormMetadata(Model model, String pageTitle, String mode) {
+        model.addAttribute("pageTitle", pageTitle);
+        model.addAttribute("mode", mode);
+    }
+
+    private void syncContactLists(String contactId, String userId, List<String> selectedListIds) {
+        List<String> requestedListIds = selectedListIds == null ? Collections.emptyList() : selectedListIds.stream()
+            .filter(Objects::nonNull)
+            .map(String::trim)
+            .filter(value -> !value.isEmpty())
+            .distinct()
+            .toList();
+
+        for (String listId : requestedListIds) {
+            ContactList list = contactListRepository.findByIdAndUser_Id(listId, userId)
+                .orElseThrow(() -> new ValidationException("Selected list is invalid", "selectedListIds"));
+            if (!membershipService.isContactInList(contactId, list.getId())) {
+                ContactListMembership membership = new ContactListMembership();
+                membership.setContactId(contactId);
+                membership.setListId(list.getId());
+                membership.setStatus("ACTIVE");
+                membershipService.addContactToList(membership);
+            }
+        }
+
+        membershipService.findByContact(contactId).stream()
+            .map(ContactListMembership::getListId)
+            .filter(existingListId -> !requestedListIds.contains(existingListId))
+            .forEach(existingListId -> membershipService.removeContactFromList(contactId, existingListId));
+    }
+
+    private void bindValidationError(BindingResult bindingResult, ValidationException ex) {
+        if (ex.getField() != null && !ex.getField().isBlank()) {
+            bindingResult.rejectValue(ex.getField(), "validation", ex.getMessage());
+            return;
+        }
+        bindingResult.reject("validation", ex.getMessage());
     }
 
     private String buildContactName(Contact contact) {
@@ -340,12 +430,15 @@ public class ContactsController {
         private String id;
         private String firstName;
         private String lastName;
+        @NotBlank(message = "Email address is required.")
+        @Email(message = "Enter a valid email address.")
         private String email;
         private String company;
         private String phone;
         private String country;
         private String status = "SUBSCRIBED";
         private List<String> tags = Collections.emptyList();
+        private List<String> selectedListIds = Collections.emptyList();
         private String notes;
         private boolean gdprConsent;
 
@@ -419,6 +512,14 @@ public class ContactsController {
 
         public void setTags(List<String> tags) {
             this.tags = tags != null ? tags : Collections.emptyList();
+        }
+
+        public List<String> getSelectedListIds() {
+            return selectedListIds;
+        }
+
+        public void setSelectedListIds(List<String> selectedListIds) {
+            this.selectedListIds = selectedListIds != null ? selectedListIds : Collections.emptyList();
         }
 
         public String getNotes() {
