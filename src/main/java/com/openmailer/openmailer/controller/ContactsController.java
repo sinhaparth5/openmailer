@@ -1,7 +1,6 @@
 package com.openmailer.openmailer.controller;
 
 import com.openmailer.openmailer.model.Contact;
-import com.openmailer.openmailer.model.ContactList;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.repository.ContactListRepository;
 import com.openmailer.openmailer.security.CustomUserDetails;
@@ -313,7 +312,7 @@ public class ContactsController {
         String company,
         String subscribedDate,
         LocalDateTime sortDate
-    ) {}
+    ) { }
 
     private record ContactDetailView(
         String id,
@@ -335,7 +334,7 @@ public class ContactsController {
         int complaintCount,
         String unsubscribeReason,
         String notes
-    ) {}
+    ) { }
 
     public static class ContactForm {
         private String id;

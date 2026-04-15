@@ -4,7 +4,6 @@ import com.openmailer.openmailer.dto.ApiResponse;
 import com.openmailer.openmailer.dto.subscription.PreferencesUpdateRequest;
 import com.openmailer.openmailer.dto.subscription.SubscribeRequest;
 import com.openmailer.openmailer.dto.subscription.SubscriptionResponse;
-import com.openmailer.openmailer.dto.subscription.UnsubscribeRequest;
 import com.openmailer.openmailer.exception.ResourceNotFoundException;
 import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.Contact;
