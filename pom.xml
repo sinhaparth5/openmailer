@@ -39,6 +39,7 @@
 	</scm>
 	<properties>
 		<java.version>25</java.version>
+		<tomcat.version>11.0.20</tomcat.version>
 	</properties>
 	<dependencies>
 		<dependency>
