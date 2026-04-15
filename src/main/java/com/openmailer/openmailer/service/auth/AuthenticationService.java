@@ -55,7 +55,7 @@ public class AuthenticationService {
 
     // Create new user
     User user = new User();
-    user.setUsername(request.getEmail()); // Use email as username
+    user.setUsername(request.getUsername());
     user.setEmail(request.getEmail());
     user.setPassword(passwordEncoderService.encode(request.getPassword()));
     user.setFirstName(request.getFirstName());
@@ -66,17 +66,9 @@ public class AuthenticationService {
 
     user = userService.createUser(user);
 
-    // Generate tokens
-    String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
-    String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
-
-    // Create user info
-    LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
-        user.getId(),
-        user.getEmail(),
-        user.getUsername(),
-        user.getRole()
-    );
+    String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
+    String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
+    LoginResponse.UserInfo userInfo = buildUserInfo(user);
 
     return new LoginResponse(accessToken, refreshToken, 3600, userInfo);
   }
@@ -129,17 +121,9 @@ public class AuthenticationService {
     user.setLastLoginAt(LocalDateTime.now());
     userService.updateUser(user.getId(), user);
 
-    // Generate tokens
-    String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
-    String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
-
-    // Create user info
-    LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
-        user.getId(),
-        user.getEmail(),
-        user.getUsername(),
-        user.getRole()
-    );
+    String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
+    String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
+    LoginResponse.UserInfo userInfo = buildUserInfo(user);
 
     return new LoginResponse(accessToken, refreshToken, 3600, userInfo);
   }
@@ -159,22 +143,13 @@ public class AuthenticationService {
       // Find user
       User user = userService.findByEmailOrThrow(email);
 
-      // Validate refresh token
-      if (!jwtService.validateToken(refreshToken, user.getEmail())) {
+      if (!jwtService.validateToken(refreshToken, user.getEmail(), "refresh")) {
         throw new UnauthorizedException("Invalid refresh token");
       }
 
-      // Generate new tokens
-      String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
-      String newRefreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
-
-      // Create user info
-      LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
-          user.getId(),
-          user.getEmail(),
-          user.getUsername(),
-          user.getRole()
-      );
+      String newAccessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
+      String newRefreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
+      LoginResponse.UserInfo userInfo = buildUserInfo(user);
 
       return new LoginResponse(newAccessToken, newRefreshToken, 3600, userInfo);
     } catch (Exception e) {
@@ -195,7 +170,7 @@ public class AuthenticationService {
       String email = jwtService.extractEmail(accessToken);
       User user = userService.findByEmailOrThrow(email);
 
-      if (!jwtService.validateToken(accessToken, user.getEmail())) {
+      if (!jwtService.validateToken(accessToken, user.getEmail(), "access")) {
         throw new UnauthorizedException("Invalid access token");
       }
 
@@ -203,5 +178,18 @@ public class AuthenticationService {
     } catch (Exception e) {
       throw new UnauthorizedException("Invalid access token");
     }
+  }
+
+  public LoginResponse.UserInfo buildUserInfo(User user) {
+    return new LoginResponse.UserInfo(
+        user.getId(),
+        user.getEmail(),
+        user.getUsername(),
+        user.getRole(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getTwoFactorEnabled(),
+        user.getAccountStatus()
+    );
   }
 }

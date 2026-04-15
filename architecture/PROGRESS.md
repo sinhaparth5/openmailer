@@ -1,14 +1,54 @@
 # OpenMailer - Implementation Progress
 
-Last Updated: 2025-12-25
+Last Updated: 2026-04-14
 
 ---
 
-## 📊 Overall Progress: ~75% Complete
+## 📊 Overall Progress: ~82% Complete
 
 ### ✅ Completed Phases: 9/12
-### 🚧 In Progress: 0/12
-### ⏳ Remaining: 3/12
+### 🚧 In Progress: 1/12
+### ⏳ Remaining: 2/12
+
+---
+
+## 🔄 Recent Progress Update (2026-04-14)
+
+### ✅ Configuration, Runtime, and Security Cleanup
+- Removed hardcoded development secrets from application properties and shifted to env-backed configuration
+- Added safer production secret handling for `JWT_SECRET` and `ENCRYPTION_KEY`
+- Unified browser auth around JWT cookies instead of mixed local storage/session patterns
+- Added logout flow wired to `/api/auth/logout`
+- Improved CSRF handling for authenticated server-rendered form flows
+- Reduced noisy exception logging for missing browser/devtools resources
+
+### ✅ Docker and Local Development Stack
+- Added a Dockerized app service alongside PostgreSQL and Redis
+- Updated local infrastructure to PostgreSQL 17 and Redis 8
+- Added Docker-oriented environment examples and startup defaults
+- Made local development more reliable with Redis/cache configuration cleanup
+
+### ✅ Production Asset Delivery
+- Added dev vs prod asset switching for readable vs minified JavaScript
+- Enabled hashed/versioned asset URLs in production through Spring resource handling
+- Vendored Alpine locally instead of relying on an external CDN
+- Added new minified assets for auth, register, import, and form submission flows
+
+### ✅ Auth and UI Flow Improvements
+- Added a proper register page and connected it to the real auth API
+- Fixed protected page access flow so browser navigation works with JWT cookies
+- Removed artificial redirect delays from login/register
+- Simplified the dashboard and shared layout to reduce template/demo noise
+
+### ✅ Real Data and Workflow Pass
+- Replaced fake dashboard, contacts, and campaigns data with real user-backed data
+- Reworked contact and campaign MVC forms to use real backing models
+- Replaced the old contact import placeholder page with a real CSV upload + validation + job status flow
+- Restricted campaign editing UI to draft campaigns only, matching backend behavior
+
+### 🚧 Current Focus
+- Finalizing remaining workflow polish around create/edit validation, list assignment, and send/schedule UX
+- Continuing runtime hardening and cleanup of remaining template-era UI rough edges
 
 ---
 

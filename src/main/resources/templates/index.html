@@ -12,58 +12,90 @@
 </head>
 <body>
     <div layout:fragment="content">
-        <div class="container mx-auto px-4 py-12 max-w-4xl">
-            <header class="bg-white rounded-lg shadow-lg p-8 mb-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h1 class="text-4xl font-bold text-gray-900">Welcome to OpenMailer</h1>
-                    <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                </div>
-                <p class="text-lg text-gray-700 leading-relaxed">
-                    OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.
-                </p>
-            </header>
+        <div class="px-1 py-2 sm:px-2 sm:py-3">
+            <div class="app-shell p-4 sm:p-6">
+                <section class="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+                    <div class="rounded-[32px] bg-[#1f2128] px-6 py-8 text-white shadow-[0_34px_70px_-40px_rgba(15,23,42,0.58)] sm:px-8">
+                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/55">Open Source Delivery System</p>
+                        <h1 class="mt-5 max-w-xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                            A quieter starting point for audience imports, campaigns, and sender setup.
+                        </h1>
+                        <p class="mt-5 max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
+                            OpenMailer keeps the product server-rendered and operationally focused. The shell now matches the new dashboard language, so setup pages, forms, and daily workflows all feel like one system instead of separate demos.
+                        </p>
+                        <div class="mt-8 flex flex-wrap gap-3">
+                            <a th:href="@{/dashboard}" class="app-button-primary px-5 py-3 text-sm">Open Dashboard</a>
+                            <a th:href="@{/login}" class="app-button-secondary border-white/15 bg-white/10 px-5 py-3 text-sm text-white hover:bg-white/18">Sign In</a>
+                        </div>
+                    </div>
 
-            <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 mb-6" role="status" aria-live="polite">
-                <div class="flex items-center">
-                    <svg class="w-6 h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <p class="text-white text-lg font-semibold">Application is running successfully!</p>
-                </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="rounded-[28px] bg-[var(--app-sun)]/65 p-5">
+                            <p class="text-sm font-medium text-slate-600">Running status</p>
+                            <p class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Application online</p>
+                            <p class="mt-3 text-sm leading-6 text-slate-700">Core pages, JWT auth flow, and Docker-backed local infrastructure are in place.</p>
+                        </div>
+                        <div class="rounded-[28px] bg-[var(--app-mint)]/65 p-5">
+                            <p class="text-sm font-medium text-slate-600">Workflow coverage</p>
+                            <p class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Contacts and campaigns</p>
+                            <p class="mt-3 text-sm leading-6 text-slate-700">Create, view, list, and import screens now share the same product design language.</p>
+                        </div>
+                        <div class="rounded-[28px] bg-[var(--app-lilac)]/65 p-5 sm:col-span-2">
+                            <p class="text-sm font-medium text-slate-600">What to do next</p>
+                            <ul class="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+                                <li>Connect your mail provider and domain records.</li>
+                                <li>Import or add contacts and define your sending audience.</li>
+                                <li>Build a campaign draft, review sender settings, and schedule delivery.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]" aria-labelledby="next-steps-heading">
+                    <div class="app-panel-strong p-6 sm:p-7">
+                        <p class="app-kicker">Next Steps</p>
+                        <h2 id="next-steps-heading" class="mt-3 text-3xl font-semibold tracking-tight text-slate-950">Bring the stack from running to ready.</h2>
+                        <ul class="mt-6 space-y-4" role="list">
+                            <li class="flex items-start gap-3 rounded-[22px] bg-white/62 px-4 py-4">
+                                <span class="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--app-sun)] text-sm font-semibold text-slate-900">1</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">Confirm database and cache settings</p>
+                                    <p class="mt-1 text-sm leading-6 text-slate-600">Use the Docker defaults or point the app at your own Postgres and Redis environment.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3 rounded-[22px] bg-white/62 px-4 py-4">
+                                <span class="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--app-mint)] text-sm font-semibold text-slate-900">2</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">Wire sender infrastructure</p>
+                                    <p class="mt-1 text-sm leading-6 text-slate-600">Add provider credentials, verify domains, and make your campaign defaults match the sender setup.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3 rounded-[22px] bg-white/62 px-4 py-4">
+                                <span class="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--app-lilac)] text-sm font-semibold text-slate-900">3</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">Move into real sending flow</p>
+                                    <p class="mt-1 text-sm leading-6 text-slate-600">Add audience data, create a draft, and validate the campaign path end to end.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <aside class="space-y-5">
+                        <section class="app-panel p-6">
+                            <p class="app-kicker">Current Direction</p>
+                            <p class="mt-4 text-sm leading-7 text-slate-700">
+                                The app now favors a restrained editorial dashboard style over the older template-heavy admin look. That same system carries through auth, list pages, forms, and detail views.
+                            </p>
+                        </section>
+                        <section class="rounded-[28px] bg-[var(--app-peach)]/72 p-6">
+                            <p class="text-sm font-semibold text-slate-900">Practical reminder</p>
+                            <p class="mt-3 text-sm leading-7 text-slate-700">
+                                Sensitive business logic still belongs on the backend. Minified frontend assets reduce readability, but they do not hide browser code.
+                            </p>
+                        </section>
+                    </aside>
+                </section>
             </div>
-
-            <section class="bg-white rounded-lg shadow-lg p-8" aria-labelledby="next-steps-heading">
-                <h2 id="next-steps-heading" class="text-2xl font-bold text-gray-900 mb-4">Next Steps</h2>
-                <ul class="space-y-3" role="list">
-                    <li class="flex items-start">
-                        <svg class="w-6 h-6 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <span class="text-gray-700">Configure your database connection in application-dev.properties</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-6 h-6 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        <span class="text-gray-700">Set up your email server settings</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-6 h-6 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
-                        </svg>
-                        <span class="text-gray-700">Create your database schema using Liquibase migrations</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-6 h-6 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                        <span class="text-gray-700">Start building your email templates and campaigns</span>
-                    </li>
-                </ul>
-            </section>
         </div>
     </div>
 

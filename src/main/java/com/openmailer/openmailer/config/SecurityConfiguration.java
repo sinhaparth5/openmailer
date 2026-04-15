@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
@@ -29,11 +30,17 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final CsrfCookieFilter csrfCookieFilter;
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+    public SecurityConfiguration(
+        JwtAuthenticationFilter jwtAuthFilter,
+        CsrfCookieFilter csrfCookieFilter,
+        UserDetailsService userDetailsService
+    ) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.csrfCookieFilter = csrfCookieFilter;
         this.userDetailsService = userDetailsService;
     }
 
@@ -51,7 +58,11 @@ public class SecurityConfiguration {
                 // Disable CSRF for API endpoints that use JWT (stateless authentication)
                 .ignoringRequestMatchers(
                     "/api/**",
-                    "/actuator/**"
+                    "/actuator/**",
+                    "/contacts",
+                    "/contacts/*/edit",
+                    "/campaigns",
+                    "/campaigns/*/edit"
                 )
             )
             // Add security headers
@@ -81,17 +92,10 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/images/**").permitAll()
                 .requestMatchers("/api/auth/**", "/track/**").permitAll()
-                .requestMatchers("/api/test/**").permitAll()  // Allow email test endpoints
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/webhooks/**", "/api/v1/webhooks/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/login").permitAll()
-                // Component showcase pages
-                .requestMatchers("/components", "/components/**").permitAll()
-                // Main application pages
-                .requestMatchers("/dashboard").permitAll()
-                .requestMatchers("/campaigns", "/campaigns/**").permitAll()
-                .requestMatchers("/contacts", "/contacts/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/login", "/register").permitAll()
                 // Swagger/OpenAPI endpoints
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
@@ -102,6 +106,7 @@ public class SecurityConfiguration {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider())
+            .addFilterAfter(csrfCookieFilter, CsrfFilter.class)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

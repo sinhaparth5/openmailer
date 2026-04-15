@@ -6,180 +6,229 @@
     <title th:text="${pageTitle}">Dashboard</title>
 </head>
 <body>
+<main layout:fragment="content">
+    <section class="app-shell overflow-hidden p-6 sm:p-8 lg:p-10">
 
-<main layout:fragment="content" class="container mx-auto px-4 py-8">
-    <div class="max-w-7xl mx-auto">
-        <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p class="mt-2 text-sm text-gray-600">Welcome back! Here's an overview of your email campaigns.</p>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="mb-8">
-            <div class="flex flex-wrap gap-3">
-                <a href="/campaigns/create" th:replace="~{components/buttons :: btn-primary(text='Create Campaign')}"></a>
-                <a href="/contacts/import" th:replace="~{components/buttons :: btn-secondary(text='Import Contacts')}"></a>
-                <a href="/templates" th:replace="~{components/buttons :: btn-outline(text='Browse Templates')}"></a>
+        <!-- ── Greeting ──────────────────────────────────────────────── -->
+        <div class="mb-8 flex items-start justify-between gap-6">
+            <div>
+                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Workspace overview</p>
+                <h1 class="mt-2.5 text-[2.6rem] font-extrabold leading-[1.08] tracking-[-0.025em] text-[#111111]">
+                    Good morning, <span th:text="${displayName}">there</span>.
+                </h1>
+                <p class="mt-3 max-w-lg text-[0.875rem] leading-6 text-slate-500">
+                    Your workspace combines audience scale, campaign readiness, and template inventory in one clear view.
+                </p>
             </div>
+            <span class="flex-shrink-0 rounded-full bg-[var(--card-lime)]/75 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-700">Live account</span>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Campaigns -->
-            <div th:replace="~{components/cards :: stat-card(
-                label='Total Campaigns',
-                value=${totalCampaigns},
-                trend='up',
-                change=${campaignsTrend},
-                icon='mail',
-                iconBg='bg-blue-100',
-                iconColor='text-blue-600'
-            )}"></div>
+        <!-- ── 4 Stat Cards ──────────────────────────────────────────── -->
+        <div class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
-            <!-- Total Emails Sent -->
-            <div th:replace="~{components/cards :: stat-card(
-                label='Emails Sent',
-                value=${totalEmailsSent},
-                trend='up',
-                change=${emailsTrend},
-                icon='send',
-                iconBg='bg-green-100',
-                iconColor='text-green-600'
-            )}"></div>
-
-            <!-- Average Open Rate -->
-            <div th:replace="~{components/cards :: stat-card(
-                label='Avg Open Rate',
-                value=${avgOpenRate},
-                trend='up',
-                change=${openRateTrend},
-                icon='chart',
-                iconBg='bg-purple-100',
-                iconColor='text-purple-600'
-            )}"></div>
-
-            <!-- Average Click Rate -->
-            <div th:replace="~{components/cards :: stat-card(
-                label='Avg Click Rate',
-                value=${avgClickRate},
-                trend='down',
-                change=${clickRateTrend},
-                icon='cursor',
-                iconBg='bg-orange-100',
-                iconColor='text-orange-600'
-            )}"></div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Email Activity Chart -->
-            <div th:replace="~{components/charts :: line-chart(
-                title='Email Activity (Last 7 Days)',
-                chartId='activityChart',
-                showLegend=true,
-                legend1='Emails Sent'
-            )}"></div>
-
-            <!-- Campaign Performance Chart -->
-            <div th:replace="~{components/charts :: bar-chart(
-                title='Top Campaigns by Open Rate',
-                chartId='performanceChart'
-            )}"></div>
-        </div>
-
-        <!-- Email Status Chart -->
-        <div class="mb-8">
-            <div th:replace="~{components/charts :: donut-chart(
-                title='Email Status Distribution',
-                chartId='statusChart',
-                centerValue='85.6%',
-                centerLabel='Delivery Rate'
-            )}"></div>
-        </div>
-
-        <!-- Recent Campaigns -->
-        <div class="bg-white rounded-lg shadow mb-8">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-gray-900">Recent Campaigns</h2>
-                    <a href="/campaigns" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View All →</a>
+            <!-- Contacts — lime -->
+            <div class="rounded-[18px] bg-[var(--card-lime)] p-5">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Contacts</p>
+                <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${contactCount}">0</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                    <span class="text-[13px] text-[#111]/55">Subscribed</span>
+                    <span class="text-[13px] font-semibold text-[#111]/75" th:text="${subscribedContactCount}">0</span>
+                </div>
+                <!-- mini bar chart -->
+                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:42%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:60%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:48%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:75%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:88%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:100%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:82%"></div>
                 </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campaign</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opens</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clicks</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr th:each="campaign : ${recentCampaigns}" class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900" th:text="${campaign.name}">Campaign Name</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span th:with="status=${campaign.status}"
-                                      th:classappend="${status == 'SENT'} ? 'bg-green-100 text-green-800' : (${status == 'SENDING'} ? 'bg-blue-100 text-blue-800' : (${status == 'SCHEDULED'} ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'))"
-                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
-                                    <span th:text="${campaign.status}">Status</span>
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${campaign.sent}">0</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${campaign.opens}">0</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${campaign.clicks}">0</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${campaign.sentDate}">Date</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex justify-end space-x-2">
-                                    <a th:href="@{/campaigns/{id}(id=${campaign.id})}" class="text-blue-600 hover:text-blue-900">View</a>
-                                    <a th:if="${campaign.status == 'DRAFT'}" th:href="@{/campaigns/{id}/edit(id=${campaign.id})}" class="text-gray-600 hover:text-gray-900">Edit</a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+            <!-- Campaigns — pink -->
+            <div class="rounded-[18px] bg-[var(--card-pink)] p-5">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Campaigns</p>
+                <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${campaignCount}">0</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                    <span class="text-[13px] text-[#111]/55">Drafts</span>
+                    <span class="text-[13px] font-semibold text-[#111]/75" th:text="${draftCampaignCount}">0</span>
+                </div>
+                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:55%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:36%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:68%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:50%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:82%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:100%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:72%"></div>
+                </div>
+            </div>
+
+            <!-- Templates — sage -->
+            <div class="rounded-[18px] bg-[var(--card-sage)] p-5">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Templates</p>
+                <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${templateCount}">0</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                    <span class="text-[13px] text-[#111]/55">Ready for new drafts</span>
+                </div>
+                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:35%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:58%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:44%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:70%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:55%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:90%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:100%"></div>
+                </div>
+            </div>
+
+            <!-- Domains — mauve -->
+            <div class="rounded-[18px] bg-[var(--card-mauve)] p-5">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Domains</p>
+                <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${verifiedDomainCount}">0</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                    <span class="text-[13px] text-[#111]/55">Providers</span>
+                    <span class="text-[13px] font-semibold text-[#111]/75" th:text="${activeProviderCount}">0</span>
+                    <span class="text-[13px] text-[#111]/55">active</span>
+                </div>
+                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:68%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:44%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:82%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:58%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:96%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:74%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:100%"></div>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- ── Main Grid ─────────────────────────────────────────────── -->
+        <div class="grid gap-5 xl:grid-cols-[1fr_320px]">
+
+            <!-- Left column -->
+            <div class="space-y-5">
+
+                <!-- Launch Checklist — dark card -->
+                <section class="rounded-[20px] border border-white/[0.07] bg-[rgba(18,18,18,0.92)] shadow-[0_24px_64px_-20px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-xl p-6 sm:p-7">
+                    <div class="mb-5 flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-white/35">Launch checklist</p>
+                            <h2 class="mt-2 text-xl font-bold text-white">Get to first send.</h2>
+                        </div>
+                        <span class="flex-shrink-0 rounded-full border border-white/10 bg-white/7 px-3 py-1 text-xs font-medium text-white/50">3 steps</span>
+                    </div>
+                    <div class="grid gap-3 lg:grid-cols-3">
+                        <div class="rounded-[14px] border border-white/[0.12] bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] p-4">
+                            <div class="flex items-start justify-between gap-2">
+                                <p class="text-sm font-semibold text-white">Verified domains</p>
+                                <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold"
+                                      th:classappend="${verifiedDomainCount > 0} ? ' bg-[var(--card-lime)]/20 text-[#ccd97a]' : ' bg-amber-400/15 text-amber-300'"
+                                      th:text="${verifiedDomainCount > 0} ? 'Ready' : 'Pending'">Pending</span>
+                            </div>
+                            <p class="mt-3 text-[13px] text-white/40">Count: <span class="font-semibold text-white/70" th:text="${verifiedDomainCount}">0</span></p>
+                        </div>
+                        <div class="rounded-[14px] border border-white/[0.12] bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] p-4">
+                            <div class="flex items-start justify-between gap-2">
+                                <p class="text-sm font-semibold text-white">Active providers</p>
+                                <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold"
+                                      th:classappend="${activeProviderCount > 0} ? ' bg-[var(--card-lime)]/20 text-[#ccd97a]' : ' bg-amber-400/15 text-amber-300'"
+                                      th:text="${activeProviderCount > 0} ? 'Ready' : 'Pending'">Pending</span>
+                            </div>
+                            <p class="mt-3 text-[13px] text-white/40">Count: <span class="font-semibold text-white/70" th:text="${activeProviderCount}">0</span></p>
+                        </div>
+                        <div class="rounded-[14px] border border-white/[0.12] bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] p-4">
+                            <div class="flex items-start justify-between gap-2">
+                                <p class="text-sm font-semibold text-white">Audience in place</p>
+                                <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold"
+                                      th:classappend="${contactCount > 0} ? ' bg-[var(--card-lime)]/20 text-[#ccd97a]' : ' bg-amber-400/15 text-amber-300'"
+                                      th:text="${contactCount > 0} ? 'Ready' : 'Pending'">Pending</span>
+                            </div>
+                            <p class="mt-3 text-[13px] text-white/40">Contacts: <span class="font-semibold text-white/70" th:text="${contactCount}">0</span></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Actions + Notes row -->
+                <section class="grid gap-5 lg:grid-cols-[200px_1fr]">
+
+                    <div class="app-panel p-6">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Quick actions</p>
+                        <h3 class="mt-2.5 text-base font-bold tracking-tight text-slate-900">Start where the account is thin.</h3>
+                        <div class="mt-5 grid gap-2.5">
+                            <a href="/campaigns/create" class="app-button-primary px-4 py-3 text-sm">Create campaign</a>
+                            <a href="/contacts/import" class="app-button-secondary px-4 py-3 text-sm">Import contacts</a>
+                            <a href="/templates" class="app-button-secondary px-4 py-3 text-sm">Open templates</a>
+                        </div>
+                    </div>
+
+                    <div class="app-panel p-6">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Workspace notes</p>
+                        <h3 class="mt-2.5 text-base font-bold tracking-tight text-slate-900">Calm, intentional design.</h3>
+                        <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                            <div class="rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 p-4">
+                                <p class="text-[13px] font-semibold text-slate-900">Pastel signals</p>
+                                <p class="mt-1.5 text-[12px] leading-5 text-slate-500">Status areas use color, not aggressive contrast.</p>
+                            </div>
+                            <div class="rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 p-4">
+                                <p class="text-[13px] font-semibold text-slate-900">Clean headings</p>
+                                <p class="mt-1.5 text-[12px] leading-5 text-slate-500">Reads like an organized workspace, not a demo.</p>
+                            </div>
+                            <div class="rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 p-4">
+                                <p class="text-[13px] font-semibold text-slate-900">One rhythm</p>
+                                <p class="mt-1.5 text-[12px] leading-5 text-slate-500">Cards, forms, and shells share one visual rhythm.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right aside (fixed 320px) -->
+            <aside class="space-y-5">
+
+                <section class="app-panel p-5">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Readiness</p>
+                    <div class="mt-4 space-y-2">
+                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
+                            <span class="text-[13px] text-slate-500">Domains</span>
+                            <span class="text-[15px] font-bold text-slate-900" th:text="${verifiedDomainCount}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
+                            <span class="text-[13px] text-slate-500">Providers</span>
+                            <span class="text-[15px] font-bold text-slate-900" th:text="${activeProviderCount}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
+                            <span class="text-[13px] text-slate-500">Drafts</span>
+                            <span class="text-[15px] font-bold text-slate-900" th:text="${draftCampaignCount}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
+                            <span class="text-[13px] text-slate-500">Scheduled</span>
+                            <span class="text-[15px] font-bold text-slate-900" th:text="${scheduledCampaignCount}">0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="app-panel p-5">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Next steps</p>
+                    <div class="mt-4 space-y-2.5">
+                        <div class="rounded-[14px] bg-[var(--card-lime)]/55 p-4">
+                            <p class="text-[13px] font-semibold text-slate-900">Missing domains?</p>
+                            <a href="/api/v1/domains" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Review domain setup →</a>
+                        </div>
+                        <div class="rounded-[14px] bg-[var(--card-pink)]/55 p-4">
+                            <p class="text-[13px] font-semibold text-slate-900">Missing providers?</p>
+                            <a href="/api/v1/providers" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Review providers →</a>
+                        </div>
+                        <div class="rounded-[14px] bg-[var(--card-sage)]/55 p-4">
+                            <p class="text-[13px] font-semibold text-slate-900">Empty audience?</p>
+                            <a href="/contacts/import" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Import contacts →</a>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </section>
 </main>
-
-<!-- Chart Initialization -->
-<th:block layout:fragment="extra-scripts">
-    <script th:replace="~{components/charts :: chart-scripts}"></script>
-    <script th:inline="javascript">
-        // Wait for Chart.js to load
-        loadChartJs().then(() => {
-            // Initialize activity chart
-            initLineChart(
-                'activityChart',
-                /*[[${activityLabels}]]*/,
-                /*[[${activityData}]]*/,
-                'Emails Sent'
-            );
-
-            // Initialize performance chart
-            initBarChart(
-                'performanceChart',
-                /*[[${campaignLabels}]]*/,
-                /*[[${campaignOpenRates}]]*/,
-                'Open Rate (%)'
-            );
-
-            // Initialize status chart
-            initDonutChart(
-                'statusChart',
-                /*[[${statusLabels}]]*/,
-                /*[[${statusData}]]*/
-            );
-        });
-    </script>
-</th:block>
-
 </body>
 </html>

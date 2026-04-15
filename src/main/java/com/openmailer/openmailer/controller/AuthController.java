@@ -4,21 +4,27 @@ import com.openmailer.openmailer.dto.request.auth.LoginRequest;
 import com.openmailer.openmailer.dto.request.auth.RegisterRequest;
 import com.openmailer.openmailer.dto.request.twofa.TwoFactorVerifyRequest;
 import com.openmailer.openmailer.dto.response.auth.LoginResponse;
-import com.openmailer.openmailer.dto.response.common.ApiResponse;
+import com.openmailer.openmailer.dto.ApiResponse;
 import com.openmailer.openmailer.dto.response.twofa.TwoFactorBackupCodesResponse;
 import com.openmailer.openmailer.dto.response.twofa.TwoFactorSetupResponse;
+import com.openmailer.openmailer.config.JwtAuthenticationFilter;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.auth.AuthenticationService;
 import com.openmailer.openmailer.service.auth.TwoFactorAuthService;
 import dev.samstevens.totp.exceptions.QrGenerationException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * REST controller for authentication operations.
@@ -28,13 +34,25 @@ import java.util.List;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+  private static final String REFRESH_TOKEN_COOKIE = "openmailer_refresh_token";
+  private static final long REFRESH_TOKEN_MAX_AGE_SECONDS = TimeUnit.DAYS.toSeconds(7);
+
   private final AuthenticationService authenticationService;
   private final TwoFactorAuthService twoFactorAuthService;
+  private final boolean secureCookies;
+  private final String cookieDomain;
 
   @Autowired
-  public AuthController(AuthenticationService authenticationService, TwoFactorAuthService twoFactorAuthService) {
+  public AuthController(
+      AuthenticationService authenticationService,
+      TwoFactorAuthService twoFactorAuthService,
+      @Value("${app.security.cookies.secure:false}") boolean secureCookies,
+      @Value("${app.security.cookies.domain:}") String cookieDomain
+  ) {
     this.authenticationService = authenticationService;
     this.twoFactorAuthService = twoFactorAuthService;
+    this.secureCookies = secureCookies;
+    this.cookieDomain = cookieDomain;
   }
 
   /**
@@ -44,9 +62,13 @@ public class AuthController {
    * @return the login response with tokens
    */
   @PostMapping("/register")
-  public ResponseEntity<ApiResponse<LoginResponse>> register(@Valid @RequestBody RegisterRequest request) {
-    LoginResponse response = authenticationService.register(request);
-    return ResponseEntity.ok(ApiResponse.success(response));
+  public ResponseEntity<ApiResponse<LoginResponse>> register(
+      @Valid @RequestBody RegisterRequest request,
+      HttpServletResponse servletResponse
+  ) {
+    LoginResponse loginResponse = authenticationService.register(request);
+    attachAuthCookies(servletResponse, loginResponse, true);
+    return ResponseEntity.ok(ApiResponse.success(loginResponse));
   }
 
   /**
@@ -56,8 +78,12 @@ public class AuthController {
    * @return the login response with tokens
    */
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+  public ResponseEntity<ApiResponse<LoginResponse>> login(
+      @Valid @RequestBody LoginRequest request,
+      HttpServletResponse servletResponse
+  ) {
     LoginResponse response = authenticationService.login(request);
+    attachAuthCookies(servletResponse, response, Boolean.TRUE.equals(request.getRememberMe()));
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
@@ -68,8 +94,18 @@ public class AuthController {
    * @return the new login response with tokens
    */
   @PostMapping("/refresh")
-  public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestBody String refreshToken) {
-    LoginResponse response = authenticationService.refreshToken(refreshToken);
+  public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(
+      @CookieValue(name = REFRESH_TOKEN_COOKIE, required = false) String refreshTokenCookie,
+      @RequestBody(required = false) String refreshToken,
+      HttpServletResponse servletResponse
+  ) {
+    String token = refreshTokenCookie != null && !refreshTokenCookie.isBlank() ? refreshTokenCookie : refreshToken;
+    if (token == null || token.isBlank()) {
+      throw new com.openmailer.openmailer.exception.UnauthorizedException("Refresh token is required");
+    }
+
+    LoginResponse response = authenticationService.refreshToken(token);
+    attachAuthCookies(servletResponse, response, true);
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
@@ -80,9 +116,8 @@ public class AuthController {
    * @return the current user
    */
   @GetMapping("/me")
-  public ResponseEntity<ApiResponse<User>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
-    User user = userDetails.getUser();
-    return ResponseEntity.ok(ApiResponse.success(user));
+  public ResponseEntity<ApiResponse<LoginResponse.UserInfo>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    return ResponseEntity.ok(ApiResponse.success(authenticationService.buildUserInfo(userDetails.getUser())));
   }
 
   /**
@@ -91,8 +126,8 @@ public class AuthController {
    * @return success message
    */
   @PostMapping("/logout")
-  public ResponseEntity<ApiResponse<Void>> logout() {
-    // JWT is stateless, so logout is handled client-side by removing the token
+  public ResponseEntity<ApiResponse<Void>> logout(HttpServletResponse response) {
+    clearAuthCookies(response);
     return ResponseEntity.ok(ApiResponse.success(null));
   }
 
@@ -207,5 +242,63 @@ public class AuthController {
     boolean isValid = twoFactorAuthService.verifyCode(user.getId(), request.getCode());
 
     return ResponseEntity.ok(ApiResponse.success(isValid));
+  }
+
+  private void attachAuthCookies(HttpServletResponse servletResponse, LoginResponse loginResponse, boolean rememberMe) {
+    long accessTokenMaxAge = loginResponse.getExpiresIn() != null ? loginResponse.getExpiresIn() : 3600;
+    ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from(JwtAuthenticationFilter.ACCESS_TOKEN_COOKIE, loginResponse.getAccessToken())
+        .httpOnly(true)
+        .secure(secureCookies)
+        .path("/")
+        .sameSite("Lax");
+
+    ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie.from(REFRESH_TOKEN_COOKIE, loginResponse.getRefreshToken())
+        .httpOnly(true)
+        .secure(secureCookies)
+        .path("/api/auth")
+        .sameSite("Strict");
+
+    if (cookieDomain != null && !cookieDomain.isBlank()) {
+      accessCookieBuilder.domain(cookieDomain);
+      refreshCookieBuilder.domain(cookieDomain);
+    }
+
+    if (rememberMe) {
+      accessCookieBuilder.maxAge(accessTokenMaxAge);
+      refreshCookieBuilder.maxAge(REFRESH_TOKEN_MAX_AGE_SECONDS);
+    }
+
+    ResponseCookie accessCookie = accessCookieBuilder.build();
+    ResponseCookie refreshCookie = refreshCookieBuilder.build();
+
+    servletResponse.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+    servletResponse.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+  }
+
+  private void clearAuthCookies(HttpServletResponse servletResponse) {
+    ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from(JwtAuthenticationFilter.ACCESS_TOKEN_COOKIE, "")
+        .httpOnly(true)
+        .secure(secureCookies)
+        .path("/")
+        .sameSite("Lax")
+        .maxAge(0);
+
+    ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie.from(REFRESH_TOKEN_COOKIE, "")
+        .httpOnly(true)
+        .secure(secureCookies)
+        .path("/api/auth")
+        .sameSite("Strict")
+        .maxAge(0);
+
+    if (cookieDomain != null && !cookieDomain.isBlank()) {
+      accessCookieBuilder.domain(cookieDomain);
+      refreshCookieBuilder.domain(cookieDomain);
+    }
+
+    ResponseCookie accessCookie = accessCookieBuilder.build();
+    ResponseCookie refreshCookie = refreshCookieBuilder.build();
+
+    servletResponse.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+    servletResponse.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
   }
 }

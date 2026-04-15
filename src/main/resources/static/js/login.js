@@ -81,7 +81,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     // Prepare request body
     const loginData = {
         email: email,
-        password: password
+        password: password,
+        rememberMe: rememberMe
     };
 
     if (twoFactorCode && twoFactorCode.length === 6) {
@@ -115,6 +116,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
         const response = await fetch('/api/auth/login', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: headers,
             body: JSON.stringify(loginData)
         });
@@ -122,27 +124,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (response.ok && result.success) {
-            // Store tokens
-            if (result.data.accessToken) {
-                if (rememberMe) {
-                    localStorage.setItem('accessToken', result.data.accessToken);
-                    if (result.data.refreshToken) {
-                        localStorage.setItem('refreshToken', result.data.refreshToken);
-                    }
-                } else {
-                    sessionStorage.setItem('accessToken', result.data.accessToken);
-                    if (result.data.refreshToken) {
-                        sessionStorage.setItem('refreshToken', result.data.refreshToken);
-                    }
-                }
-            }
-
             showAlert('Login successful! Redirecting...', 'success');
 
-            // Redirect to dashboard or home page
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1000);
+            window.location.href = '/dashboard';
         } else {
             // Handle error response
             const errorMessage = result.message || 'Login failed. Please check your credentials.';

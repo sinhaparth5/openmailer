@@ -6,183 +6,108 @@
     <title th:text="${pageTitle}">Campaigns</title>
 </head>
 <body>
+<main layout:fragment="content">
+    <div class="app-shell p-4 sm:p-6">
+        <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <p class="app-kicker">Campaigns</p>
+                <h1 class="mt-3 text-4xl font-semibold tracking-tight text-slate-950">Drafts, schedules, and sends</h1>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600">Review the campaigns that actually exist for this account, filter by state, and keep drafts moving without the old template-heavy admin styling.</p>
+            </div>
+            <a href="/campaigns/create" class="app-button-primary px-5 py-3 text-sm">Create Campaign</a>
+        </div>
 
-<main layout:fragment="content" class="container mx-auto px-4 py-8">
-    <div class="max-w-7xl mx-auto">
-        <!-- Page Header -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between">
+        <div class="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="rounded-[24px] bg-[var(--app-sun)]/62 p-5">
+                <p class="text-sm font-medium text-slate-600">Total</p>
+                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${totalCampaigns}">0</p>
+            </div>
+            <div class="rounded-[24px] bg-[var(--app-peach)]/62 p-5">
+                <p class="text-sm font-medium text-slate-600">Draft</p>
+                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${draftCampaigns}">0</p>
+            </div>
+            <div class="rounded-[24px] bg-[var(--app-lilac)]/62 p-5">
+                <p class="text-sm font-medium text-slate-600">Scheduled</p>
+                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${scheduledCampaigns}">0</p>
+            </div>
+            <div class="rounded-[24px] bg-[var(--app-mint)]/62 p-5">
+                <p class="text-sm font-medium text-slate-600">Sent</p>
+                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${sentCampaigns}">0</p>
+            </div>
+        </div>
+
+        <section class="app-panel p-5">
+            <form method="get" action="/campaigns" class="grid gap-4 lg:grid-cols-[1.45fr_0.7fr_auto_auto]">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Campaigns</h1>
-                    <p class="mt-2 text-sm text-gray-600">Create and manage your email campaigns.</p>
+                    <label for="search" class="mb-2 block text-sm font-medium text-slate-700">Search</label>
+                    <input type="text" id="search" name="search" th:value="${searchQuery}" placeholder="Search campaigns..." class="app-input">
                 </div>
-                <a href="/campaigns/create" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
-                    Create Campaign
-                </a>
-            </div>
-        </div>
-
-        <!-- Stats Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
-                        <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total</p>
-                        <p class="text-2xl font-semibold text-gray-900" th:text="${totalCampaigns}">0</p>
-                    </div>
+                <div>
+                    <label for="status" class="mb-2 block text-sm font-medium text-slate-700">Status</label>
+                    <select id="status" name="status" class="app-select">
+                        <option th:each="filter : ${statusFilters}"
+                                th:value="${filter.value}"
+                                th:text="${filter.label}"
+                                th:selected="${filter.value == currentStatus}">All Statuses</option>
+                    </select>
                 </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-gray-100 rounded-md p-3">
-                        <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Draft</p>
-                        <p class="text-2xl font-semibold text-gray-900" th:text="${draftCampaigns}">0</p>
-                    </div>
+                <div class="flex items-end">
+                    <button type="submit" class="app-button-primary w-full px-4 py-3 text-sm">Filter</button>
                 </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-purple-100 rounded-md p-3">
-                        <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Scheduled</p>
-                        <p class="text-2xl font-semibold text-gray-900" th:text="${scheduledCampaigns}">0</p>
-                    </div>
+                <div class="flex items-end">
+                    <a href="/campaigns" class="app-button-secondary w-full px-4 py-3 text-center text-sm">Clear</a>
                 </div>
-            </div>
+            </form>
+        </section>
 
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Sent</p>
-                        <p class="text-2xl font-semibold text-gray-900" th:text="${sentCampaigns}">0</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filters and Search -->
-        <div class="bg-white rounded-lg shadow mb-6">
-            <div class="p-6">
-                <form method="get" action="/campaigns" class="flex flex-col md:flex-row gap-4">
-                    <!-- Search -->
-                    <div class="flex-1">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                        <input type="text"
-                               id="search"
-                               name="search"
-                               th:value="${searchQuery}"
-                               placeholder="Search campaigns..."
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <!-- Status Filter -->
-                    <div class="md:w-48">
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select id="status"
-                                name="status"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option th:each="filter : ${statusFilters}"
-                                    th:value="${filter.value}"
-                                    th:text="${filter.label}"
-                                    th:selected="${filter.value == currentStatus}">All Statuses</option>
-                        </select>
-                    </div>
-
-                    <!-- Filter Button -->
-                    <div class="md:w-32 flex items-end">
-                        <button type="submit"
-                                class="w-full px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 font-medium">
-                            Filter
-                        </button>
-                    </div>
-
-                    <!-- Clear Filters -->
-                    <div class="md:w-32 flex items-end">
-                        <a href="/campaigns"
-                           class="w-full px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 font-medium text-center">
-                            Clear
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Campaigns Table -->
-        <div class="bg-white rounded-lg shadow">
+        <section class="app-panel-strong mt-5 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campaign</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipients</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opens</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clicks</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent Date</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <table class="min-w-full text-left">
+                    <thead class="border-b border-[rgba(57,48,36,0.08)] bg-white/65">
+                        <tr class="text-xs uppercase tracking-[0.18em] text-slate-500">
+                            <th class="px-5 py-4">Campaign</th>
+                            <th class="px-5 py-4">Status</th>
+                            <th class="px-5 py-4">Recipients</th>
+                            <th class="px-5 py-4">Opens</th>
+                            <th class="px-5 py-4">Clicks</th>
+                            <th class="px-5 py-4">Sent Date</th>
+                            <th class="px-5 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr th:each="campaign : ${campaigns}" class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
-                                <div class="flex flex-col">
-                                    <div class="text-sm font-medium text-gray-900" th:text="${campaign.name}">Campaign Name</div>
-                                    <div class="text-sm text-gray-500" th:text="${campaign.subject}">Subject line</div>
+                    <tbody th:if="${!#lists.isEmpty(campaigns)}" class="divide-y divide-[rgba(57,48,36,0.08)] bg-white/70">
+                        <tr th:each="campaign : ${campaigns}" class="transition hover:bg-white/95">
+                            <td class="px-5 py-5">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-950" th:text="${campaign.name}">Campaign Name</p>
+                                    <p class="mt-1 text-sm text-slate-500" th:text="${campaign.subject}">Subject line</p>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-5 py-5">
                                 <span th:with="status=${campaign.status}"
-                                      th:classappend="${status == 'SENT'} ? 'bg-green-100 text-green-800' :
-                                                      (${status == 'SENDING'} ? 'bg-blue-100 text-blue-800' :
-                                                      (${status == 'SCHEDULED'} ? 'bg-purple-100 text-purple-800' :
-                                                      (${status == 'PAUSED'} ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800')))"
-                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                                      th:classappend="${status == 'SENT'} ? 'bg-[var(--app-mint)]/72 text-emerald-950' :
+                                                      (${status == 'SENDING'} ? 'bg-[var(--app-lilac)]/72 text-slate-900' :
+                                                      (${status == 'SCHEDULED'} ? 'bg-[var(--app-sun)]/72 text-amber-950' :
+                                                      (${status == 'PAUSED'} ? 'bg-[var(--app-peach)]/72 text-rose-950' : 'bg-slate-200 text-slate-700')))"
+                                      class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold">
                                     <span th:text="${campaign.status}">Status</span>
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900" th:text="${campaign.recipients}">0</div>
+                            <td class="px-5 py-5 text-sm text-slate-600" th:text="${campaign.recipients}">0</td>
+                            <td class="px-5 py-5">
+                                <p class="text-sm font-medium text-slate-900" th:text="${campaign.opens}">0</p>
+                                <p class="mt-1 text-xs text-slate-500" th:text="${campaign.openRate}">0%</p>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900" th:text="${campaign.opens}">0</div>
-                                <div class="text-xs text-gray-500" th:text="${campaign.openRate}">0%</div>
+                            <td class="px-5 py-5">
+                                <p class="text-sm font-medium text-slate-900" th:text="${campaign.clicks}">0</p>
+                                <p class="mt-1 text-xs text-slate-500" th:text="${campaign.clickRate}">0%</p>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900" th:text="${campaign.clicks}">0</div>
-                                <div class="text-xs text-gray-500" th:text="${campaign.clickRate}">0%</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${campaign.sentDate}">Date</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex justify-end space-x-3">
-                                    <a th:href="@{/campaigns/{id}(id=${campaign.id})}"
-                                       class="text-blue-600 hover:text-blue-900">View</a>
-                                    <a th:if="${campaign.status == 'DRAFT' || campaign.status == 'SCHEDULED'}"
+                            <td class="px-5 py-5 text-sm text-slate-600" th:text="${campaign.sentDate}">Date</td>
+                            <td class="px-5 py-5 text-right">
+                                <div class="flex justify-end gap-3 text-sm font-medium">
+                                    <a th:href="@{/campaigns/{id}(id=${campaign.id})}" class="text-slate-900 transition hover:text-slate-700">View</a>
+                                    <a th:if="${campaign.status == 'DRAFT'}"
                                        th:href="@{/campaigns/{id}/edit(id=${campaign.id})}"
-                                       class="text-gray-600 hover:text-gray-900">Edit</a>
-                                    <button th:if="${campaign.status == 'DRAFT'}"
-                                            onclick="alert('Delete functionality coming soon')"
-                                            class="text-red-600 hover:text-red-900">Delete</button>
+                                       class="text-slate-500 transition hover:text-slate-800">Edit</a>
                                 </div>
                             </td>
                         </tr>
@@ -190,71 +115,34 @@
                 </table>
             </div>
 
-            <!-- Empty State -->
-            <div th:if="${#lists.isEmpty(campaigns)}" class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">No campaigns found</h3>
-                <p class="mt-1 text-sm text-gray-500">Get started by creating a new campaign.</p>
+            <div th:if="${#lists.isEmpty(campaigns)}" class="p-12 text-center">
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-[24px] bg-[var(--app-lilac)]/65 text-slate-500">
+                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <h3 class="mt-5 text-lg font-semibold text-slate-950">No campaigns found</h3>
+                <p class="mt-2 text-sm text-slate-500">Start by creating a draft campaign with the updated form and delivery setup.</p>
                 <div class="mt-6">
-                    <a href="/campaigns/create" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                        Create Campaign
-                    </a>
+                    <a href="/campaigns/create" class="app-button-primary px-5 py-3 text-sm">Create Campaign</a>
                 </div>
             </div>
 
-            <!-- Pagination -->
-            <div th:if="${!#lists.isEmpty(campaigns)}" class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1 flex justify-between sm:hidden">
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Previous
-                        </a>
-                        <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Next
-                        </a>
-                    </div>
-                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p class="text-sm text-gray-700">
-                                Showing
-                                <span class="font-medium">1</span>
-                                to
-                                <span class="font-medium" th:text="${#lists.size(campaigns)}">10</span>
-                                of
-                                <span class="font-medium" th:text="${totalCampaigns}">0</span>
-                                campaigns
-                            </p>
-                        </div>
-                        <div>
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                    <span class="sr-only">Previous</span>
-                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                </a>
-                                <a th:each="page : ${pages}"
-                                   th:href="@{/campaigns(page=${page})}"
-                                   th:classappend="${page == currentPage} ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'"
-                                   class="relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    <span th:text="${page}">1</span>
-                                </a>
-                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                    <span class="sr-only">Next</span>
-                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                </a>
-                            </nav>
-                        </div>
-                    </div>
+            <div th:if="${!#lists.isEmpty(campaigns)}" class="flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(57,48,36,0.08)] bg-white/65 px-5 py-4 text-sm text-slate-500">
+                <p>Showing <span class="font-medium text-slate-900">1</span> to <span class="font-medium text-slate-900" th:text="${#lists.size(campaigns)}">10</span> of <span class="font-medium text-slate-900" th:text="${totalCampaigns}">0</span> campaigns</p>
+                <div class="flex items-center gap-2">
+                    <a href="#" class="app-button-secondary px-3 py-2 text-sm opacity-60 pointer-events-none">Previous</a>
+                    <a th:each="page : ${pages}"
+                       th:href="@{/campaigns(page=${page})}"
+                       th:classappend="${page == currentPage} ? ' bg-[var(--app-sun)]/70 border-transparent text-slate-950' : ''"
+                       class="app-button-secondary px-3 py-2 text-sm">
+                        <span th:text="${page}">1</span>
+                    </a>
+                    <a href="#" class="app-button-secondary px-3 py-2 text-sm opacity-60 pointer-events-none">Next</a>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 </main>
-
 </body>
 </html>

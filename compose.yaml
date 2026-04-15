@@ -1,0 +1,68 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openmailer-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: 8080
+      APP_BASE_URL: http://localhost:8080
+      DATABASE_URL: jdbc:postgresql://postgres:5432/openmailer
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      CACHE_TYPE: redis
+      ENCRYPTION_KEY: cd18b33b46ab2d5ccced4f4ea20da280
+      JWT_SECRET: hbJkYjW4i9KxlUb9LU7+QjP5UIphJqzWH6IqAP5gYuo=
+      JWT_ACCESS_TOKEN_EXPIRATION: 3600000
+      JWT_REFRESH_TOKEN_EXPIRATION: 604800000
+      MAIL_HOST: ""
+      MAIL_PORT: 587
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      APP_TEST_EMAIL_RECIPIENT: ""
+      APP_ASSETS_MINIFIED: "true"
+    ports:
+      - "8080:8080"
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: openmailer-postgres
+    environment:
+      POSTGRES_DB: openmailer
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d openmailer"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8-alpine
+    container_name: openmailer-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

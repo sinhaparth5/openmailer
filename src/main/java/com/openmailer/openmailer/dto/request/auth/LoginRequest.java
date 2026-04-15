@@ -20,6 +20,8 @@ public class LoginRequest {
   @Size(min = 6, max = 6, message = "Two-factor code must be 6 digits")
   private String twoFactorCode;
 
+  private Boolean rememberMe = false;
+
   public LoginRequest() {
   }
 
@@ -57,5 +59,13 @@ public class LoginRequest {
 
   public void setTwoFactorCode(String twoFactorCode) {
     this.twoFactorCode = twoFactorCode;
+  }
+
+  public Boolean getRememberMe() {
+    return rememberMe;
+  }
+
+  public void setRememberMe(Boolean rememberMe) {
+    this.rememberMe = rememberMe;
   }
 }

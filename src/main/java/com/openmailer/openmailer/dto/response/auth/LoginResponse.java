@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class LoginResponse {
   private String accessToken;
   private String refreshToken;
+  private String tokenType = "Bearer";
   private Integer expiresIn;
   private UserInfo user;
 
@@ -29,15 +30,32 @@ public class LoginResponse {
     private String email;
     private String username;
     private String role;
+    private String firstName;
+    private String lastName;
+    private Boolean twoFactorEnabled;
+    private String accountStatus;
 
     public UserInfo() {
     }
 
-    public UserInfo(String id, String email, String username, String role) {
+    public UserInfo(
+        String id,
+        String email,
+        String username,
+        String role,
+        String firstName,
+        String lastName,
+        Boolean twoFactorEnabled,
+        String accountStatus
+    ) {
       this.id = id;
       this.email = email;
       this.username = username;
       this.role = role;
+      this.firstName = firstName;
+      this.lastName = lastName;
+      this.twoFactorEnabled = twoFactorEnabled;
+      this.accountStatus = accountStatus;
     }
 
     // Getters and Setters
@@ -72,6 +90,38 @@ public class LoginResponse {
     public void setRole(String role) {
       this.role = role;
     }
+
+    public String getFirstName() {
+      return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+      this.firstName = firstName;
+    }
+
+    public String getLastName() {
+      return lastName;
+    }
+
+    public void setLastName(String lastName) {
+      this.lastName = lastName;
+    }
+
+    public Boolean getTwoFactorEnabled() {
+      return twoFactorEnabled;
+    }
+
+    public void setTwoFactorEnabled(Boolean twoFactorEnabled) {
+      this.twoFactorEnabled = twoFactorEnabled;
+    }
+
+    public String getAccountStatus() {
+      return accountStatus;
+    }
+
+    public void setAccountStatus(String accountStatus) {
+      this.accountStatus = accountStatus;
+    }
   }
 
   // Getters and Setters
@@ -89,6 +139,14 @@ public class LoginResponse {
 
   public void setRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
+  }
+
+  public String getTokenType() {
+    return tokenType;
+  }
+
+  public void setTokenType(String tokenType) {
+    this.tokenType = tokenType;
   }
 
   public Integer getExpiresIn() {

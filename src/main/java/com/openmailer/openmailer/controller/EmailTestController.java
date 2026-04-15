@@ -4,7 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,8 +24,21 @@ public class EmailTestController {
 
     private static final Logger log = LoggerFactory.getLogger(EmailTestController.class);
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
+    private final String mailFrom;
+    private final String mailHost;
+    private final String quickTestRecipient;
+
+    public EmailTestController(
+            JavaMailSender mailSender,
+            @Value("${spring.mail.username:}") String mailFrom,
+            @Value("${spring.mail.host:unknown}") String mailHost,
+            @Value("${app.test-email.recipient:}") String quickTestRecipient) {
+        this.mailSender = mailSender;
+        this.mailFrom = mailFrom;
+        this.mailHost = mailHost;
+        this.quickTestRecipient = quickTestRecipient;
+    }
 
     /**
      * Send a test email
@@ -42,13 +55,19 @@ public class EmailTestController {
         Map<String, Object> response = new HashMap<>();
 
         try {
+            if (mailFrom == null || mailFrom.isBlank()) {
+                response.put("success", false);
+                response.put("error", "MAIL_USERNAME or spring.mail.username must be configured before sending test emails.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             // Set email properties
             helper.setTo(toEmail);
             helper.setSubject(subject);
-            helper.setFrom("sinhaparth555@gmail.com", "OpenMailer Test");
+            helper.setFrom(mailFrom, "OpenMailer Test");
 
             // Create HTML body
             String htmlContent = createTestEmailHtml(toEmail);
@@ -88,7 +107,14 @@ public class EmailTestController {
      */
     @GetMapping("/send-quick-test")
     public ResponseEntity<Map<String, Object>> sendQuickTest() {
-        return sendTestEmail("sinhaparth555@gmail.com", "Quick Test from OpenMailer");
+        if (quickTestRecipient == null || quickTestRecipient.isBlank()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("error", "Configure app.test-email.recipient to use the quick test endpoint.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        return sendTestEmail(quickTestRecipient, "Quick Test from OpenMailer");
     }
 
     /**
@@ -150,7 +176,7 @@ public class EmailTestController {
                             <strong>Test Details:</strong><br>
                             📧 Recipient: %s<br>
                             🕐 Sent At: %s<br>
-                            📮 Provider: Brevo SMTP (smtp-relay.brevo.com)<br>
+                            📮 Provider Host: %s<br>
                             ⚡ Status: Successfully Delivered
                         </div>
 
@@ -172,6 +198,6 @@ public class EmailTestController {
                 </div>
             </body>
             </html>
-            """.formatted(recipient, timestamp);
+            """.formatted(recipient, timestamp, mailHost);
     }
 }
