@@ -30,6 +30,10 @@
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" th:href="@{/css/output.css}">
 
     <th:block layout:fragment="extra-head"></th:block>
@@ -39,7 +43,7 @@
         Skip to main content
     </a>
 
-    <div class="mx-auto flex min-h-screen w-full max-w-[1500px] items-stretch px-3 py-3 sm:px-5 sm:py-5">
+    <div class="mx-auto flex min-h-screen w-full max-w-[1440px] items-stretch px-4 py-3 sm:px-6 sm:py-5">
         <div class="flex w-full flex-col gap-4">
             <div th:replace="~{layout/fragments :: flash-messages}"></div>
             <main id="main-content" layout:fragment="content" role="main" class="flex w-full">

@@ -20,11 +20,17 @@
     --app-radius-xl: 28px;
     --app-radius-lg: 22px;
     --app-radius-md: 18px;
-    --font-ui: "Plus Jakarta Sans", "Avenir Next", "Aptos", "Segoe UI", sans-serif;
+    --font-ui: "DM Sans", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Stat card colors — matched from design reference */
+    --card-lime: #ccd97a;
+    --card-pink: #f4b0bf;
+    --card-sage: #a4c892;
+    --card-mauve: #e8b8ce;
   }
 
   html {
     font-family: var(--font-ui);
+    font-optical-sizing: auto;
     color: var(--app-text);
   }
 

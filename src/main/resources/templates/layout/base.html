@@ -30,6 +30,10 @@
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" th:href="@{/css/output.css}">
 
     <!-- Alpine.js Components (must load before Alpine.js) -->
@@ -40,12 +44,12 @@
 
     <th:block layout:fragment="extra-head"></th:block>
 </head>
-<body class="min-h-screen text-slate-900 flex flex-col antialiased">
+<body class="min-h-screen flex flex-col antialiased">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:m-2 focus:rounded">
         Skip to main content
     </a>
 
-    <div class="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-3 py-3 sm:px-5 sm:py-5">
+    <div class="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 py-3 sm:px-6 sm:py-5">
         <nav th:replace="~{layout/fragments :: navbar}"></nav>
         <div th:replace="~{layout/fragments :: flash-messages}"></div>
 

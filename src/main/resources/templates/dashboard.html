@@ -6,91 +6,157 @@
     <title th:text="${pageTitle}">Dashboard</title>
 </head>
 <body>
-<main layout:fragment="content" class="px-1 py-2 sm:px-2 sm:py-3">
-    <section class="app-shell overflow-hidden p-4 sm:p-6 lg:p-7">
-        <div class="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
+<main layout:fragment="content">
+    <section class="app-shell overflow-hidden p-6 sm:p-8 lg:p-10">
+
+        <!-- ── Greeting ──────────────────────────────────────────────── -->
+        <div class="mb-8 flex items-start justify-between gap-6">
+            <div>
+                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Workspace overview</p>
+                <h1 class="mt-2.5 text-[2.6rem] font-extrabold leading-[1.08] tracking-[-0.025em] text-[#111111]">
+                    Good morning, <span th:text="${displayName}">there</span>.
+                </h1>
+                <p class="mt-3 max-w-lg text-[0.875rem] leading-6 text-slate-500">
+                    Your workspace combines audience scale, campaign readiness, and template inventory in one clear view.
+                </p>
+            </div>
+            <span class="flex-shrink-0 rounded-full bg-[var(--card-lime)]/75 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-700">Live account</span>
+        </div>
+
+        <!-- ── 4 Stat Cards ──────────────────────────────────────────── -->
+        <div class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+            <!-- Contacts — lime -->
+            <div class="rounded-[18px] bg-[var(--card-lime)] p-5">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Contacts</p>
+                <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${contactCount}">0</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                    <span class="text-[13px] text-[#111]/55">Subscribed</span>
+                    <span class="text-[13px] font-semibold text-[#111]/75" th:text="${subscribedContactCount}">0</span>
+                </div>
+                <!-- mini bar chart -->
+                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:42%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:60%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:48%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:75%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:88%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:100%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:82%"></div>
+                </div>
+            </div>
+
+            <!-- Campaigns — pink -->
+            <div class="rounded-[18px] bg-[var(--card-pink)] p-5">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Campaigns</p>
+                <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${campaignCount}">0</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                    <span class="text-[13px] text-[#111]/55">Drafts</span>
+                    <span class="text-[13px] font-semibold text-[#111]/75" th:text="${draftCampaignCount}">0</span>
+                </div>
+                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:55%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:36%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:68%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:50%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:82%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:100%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:72%"></div>
+                </div>
+            </div>
+
+            <!-- Templates — sage -->
+            <div class="rounded-[18px] bg-[var(--card-sage)] p-5">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Templates</p>
+                <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${templateCount}">0</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                    <span class="text-[13px] text-[#111]/55">Ready for new drafts</span>
+                </div>
+                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:35%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:58%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:44%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:70%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:55%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:90%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:100%"></div>
+                </div>
+            </div>
+
+            <!-- Domains — mauve -->
+            <div class="rounded-[18px] bg-[var(--card-mauve)] p-5">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Domains</p>
+                <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${verifiedDomainCount}">0</p>
+                <div class="mt-2 flex items-center gap-1.5">
+                    <span class="text-[13px] text-[#111]/55">Providers</span>
+                    <span class="text-[13px] font-semibold text-[#111]/75" th:text="${activeProviderCount}">0</span>
+                    <span class="text-[13px] text-[#111]/55">active</span>
+                </div>
+                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:68%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:44%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:82%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:58%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:96%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:74%"></div>
+                    <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Main Grid ─────────────────────────────────────────────── -->
+        <div class="grid gap-5 xl:grid-cols-[1fr_320px]">
+
+            <!-- Left column -->
             <div class="space-y-5">
-                <section class="grid gap-5 lg:grid-cols-[1.12fr_0.88fr]">
-                    <div class="app-panel-strong overflow-hidden p-6 sm:p-7">
-                        <p class="app-kicker">Workspace Overview</p>
-                        <div class="mt-4 flex flex-wrap items-start justify-between gap-4">
-                            <div>
-                                <h1 class="text-4xl font-semibold tracking-tight text-slate-950">Hi, <span th:text="${displayName}">there</span>.</h1>
-                                <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600">
-                                    Your current workspace combines audience scale, campaign readiness, template inventory,
-                                    and sender prerequisites in one calmer operating view.
-                                </p>
-                            </div>
-                            <span class="rounded-full bg-[var(--app-sun)]/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Live account state</span>
-                        </div>
 
-                        <div class="mt-8 grid gap-4 sm:grid-cols-3">
-                            <div class="rounded-[24px] bg-[var(--app-sun)]/62 p-5">
-                                <p class="text-sm font-medium text-slate-600">Contacts</p>
-                                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${contactCount}">0</p>
-                                <p class="mt-2 text-sm text-slate-600">Subscribed: <span class="font-medium text-slate-900" th:text="${subscribedContactCount}">0</span></p>
-                            </div>
-                            <div class="rounded-[24px] bg-[var(--app-peach)]/62 p-5">
-                                <p class="text-sm font-medium text-slate-600">Campaigns</p>
-                                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${campaignCount}">0</p>
-                                <p class="mt-2 text-sm text-slate-600">Drafts: <span class="font-medium text-slate-900" th:text="${draftCampaignCount}">0</span></p>
-                            </div>
-                            <div class="rounded-[24px] bg-[var(--app-lilac)]/62 p-5">
-                                <p class="text-sm font-medium text-slate-600">Templates</p>
-                                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${templateCount}">0</p>
-                                <p class="mt-2 text-sm text-slate-600">Ready for new drafts.</p>
-                            </div>
+                <!-- Launch Checklist — dark card -->
+                <section class="rounded-[20px] border border-white/[0.07] bg-[rgba(18,18,18,0.92)] shadow-[0_24px_64px_-20px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-xl p-6 sm:p-7">
+                    <div class="mb-5 flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-white/35">Launch checklist</p>
+                            <h2 class="mt-2 text-xl font-bold text-white">Get to first send.</h2>
                         </div>
+                        <span class="flex-shrink-0 rounded-full border border-white/10 bg-white/7 px-3 py-1 text-xs font-medium text-white/50">3 steps</span>
                     </div>
-
-                    <div class="rounded-[30px] bg-[#1f2128] p-6 text-white shadow-[0_28px_60px_-34px_rgba(15,23,42,0.6)]">
-                        <div class="flex items-start justify-between gap-4">
-                            <div>
-                                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">Launch Checklist</p>
-                                <h2 class="mt-3 text-2xl font-semibold">Get to first send</h2>
+                    <div class="grid gap-3 lg:grid-cols-3">
+                        <div class="rounded-[14px] border border-white/[0.12] bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] p-4">
+                            <div class="flex items-start justify-between gap-2">
+                                <p class="text-sm font-semibold text-white">Verified domains</p>
+                                <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold"
+                                      th:classappend="${verifiedDomainCount > 0} ? ' bg-[var(--card-lime)]/20 text-[#ccd97a]' : ' bg-amber-400/15 text-amber-300'"
+                                      th:text="${verifiedDomainCount > 0} ? 'Ready' : 'Pending'">Pending</span>
                             </div>
-                            <span class="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-medium text-white/75">3 steps</span>
+                            <p class="mt-3 text-[13px] text-white/40">Count: <span class="font-semibold text-white/70" th:text="${verifiedDomainCount}">0</span></p>
                         </div>
-
-                        <div class="mt-6 space-y-4">
-                            <div class="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                                <div class="flex items-center justify-between gap-3">
-                                    <p class="text-sm font-medium">Verified domains</p>
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                                          th:classappend="${verifiedDomainCount > 0} ? ' bg-emerald-300/20 text-emerald-200' : ' bg-amber-300/20 text-amber-100'"
-                                          th:text="${verifiedDomainCount > 0} ? 'Ready' : 'Pending'">Pending</span>
-                                </div>
-                                <p class="mt-2 text-sm text-white/65">Count: <span class="font-medium text-white" th:text="${verifiedDomainCount}">0</span></p>
+                        <div class="rounded-[14px] border border-white/[0.12] bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] p-4">
+                            <div class="flex items-start justify-between gap-2">
+                                <p class="text-sm font-semibold text-white">Active providers</p>
+                                <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold"
+                                      th:classappend="${activeProviderCount > 0} ? ' bg-[var(--card-lime)]/20 text-[#ccd97a]' : ' bg-amber-400/15 text-amber-300'"
+                                      th:text="${activeProviderCount > 0} ? 'Ready' : 'Pending'">Pending</span>
                             </div>
-
-                            <div class="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                                <div class="flex items-center justify-between gap-3">
-                                    <p class="text-sm font-medium">Active providers</p>
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                                          th:classappend="${activeProviderCount > 0} ? ' bg-emerald-300/20 text-emerald-200' : ' bg-amber-300/20 text-amber-100'"
-                                          th:text="${activeProviderCount > 0} ? 'Ready' : 'Pending'">Pending</span>
-                                </div>
-                                <p class="mt-2 text-sm text-white/65">Count: <span class="font-medium text-white" th:text="${activeProviderCount}">0</span></p>
+                            <p class="mt-3 text-[13px] text-white/40">Count: <span class="font-semibold text-white/70" th:text="${activeProviderCount}">0</span></p>
+                        </div>
+                        <div class="rounded-[14px] border border-white/[0.12] bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] p-4">
+                            <div class="flex items-start justify-between gap-2">
+                                <p class="text-sm font-semibold text-white">Audience in place</p>
+                                <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold"
+                                      th:classappend="${contactCount > 0} ? ' bg-[var(--card-lime)]/20 text-[#ccd97a]' : ' bg-amber-400/15 text-amber-300'"
+                                      th:text="${contactCount > 0} ? 'Ready' : 'Pending'">Pending</span>
                             </div>
-
-                            <div class="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                                <div class="flex items-center justify-between gap-3">
-                                    <p class="text-sm font-medium">Audience in place</p>
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                                          th:classappend="${contactCount > 0} ? ' bg-emerald-300/20 text-emerald-200' : ' bg-amber-300/20 text-amber-100'"
-                                          th:text="${contactCount > 0} ? 'Ready' : 'Pending'">Pending</span>
-                                </div>
-                                <p class="mt-2 text-sm text-white/65">Contacts: <span class="font-medium text-white" th:text="${contactCount}">0</span></p>
-                            </div>
+                            <p class="mt-3 text-[13px] text-white/40">Contacts: <span class="font-semibold text-white/70" th:text="${contactCount}">0</span></p>
                         </div>
                     </div>
                 </section>
 
-                <section class="grid gap-5 lg:grid-cols-[0.82fr_1.18fr]">
+                <!-- Actions + Notes row -->
+                <section class="grid gap-5 lg:grid-cols-[200px_1fr]">
+
                     <div class="app-panel p-6">
-                        <p class="app-kicker">Actions</p>
-                        <h3 class="mt-4 text-2xl font-semibold tracking-tight text-slate-950">Start where the account is thin.</h3>
-                        <div class="mt-6 grid gap-3">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Quick actions</p>
+                        <h3 class="mt-2.5 text-base font-bold tracking-tight text-slate-900">Start where the account is thin.</h3>
+                        <div class="mt-5 grid gap-2.5">
                             <a href="/campaigns/create" class="app-button-primary px-4 py-3 text-sm">Create campaign</a>
                             <a href="/contacts/import" class="app-button-secondary px-4 py-3 text-sm">Import contacts</a>
                             <a href="/templates" class="app-button-secondary px-4 py-3 text-sm">Open templates</a>
@@ -98,68 +164,65 @@
                     </div>
 
                     <div class="app-panel p-6">
-                        <div class="flex items-start justify-between gap-4">
-                            <div>
-                                <p class="app-kicker">Operational Notes</p>
-                                <h3 class="mt-4 text-2xl font-semibold tracking-tight text-slate-950">The redesigned UI is built to feel lighter, not louder.</h3>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Workspace notes</p>
+                        <h3 class="mt-2.5 text-base font-bold tracking-tight text-slate-900">Calm, intentional design.</h3>
+                        <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                            <div class="rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 p-4">
+                                <p class="text-[13px] font-semibold text-slate-900">Pastel signals</p>
+                                <p class="mt-1.5 text-[12px] leading-5 text-slate-500">Status areas use color, not aggressive contrast.</p>
                             </div>
-                            <span class="rounded-full bg-[var(--app-mint)]/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">Reference-led</span>
-                        </div>
-                        <div class="mt-6 grid gap-4 md:grid-cols-3">
-                            <div class="app-soft-card p-4">
-                                <p class="text-sm font-medium text-slate-900">Pastel signal blocks</p>
-                                <p class="mt-2 text-sm leading-6 text-slate-600">Status, actions, and summary areas are separated by soft color rather than aggressive contrast.</p>
+                            <div class="rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 p-4">
+                                <p class="text-[13px] font-semibold text-slate-900">Clean headings</p>
+                                <p class="mt-1.5 text-[12px] leading-5 text-slate-500">Reads like an organized workspace, not a demo.</p>
                             </div>
-                            <div class="app-soft-card p-4">
-                                <p class="text-sm font-medium text-slate-900">Large, clean headings</p>
-                                <p class="mt-2 text-sm leading-6 text-slate-600">The dashboard now reads more like an organized workspace and less like an admin demo template.</p>
-                            </div>
-                            <div class="app-soft-card p-4">
-                                <p class="text-sm font-medium text-slate-900">Rounded composition</p>
-                                <p class="mt-2 text-sm leading-6 text-slate-600">Cards, forms, and shells share one visual rhythm across product and auth pages.</p>
+                            <div class="rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 p-4">
+                                <p class="text-[13px] font-semibold text-slate-900">One rhythm</p>
+                                <p class="mt-1.5 text-[12px] leading-5 text-slate-500">Cards, forms, and shells share one visual rhythm.</p>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
 
+            <!-- Right aside (fixed 320px) -->
             <aside class="space-y-5">
-                <section class="app-panel p-6">
-                    <p class="app-kicker">Readiness Snapshot</p>
-                    <div class="mt-5 space-y-4">
-                        <div class="flex items-center justify-between rounded-[22px] bg-white/70 px-4 py-3">
-                            <span class="text-sm text-slate-600">Domains configured</span>
-                            <span class="text-lg font-semibold text-slate-900" th:text="${verifiedDomainCount}">0</span>
+
+                <section class="app-panel p-5">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Readiness</p>
+                    <div class="mt-4 space-y-2">
+                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
+                            <span class="text-[13px] text-slate-500">Domains</span>
+                            <span class="text-[15px] font-bold text-slate-900" th:text="${verifiedDomainCount}">0</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-[22px] bg-white/70 px-4 py-3">
-                            <span class="text-sm text-slate-600">Providers active</span>
-                            <span class="text-lg font-semibold text-slate-900" th:text="${activeProviderCount}">0</span>
+                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
+                            <span class="text-[13px] text-slate-500">Providers</span>
+                            <span class="text-[15px] font-bold text-slate-900" th:text="${activeProviderCount}">0</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-[22px] bg-white/70 px-4 py-3">
-                            <span class="text-sm text-slate-600">Draft campaigns</span>
-                            <span class="text-lg font-semibold text-slate-900" th:text="${draftCampaignCount}">0</span>
+                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
+                            <span class="text-[13px] text-slate-500">Drafts</span>
+                            <span class="text-[15px] font-bold text-slate-900" th:text="${draftCampaignCount}">0</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-[22px] bg-white/70 px-4 py-3">
-                            <span class="text-sm text-slate-600">Scheduled campaigns</span>
-                            <span class="text-lg font-semibold text-slate-900" th:text="${scheduledCampaignCount}">0</span>
+                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
+                            <span class="text-[13px] text-slate-500">Scheduled</span>
+                            <span class="text-[15px] font-bold text-slate-900" th:text="${scheduledCampaignCount}">0</span>
                         </div>
                     </div>
                 </section>
 
-                <section class="app-panel p-6">
-                    <p class="app-kicker">What To Do Next</p>
-                    <div class="mt-5 space-y-4">
-                        <div class="rounded-[24px] bg-[var(--app-sun)]/55 p-4">
-                            <p class="text-sm font-medium text-slate-900">If domains are still missing</p>
-                            <a href="/api/v1/domains" class="mt-2 inline-flex text-sm font-semibold text-slate-700 hover:text-slate-950">Review domain setup</a>
+                <section class="app-panel p-5">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Next steps</p>
+                    <div class="mt-4 space-y-2.5">
+                        <div class="rounded-[14px] bg-[var(--card-lime)]/55 p-4">
+                            <p class="text-[13px] font-semibold text-slate-900">Missing domains?</p>
+                            <a href="/api/v1/domains" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Review domain setup →</a>
                         </div>
-                        <div class="rounded-[24px] bg-[var(--app-peach)]/55 p-4">
-                            <p class="text-sm font-medium text-slate-900">If providers are still missing</p>
-                            <a href="/api/v1/providers" class="mt-2 inline-flex text-sm font-semibold text-slate-700 hover:text-slate-950">Review providers</a>
+                        <div class="rounded-[14px] bg-[var(--card-pink)]/55 p-4">
+                            <p class="text-[13px] font-semibold text-slate-900">Missing providers?</p>
+                            <a href="/api/v1/providers" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Review providers →</a>
                         </div>
-                        <div class="rounded-[24px] bg-[var(--app-mint)]/55 p-4">
-                            <p class="text-sm font-medium text-slate-900">If the audience is still empty</p>
-                            <a href="/contacts/import" class="mt-2 inline-flex text-sm font-semibold text-slate-700 hover:text-slate-950">Import contacts</a>
+                        <div class="rounded-[14px] bg-[var(--card-sage)]/55 p-4">
+                            <p class="text-[13px] font-semibold text-slate-900">Empty audience?</p>
+                            <a href="/contacts/import" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Import contacts →</a>
                         </div>
                     </div>
                 </section>
