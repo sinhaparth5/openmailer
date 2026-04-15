@@ -1,6 +1,6 @@
 # OpenMailer - Implementation Progress
 
-Last Updated: 2026-04-14
+Last Updated: 2026-04-15
 
 ---
 
@@ -44,10 +44,13 @@ Last Updated: 2026-04-14
 - Replaced fake dashboard, contacts, and campaigns data with real user-backed data
 - Reworked contact and campaign MVC forms to use real backing models
 - Replaced the old contact import placeholder page with a real CSV upload + validation + job status flow
+- Added real list selection to the contact import workflow
 - Restricted campaign editing UI to draft campaigns only, matching backend behavior
 
 ### 🚧 Current Focus
-- Finalizing remaining workflow polish around create/edit validation, list assignment, and send/schedule UX
+- Finalizing server-rendered create/edit validation and inline form error handling for contacts and campaigns
+- Adding list assignment/editing directly in the contact create/edit workflow
+- Wiring send, schedule, and cancel actions into the Thymeleaf campaign detail UX to match the existing API capabilities
 - Continuing runtime hardening and cleanup of remaining template-era UI rough edges
 
 ---
