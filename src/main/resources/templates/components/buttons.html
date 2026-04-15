@@ -8,55 +8,55 @@
 
 <!-- Primary Button -->
 <button th:fragment="btn-primary"
-        class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="app-button-primary px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Button'">Button</span>
 </button>
 
 <!-- Secondary Button -->
 <button th:fragment="btn-secondary"
-        class="inline-flex items-center justify-center px-4 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="app-button-secondary px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Button'">Button</span>
 </button>
 
 <!-- Outline Button -->
 <button th:fragment="btn-outline"
-        class="inline-flex items-center justify-center px-4 py-2 bg-white border-2 border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="inline-flex items-center justify-center rounded-full border border-[rgba(57,48,36,0.14)] bg-transparent px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Button'">Button</span>
 </button>
 
 <!-- Danger Button -->
 <button th:fragment="btn-danger"
-        class="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="inline-flex items-center justify-center rounded-full bg-[#c05645] px-4 py-2 text-sm font-semibold text-white shadow-[0_18px_32px_-24px_rgba(192,86,69,0.5)] transition hover:-translate-y-0.5 hover:bg-[#a84839] focus:outline-none focus:ring-2 focus:ring-[#c05645] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Delete'">Delete</span>
 </button>
 
 <!-- Success Button -->
 <button th:fragment="btn-success"
-        class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="inline-flex items-center justify-center rounded-full bg-[#2f855a] px-4 py-2 text-sm font-semibold text-white shadow-[0_18px_32px_-24px_rgba(47,133,90,0.45)] transition hover:-translate-y-0.5 hover:bg-[#266f4b] focus:outline-none focus:ring-2 focus:ring-[#2f855a] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Success'">Success</span>
 </button>
 
 <!-- Warning Button -->
 <button th:fragment="btn-warning"
-        class="inline-flex items-center justify-center px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="inline-flex items-center justify-center rounded-full bg-[#d69e2e] px-4 py-2 text-sm font-semibold text-slate-950 shadow-[0_18px_32px_-24px_rgba(214,158,46,0.45)] transition hover:-translate-y-0.5 hover:bg-[#bf8a22] focus:outline-none focus:ring-2 focus:ring-[#d69e2e] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Warning'">Warning</span>
 </button>
 
 <!-- Small Button -->
 <button th:fragment="btn-sm"
-        class="inline-flex items-center justify-center px-3 py-1.5 text-sm bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="app-button-primary px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Small'">Small</span>
 </button>
 
 <!-- Large Button -->
 <button th:fragment="btn-lg"
-        class="inline-flex items-center justify-center px-6 py-3 text-lg bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="app-button-primary px-6 py-3 text-base disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Large Button'">Large Button</span>
 </button>
 
 <!-- Loading Button -->
 <button th:fragment="btn-loading"
-        class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="app-button-primary px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
         disabled>
     <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -67,7 +67,7 @@
 
 <!-- Icon Button -->
 <button th:fragment="btn-icon"
-        class="inline-flex items-center justify-center p-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="app-button-primary p-2.5 disabled:cursor-not-allowed disabled:opacity-50">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
     </svg>
@@ -75,13 +75,13 @@
 
 <!-- Ghost Button (text only) -->
 <button th:fragment="btn-ghost"
-        class="inline-flex items-center justify-center px-4 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/72 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Ghost'">Ghost</span>
 </button>
 
 <!-- Link Button -->
 <button th:fragment="btn-link"
-        class="inline-flex items-center justify-center text-blue-600 font-medium hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="inline-flex items-center justify-center rounded px-1 text-sm font-medium text-slate-700 underline-offset-4 transition hover:text-slate-950 hover:underline focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:cursor-not-allowed disabled:opacity-50">
     <span th:text="${text} ?: 'Link'">Link</span>
 </button>
 

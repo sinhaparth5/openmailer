@@ -6,76 +6,172 @@
     <title>Fragments</title>
 </head>
 <body>
-    <nav th:fragment="navbar" class="border-b border-slate-200/80 bg-white/88 backdrop-blur-sm" role="navigation" aria-label="Main navigation">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-3">
-                    <a th:href="@{/}" class="flex items-center" aria-label="OpenMailer home">
-                        <img th:src="@{/images/hero.png}" alt="OpenMailer" class="h-10" />
-                    </a>
-                </div>
-
-                <div class="hidden md:flex items-center space-x-6" role="menubar">
-                    <a th:href="@{/dashboard}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Dashboard</a>
-                    <a th:href="@{/campaigns}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Campaigns</a>
-                    <a th:href="@{/contacts}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Contacts</a>
-                    <a th:href="@{/templates}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 rounded px-2 py-1" role="menuitem">Templates</a>
-
-                    <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
-                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600" sec:authentication="name" aria-label="Current user">User</span>
-                        <form class="inline js-logout-form">
-                            <button type="submit" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2" aria-label="Log out of your account">
-                                Logout
-                            </button>
-                        </form>
+    <nav th:fragment="navbar" class="app-shell relative mb-5 px-4 py-4 sm:px-6" role="navigation" aria-label="Main navigation">
+        <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <a th:href="@{/}" class="flex items-center gap-3" aria-label="OpenMailer home">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[#171717] text-sm font-bold text-white shadow-[0_18px_30px_-24px_rgba(23,23,23,0.7)]">OM</div>
+                    <div>
+                        <p class="text-lg font-semibold tracking-tight text-slate-900">OpenMailer</p>
+                        <p class="text-xs text-slate-500">Audience, delivery, and campaigns</p>
                     </div>
+                </a>
+            </div>
 
-                    <div sec:authorize="!isAuthenticated()">
-                        <a th:href="@{/login}" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2" aria-label="Sign in to your account">
-                            Sign In
-                        </a>
-                    </div>
-                </div>
-
-                <div class="md:hidden">
-                    <button id="mobileMenuButton" type="button" class="text-gray-700 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobileMenu">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
+            <div class="hidden min-w-0 flex-1 items-center justify-center md:flex">
+                <div class="flex items-center gap-1 rounded-full border border-[rgba(57,48,36,0.1)] bg-white/70 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]" role="menubar">
+                    <a th:href="@{/dashboard}" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-[var(--app-sun)]/70 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400" role="menuitem">Dashboard</a>
+                    <a th:href="@{/campaigns}" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-[var(--app-lilac)]/65 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400" role="menuitem">Campaigns</a>
+                    <a th:href="@{/contacts}" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-[var(--app-mint)]/70 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400" role="menuitem">Contacts</a>
+                    <a th:href="@{/templates}" class="rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-[var(--app-peach)]/70 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400" role="menuitem">Templates</a>
                 </div>
             </div>
 
-            <div id="mobileMenu" class="hidden md:hidden pb-4" role="menu" aria-label="Mobile navigation">
-                <div class="flex flex-col space-y-3">
-                    <a th:href="@{/dashboard}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" role="menuitem">Dashboard</a>
-                    <a th:href="@{/campaigns}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" role="menuitem">Campaigns</a>
-                    <a th:href="@{/contacts}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" role="menuitem">Contacts</a>
-                    <a th:href="@{/templates}" class="text-sm font-medium text-slate-700 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded px-2 py-1" role="menuitem">Templates</a>
+            <div class="hidden items-center gap-3 md:flex">
+                <div sec:authorize="isAuthenticated()" class="flex items-center gap-3">
+                    <span class="inline-flex items-center rounded-full border border-[rgba(57,48,36,0.1)] bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm" sec:authentication="name" aria-label="Current user">User</span>
+                    <form class="inline js-logout-form">
+                        <button type="submit" class="app-button-secondary px-4 py-2 text-sm" aria-label="Log out of your account">
+                            Logout
+                        </button>
+                    </form>
+                </div>
 
-                    <div sec:authorize="isAuthenticated()" class="pt-3 border-t">
-                        <span class="mb-2 block text-sm text-slate-600" sec:authentication="name" aria-label="Current user">User</span>
-                        <form class="js-logout-form">
-                            <button type="submit" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 rounded px-2 py-1" aria-label="Log out of your account">
-                                Logout
-                            </button>
-                        </form>
-                    </div>
+                <div sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="app-button-primary px-5 py-2.5 text-sm" aria-label="Sign in to your account">
+                        Sign In
+                    </a>
+                </div>
+            </div>
 
-                    <div sec:authorize="!isAuthenticated()" class="pt-3 border-t">
-                        <a th:href="@{/login}" class="block rounded-lg bg-slate-900 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500" aria-label="Sign in to your account">
-                            Sign In
-                        </a>
-                    </div>
+            <div class="md:hidden">
+                <button id="mobileMenuButton" type="button" class="rounded-full border border-[rgba(57,48,36,0.1)] bg-white/75 p-2.5 text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobileMenu">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobileMenuBackdrop" class="hidden fixed inset-0 z-30 bg-slate-950/12 backdrop-blur-[1px] md:hidden" aria-hidden="true"></div>
+
+        <div id="mobileMenu" class="hidden absolute inset-x-0 top-[calc(100%+0.75rem)] z-40 pt-0 md:hidden" role="menu" aria-label="Mobile navigation">
+            <div class="app-soft-card mx-1 flex flex-col gap-2 border border-[rgba(57,48,36,0.08)] p-4 shadow-[0_30px_60px_-38px_rgba(15,23,42,0.46)]">
+                <div class="mb-1 flex items-center justify-between px-2">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Navigation</p>
+                    <span class="rounded-full bg-white/72 px-3 py-1 text-[11px] font-medium text-slate-500">OpenMailer</span>
+                </div>
+                <a th:href="@{/dashboard}" class="rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/80 hover:text-slate-950" role="menuitem">Dashboard</a>
+                <a th:href="@{/campaigns}" class="rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/80 hover:text-slate-950" role="menuitem">Campaigns</a>
+                <a th:href="@{/contacts}" class="rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/80 hover:text-slate-950" role="menuitem">Contacts</a>
+                <a th:href="@{/templates}" class="rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-white/80 hover:text-slate-950" role="menuitem">Templates</a>
+
+                <div sec:authorize="isAuthenticated()" class="mt-2 border-t border-[rgba(57,48,36,0.08)] pt-3">
+                    <span class="mb-2 block text-sm text-slate-600" sec:authentication="name" aria-label="Current user">User</span>
+                    <form class="js-logout-form">
+                        <button type="submit" class="app-button-secondary w-full px-3 py-2.5 text-sm" aria-label="Log out of your account">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+
+                <div sec:authorize="!isAuthenticated()" class="mt-2 border-t border-[rgba(57,48,36,0.08)] pt-3">
+                    <a th:href="@{/login}" class="app-button-primary flex w-full px-4 py-2.5 text-center text-sm" aria-label="Sign in to your account">
+                        Sign In
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <footer th:fragment="footer" class="mt-auto border-t border-slate-200/80 bg-white/80" role="contentinfo" aria-label="Site footer">
-        <div class="container mx-auto flex flex-col gap-3 px-4 py-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-            <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> OpenMailer</p>
-            <p>Focused on sender setup, audience import, and campaign execution.</p>
+    <div th:fragment="flash-messages" class="mb-5 space-y-3" aria-live="polite">
+        <div th:if="${successMessage}" class="app-flash app-flash-success" data-flash-message>
+            <div class="flex items-start gap-3 pr-10">
+                <div class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-emerald-800">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold">Success</p>
+                    <p class="mt-1 text-sm leading-6" th:text="${successMessage}">Action completed successfully.</p>
+                </div>
+            </div>
+            <button type="button" class="absolute right-3 top-3 rounded-full p-2 text-current/70 transition hover:bg-white/55 hover:text-current" data-flash-dismiss aria-label="Dismiss message">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div th:if="${errorMessage}" class="app-flash app-flash-error" data-flash-message>
+            <div class="flex items-start gap-3 pr-10">
+                <div class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/68 text-rose-800">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold">Something needs attention</p>
+                    <p class="mt-1 text-sm leading-6" th:text="${errorMessage}">An error occurred.</p>
+                </div>
+            </div>
+            <button type="button" class="absolute right-3 top-3 rounded-full p-2 text-current/70 transition hover:bg-white/55 hover:text-current" data-flash-dismiss aria-label="Dismiss message">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div th:if="${warningMessage}" class="app-flash app-flash-warning" data-flash-message>
+            <div class="flex items-start gap-3 pr-10">
+                <div class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/68 text-amber-800">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m0 3.75h.01M10.29 3.86l-7.5 13A2 2 0 004.52 20h14.96a2 2 0 001.73-3.14l-7.48-13a2 2 0 00-3.44 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold">Heads up</p>
+                    <p class="mt-1 text-sm leading-6" th:text="${warningMessage}">Please review this message.</p>
+                </div>
+            </div>
+            <button type="button" class="absolute right-3 top-3 rounded-full p-2 text-current/70 transition hover:bg-white/55 hover:text-current" data-flash-dismiss aria-label="Dismiss message">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div th:if="${infoMessage}" class="app-flash app-flash-info" data-flash-message>
+            <div class="flex items-start gap-3 pr-10">
+                <div class="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/68 text-indigo-800">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold">Info</p>
+                    <p class="mt-1 text-sm leading-6" th:text="${infoMessage}">Additional information.</p>
+                </div>
+            </div>
+            <button type="button" class="absolute right-3 top-3 rounded-full p-2 text-current/70 transition hover:bg-white/55 hover:text-current" data-flash-dismiss aria-label="Dismiss message">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <footer th:fragment="footer" class="mt-5" role="contentinfo" aria-label="Site footer">
+        <div class="app-shell flex flex-col gap-3 px-5 py-4 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+            <div>
+                <p class="font-medium text-slate-700">&copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> OpenMailer</p>
+                <p class="mt-1 text-xs text-slate-500">Built around sender setup, audience import, and campaign execution.</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-slate-400">
+                <span class="app-status-dot bg-[var(--app-mint)]"></span>
+                <span>Quiet dashboard system</span>
+            </div>
         </div>
     </footer>
 
