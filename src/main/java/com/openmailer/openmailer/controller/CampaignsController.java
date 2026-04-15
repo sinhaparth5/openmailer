@@ -355,7 +355,7 @@ public class CampaignsController {
         String clickRate,
         String sentDate,
         LocalDateTime sortDate
-    ) {}
+    ) { }
 
     private record CampaignDetailView(
         String id,
@@ -386,7 +386,7 @@ public class CampaignsController {
         String createdDate,
         String scheduledDate,
         String sentDate
-    ) {}
+    ) { }
 
     public static class CampaignForm {
         private String id;

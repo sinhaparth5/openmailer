@@ -165,7 +165,7 @@ public class EmailProvider {
         }
         try {
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(configuration, new TypeReference<Map<String, String>>() {});
+            return mapper.readValue(configuration, new TypeReference<Map<String, String>>() { });
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse configuration JSON", e);
         }
@@ -310,4 +310,3 @@ public class EmailProvider {
         this.providerName = name;
     }
 }
-

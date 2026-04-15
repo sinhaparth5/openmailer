@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 public class OpenmailerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OpenmailerApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OpenmailerApplication.class, args);
+    }
 
 }
