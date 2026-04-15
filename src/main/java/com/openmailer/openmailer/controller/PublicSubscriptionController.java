@@ -295,7 +295,7 @@ public class PublicSubscriptionController {
                     </div>
                 </body>
                 </html>
-                """, contact.getEmail(), token);
+                """, safeEmail, safeHrefToken);
 
             return ResponseEntity.ok()
                     .header("Content-Type", "text/html; charset=UTF-8")
