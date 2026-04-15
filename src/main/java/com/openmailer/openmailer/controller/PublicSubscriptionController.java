@@ -19,7 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -225,6 +228,10 @@ public class PublicSubscriptionController {
                 // Unsubscribe from all lists
                 contact = unsubscribeService.unsubscribe(token, reason);
             }
+
+            String safeEmail = HtmlUtils.htmlEscape(contact.getEmail());
+            String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
+            String safeHrefToken = HtmlUtils.htmlEscape(encodedToken);
 
             String html = String.format("""
                 <!DOCTYPE html>
