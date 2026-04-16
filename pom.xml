@@ -67,6 +67,7 @@
 		<jackson-bom.version>3.1.1</jackson-bom.version>
 		<assertj.version>3.27.7</assertj.version>
 		<logback.version>1.5.25</logback.version>
+		<thymeleaf.version>3.1.4.RELEASE</thymeleaf.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -199,7 +200,18 @@
                 <groupId>net.i2p.crypto</groupId>
                 <artifactId>eddsa</artifactId>
             </exclusion>
+            <!-- Exclude vulnerable jakarta.mail 2.0.0; re-declared below at 2.0.2 -->
+            <exclusion>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>jakarta.mail</artifactId>
+            </exclusion>
         </exclusions>
+    </dependency>
+    <!-- Patched jakarta.mail — fixes SMTP injection via \r\n (CVE in 2.0.0) -->
+    <dependency>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>jakarta.mail</artifactId>
+        <version>2.0.2</version>
     </dependency>
 
     <!-- CSV Processing for contact import/export -->
