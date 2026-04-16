@@ -1,10 +1,10 @@
 # OpenMailer - Implementation Progress
 
-Last Updated: 2026-04-15
+Last Updated: 2026-04-16
 
 ---
 
-## 📊 Overall Progress: ~82% Complete
+## 📊 Overall Progress: ~86% Complete
 
 ### ✅ Completed Phases: 9/12
 ### 🚧 In Progress: 1/12
@@ -12,9 +12,47 @@ Last Updated: 2026-04-15
 
 ---
 
-## 🔄 Recent Progress Update (2026-04-14)
+## 🔄 Recent Progress Update (2026-04-16)
 
-### ✅ Configuration, Runtime, and Security Cleanup
+### ✅ Authentication, Recovery, and Account Settings
+- Fixed auth state persistence so successful logins now correctly update `lastLoginAt`
+- Added failed-login tracking with account lockout after repeated bad password or bad 2FA attempts
+- Implemented forgot-password and reset-password flows with hashed reset tokens and reset email delivery
+- Added live password validation on register, reset-password, and change-password flows
+- Built a real 2-step login flow for 2FA accounts: email/password first, then code verification
+- Added account settings capabilities for profile update, password change, 2FA setup/disable, and backup code regeneration
+- Improved the login UX for 2FA with a dedicated verification step instead of forcing all inputs at once
+
+### ✅ Navigation and Settings UX
+- Reworked the authenticated navbar to show the user's profile name instead of raw email
+- Moved logout into the profile dropdown and removed the extra top-level security/logout actions
+- Added and fixed the profile dropdown behavior, including clipping and z-index issues in the shared layout
+- Expanded the previous security-only settings page into a broader account settings experience
+
+### ✅ Contacts and Lists Workflow
+- Added real contact list management pages for creating, viewing, updating, and deleting lists
+- Connected contact lists into the product flow so campaigns can target a selected list from the create form
+- Added list-management navigation from contacts pages to make list setup easier before campaign creation
+- Fixed controller test wiring after contact list service dependencies changed
+
+### ✅ Campaign Workflow Polish
+- Improved campaign create/edit readiness messaging for templates, lists, verified domains, and providers
+- Added clearer delivery-state messaging and next-step guidance on campaign list and detail screens
+- Improved scheduling UX with safer defaults and minimum scheduling constraints
+
+### ✅ Runtime and Security Hardening
+- Fixed CSP mismatches for Google Fonts in the server security headers
+- Added a BunkerWeb reverse-proxy setup on the main Docker stack and tuned initial protections
+- Fixed BunkerWeb API allowlisting and disabled noisy BunkerNet behavior on the current `1.4.0` stack
+- Improved stale JWT handling by clearing invalid/expired auth cookies instead of treating them like hard failures
+
+### ✅ Alternate Infrastructure Track
+- Added a separate experimental compose stack at `compose.bunkerweb-1.6.9.yml`
+- Kept the main `compose.yaml` on the simpler working BunkerWeb `1.4.0` setup
+- Prepared the experimental `1.6.9` stack with scheduler, autoconf, UI, and socket proxy for later testing
+- Configured that experimental stack to reuse the same PostgreSQL and Redis services instead of adding extra database containers
+
+### ✅ Earlier Configuration, Runtime, and Security Cleanup
 - Removed hardcoded development secrets from application properties and shifted to env-backed configuration
 - Added safer production secret handling for `JWT_SECRET` and `ENCRYPTION_KEY`
 - Unified browser auth around JWT cookies instead of mixed local storage/session patterns
@@ -48,10 +86,10 @@ Last Updated: 2026-04-15
 - Restricted campaign editing UI to draft campaigns only, matching backend behavior
 
 ### 🚧 Current Focus
-- Finalizing server-rendered create/edit validation and inline form error handling for contacts and campaigns
-- Adding list assignment/editing directly in the contact create/edit workflow
-- Wiring send, schedule, and cancel actions into the Thymeleaf campaign detail UX to match the existing API capabilities
-- Continuing runtime hardening and cleanup of remaining template-era UI rough edges
+- Expanding contacts workflow beyond basic lists into bulk assignment, duplicate handling, and better import ergonomics
+- Continuing campaign UX polish around draft reuse, action clarity, and end-to-end sending workflow
+- Keeping the main Docker/BunkerWeb setup stable on `1.4.0` while preserving the separate `1.6.9` experimental stack for later work
+- Cleaning up remaining runtime noise and template-era UI rough edges as they appear during real usage
 
 ---
 
