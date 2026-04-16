@@ -1,10 +1,11 @@
 package com.openmailer.openmailer.service.auth;
 
 import com.openmailer.openmailer.dto.request.auth.LoginRequest;
+import com.openmailer.openmailer.dto.request.auth.LoginTwoFactorRequest;
 import com.openmailer.openmailer.dto.request.auth.RegisterRequest;
+import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.dto.response.auth.LoginResponse;
 import com.openmailer.openmailer.exception.UnauthorizedException;
-import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.service.security.JwtService;
 import com.openmailer.openmailer.service.security.PasswordEncoderService;
@@ -24,6 +25,7 @@ public class AuthenticationService {
 
   private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
   private static final long ACCOUNT_LOCK_MINUTES = 15;
+  private static final String PENDING_TWO_FACTOR_TOKEN_TYPE = "pending-2fa";
 
   private final UserService userService;
   private final PasswordEncoderService passwordEncoderService;
@@ -76,9 +78,13 @@ public class AuthenticationService {
     return new LoginResponse(accessToken, refreshToken, 3600, userInfo);
   }
 
+  public User updateProfile(String userId, User updatedUser) {
+    return userService.updateUser(userId, updatedUser);
+  }
+
   /**
    * Authenticate user and generate tokens.
-   * Supports two-factor authentication if enabled.
+   * First-step login using email and password.
    *
    * @param request the login request
    * @return the login response with tokens
@@ -103,30 +109,51 @@ public class AuthenticationService {
       throw new UnauthorizedException("Account is disabled");
     }
 
-    // Check 2FA if enabled
     if (user.getTwoFactorEnabled() != null && user.getTwoFactorEnabled()) {
-      if (request.getTwoFactorCode() == null || request.getTwoFactorCode().isBlank()) {
-        throw new UnauthorizedException("Two-factor authentication code is required");
+      return LoginResponse.pendingTwoFactor(
+          jwtService.generatePendingTwoFactorToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole()),
+          buildUserInfo(user)
+      );
+    }
+
+    return completeLogin(user);
+  }
+
+  public LoginResponse verifyTwoFactorLogin(LoginTwoFactorRequest request) {
+    try {
+      String pendingToken = request.getPendingTwoFactorToken();
+      String email = jwtService.extractEmail(pendingToken);
+      User user = userService.findByEmailOrThrow(email);
+
+      if (!jwtService.validateToken(pendingToken, user.getEmail(), PENDING_TWO_FACTOR_TOKEN_TYPE)) {
+        throw new UnauthorizedException("Two-factor verification session has expired. Sign in again.");
       }
 
-      // Verify 2FA code (try both TOTP and backup code)
-      boolean isValidTotp = twoFactorAuthService.verifyCode(user.getId(), request.getTwoFactorCode());
+      if (isAccountLocked(user)) {
+        throw new UnauthorizedException("Account is locked. Try again later");
+      }
+
+      boolean isValidTotp = twoFactorAuthService.verifyCode(user.getId(), request.getCode());
       boolean isValidBackup = false;
 
-      if (!isValidTotp) {
-        // Check if it's a backup code (8 characters)
-        if (request.getTwoFactorCode().length() == 8) {
-          isValidBackup = twoFactorAuthService.verifyBackupCode(user.getId(), request.getTwoFactorCode());
-        }
+      if (!isValidTotp && request.getCode() != null && request.getCode().length() == 8) {
+        isValidBackup = twoFactorAuthService.verifyBackupCode(user.getId(), request.getCode());
       }
 
       if (!isValidTotp && !isValidBackup) {
         recordFailedLoginAttempt(user);
         throw new UnauthorizedException("Invalid two-factor authentication code");
       }
-    }
 
-    // Persist login activity through a dedicated auth-state path.
+      return completeLogin(user);
+    } catch (UnauthorizedException ex) {
+      throw ex;
+    } catch (Exception ex) {
+      throw new UnauthorizedException("Two-factor verification session has expired. Sign in again.");
+    }
+  }
+
+  private LoginResponse completeLogin(User user) {
     userService.recordSuccessfulLogin(user.getId(), LocalDateTime.now());
 
     String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
@@ -199,6 +226,22 @@ public class AuthenticationService {
         user.getTwoFactorEnabled(),
         user.getAccountStatus()
     );
+  }
+
+  public void changePassword(String userId, String currentPassword, String newPassword) {
+    User user = userService.findById(userId);
+
+    if (!passwordEncoderService.matches(currentPassword, user.getPassword())) {
+      throw new ValidationException("Current password is incorrect", "currentPassword");
+    }
+
+    if (passwordEncoderService.matches(newPassword, user.getPassword())) {
+      throw new ValidationException("New password must be different from the current password", "newPassword");
+    }
+
+    user.setPassword(passwordEncoderService.encode(newPassword));
+    user.setUpdatedAt(LocalDateTime.now());
+    userService.updatePassword(user.getId(), user.getPassword());
   }
 
   private boolean isAccountLocked(User user) {

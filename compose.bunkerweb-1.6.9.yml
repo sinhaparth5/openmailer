@@ -1,9 +1,21 @@
+name: openmailer-bw169
+
+x-bw-api-env: &bw-api-env
+  API_HTTP_PORT: "5000"
+  API_LISTEN_IP: "0.0.0.0"
+  API_SERVER_NAME: "bwapi"
+  API_WHITELIST_IP: "127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
+  API_TOKEN: "openmailer-bw169-api-token"
+
+x-bw-db-env: &bw-db-env
+  DATABASE_URI: "postgresql+psycopg://postgres:postgres@postgres:5432/openmailer"
+  TZ: "Europe/London"
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: openmailer-app
     depends_on:
       postgres:
         condition: service_healthy
@@ -12,7 +24,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8080
-      APP_BASE_URL: http://localhost:8080
+      APP_BASE_URL: http://localhost:9080
       DATABASE_URL: jdbc:postgresql://postgres:5432/openmailer
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: postgres
@@ -58,49 +70,114 @@ services:
       - "bunkerweb.USE_BLACKLIST=yes"
       - "bunkerweb.BLACKLIST_URI=^/wp-admin/?$ ^/wp-login\\.php$ ^/xmlrpc\\.php$ ^/\\.env$ ^/server-status$"
       - "bunkerweb.PERMISSIONS_POLICY=accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), usb=(), web-share=(), xr-spatial-tracking=()"
-      - "bunkerweb.FEATURE_POLICY="
 
   bunkerweb:
-    image: bunkerity/bunkerweb:1.4.0
-    container_name: openmailer-bunkerweb
+    image: bunkerity/bunkerweb:1.6.9
     depends_on:
       - app
     ports:
-      - "8080:8080"
-      - "8443:8443"
-    volumes:
-      - bw-data:/data
+      - "9080:8080/tcp"
+      - "9443:8443/tcp"
+      - "9443:8443/udp"
     environment:
-      MULTISITE: "yes"
-      SERVER_NAME: ""
+      <<: *bw-api-env
       USE_BUNKERNET: "no"
-      API_WHITELIST_IP: "127.0.0.0/8 10.20.30.0/24 172.16.0.0/12"
     labels:
-      - "bunkerweb.AUTOCONF"
+      - "bunkerweb.INSTANCE=yes"
+    restart: unless-stopped
     networks:
-      - bw-autoconf
+      - bw-universe
       - bw-services
 
-  bunkerweb-autoconf:
-    image: bunkerity/bunkerweb-autoconf:1.4.0
-    container_name: openmailer-bunkerweb-autoconf
+  bw-scheduler:
+    image: bunkerity/bunkerweb-scheduler:1.6.9
     depends_on:
       - bunkerweb
+      - postgres
+      - redis
+    environment:
+      <<: [*bw-api-env, *bw-db-env]
+      BUNKERWEB_INSTANCES: ""
+      SERVER_NAME: ""
+      MULTISITE: "yes"
+      DISABLE_DEFAULT_SERVER: "yes"
+      USE_BUNKERNET: "no"
     volumes:
-      - bw-data:/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - bw-storage:/data
+    restart: unless-stopped
     networks:
-      - bw-autoconf
+      - bw-universe
+      - default
+
+  bw-autoconf:
+    image: bunkerity/bunkerweb-autoconf:1.6.9
+    depends_on:
+      - bunkerweb
+      - bw-docker
+      - postgres
+      - redis
+    environment:
+      <<: *bw-db-env
+      AUTOCONF_MODE: "yes"
+      DOCKER_HOST: "tcp://bw-docker:2375"
+    restart: unless-stopped
+    networks:
+      - bw-universe
+      - bw-docker
+      - default
+
+  bw-ui:
+    image: bunkerity/bunkerweb-ui:1.6.9
+    depends_on:
+      - bw-scheduler
+      - postgres
+      - redis
+    ports:
+      - "9081:7000"
+    environment:
+      <<: *bw-db-env
+      ADMIN_USERNAME: "admin"
+      ADMIN_PASSWORD: "OpenMailerBw!2026"
+      OVERRIDE_ADMIN_CREDS: "yes"
+      TOTP_ENCRYPTION_KEYS: "openmailer-bw169-totp-key"
+      FLASK_SECRET: "openmailer-bw169-flask-secret"
+      UI_FORWARDED_ALLOW_IPS: "127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+    volumes:
+      - bw-ui-data:/var/lib/bunkerweb
+      - bw-logs:/var/log/bunkerweb
+    restart: unless-stopped
+    networks:
+      - bw-universe
+      - default
+    labels:
+      - "bunkerweb.SERVER_NAME=localhost"
+      - "bunkerweb.USE_TEMPLATE=ui"
+      - "bunkerweb.USE_REVERSE_PROXY=yes"
+      - "bunkerweb.REVERSE_PROXY_URL=/bunkerweb-ui"
+      - "bunkerweb.REVERSE_PROXY_HOST=http://bw-ui:7000"
+
+  bw-docker:
+    image: tecnativa/docker-socket-proxy:nightly
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      CONTAINERS: "1"
+      EVENTS: "1"
+      INFO: "1"
+      NETWORKS: "1"
+      PING: "1"
+      VERSION: "1"
+      LOG_LEVEL: "warning"
+    restart: unless-stopped
+    networks:
+      - bw-docker
 
   postgres:
     image: postgres:17-alpine
-    container_name: openmailer-postgres
     environment:
       POSTGRES_DB: openmailer
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -111,9 +188,6 @@ services:
 
   redis:
     image: redis:8-alpine
-    container_name: openmailer-redis
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -123,10 +197,13 @@ services:
       retries: 5
 
 volumes:
-  bw-data:
+  bw-storage:
+  bw-logs:
+  bw-ui-data:
   postgres_data:
   redis_data:
 
 networks:
-  bw-autoconf:
+  bw-universe:
   bw-services:
+  bw-docker:

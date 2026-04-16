@@ -7,6 +7,7 @@ import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.repository.ContactListRepository;
 import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.contact.ContactImportService;
+import com.openmailer.openmailer.service.contact.ContactListService;
 import com.openmailer.openmailer.service.contact.ContactListMembershipService;
 import com.openmailer.openmailer.service.contact.ContactService;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,9 @@ class ContactsControllerTest {
     private ContactImportService contactImportService;
 
     @Mock
+    private ContactListService contactListService;
+
+    @Mock
     private ContactListMembershipService membershipService;
 
     @Mock
@@ -51,6 +55,7 @@ class ContactsControllerTest {
         controller = new ContactsController(
             contactService,
             contactImportService,
+            contactListService,
             membershipService,
             contactListRepository
         );

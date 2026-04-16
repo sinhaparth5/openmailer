@@ -21,6 +21,7 @@ public class SecuritySettingsController {
     String userId = userDetails.getUser().getId();
 
     model.addAttribute("pageTitle", "Security Settings - OpenMailer");
+    model.addAttribute("currentUser", userDetails.getUser());
     model.addAttribute("twoFactorEnabled", twoFactorAuthService.isTwoFactorEnabled(userId));
     model.addAttribute("backupCodeCount", twoFactorAuthService.getRemainingBackupCodes(userId).size());
     model.addAttribute("lastLoginAt", userDetails.getUser().getLastLoginAt());

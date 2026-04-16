@@ -8,6 +8,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -42,15 +43,17 @@ public class PasswordResetService {
       PasswordEncoderService passwordEncoderService,
       JavaMailSender mailSender,
       @Value("${app.base-url:http://localhost:8080}") String appBaseUrl,
-      @Value("${spring.mail.username:no-reply@openmailer.local}") String mailFrom
+      @Value("${app.mail.from:}") String configuredMailFrom,
+      @Value("${spring.mail.username:}") String mailUsername
   ) {
     this.userRepository = userRepository;
     this.passwordEncoderService = passwordEncoderService;
     this.mailSender = mailSender;
     this.appBaseUrl = appBaseUrl;
-    this.mailFrom = mailFrom;
+    this.mailFrom = resolveMailFrom(configuredMailFrom, mailUsername);
   }
 
+  @CacheEvict(value = "users", allEntries = true)
   public void requestPasswordReset(String email) {
     Optional<User> optionalUser = userRepository.findByEmail(email);
     if (optionalUser.isEmpty()) {
@@ -72,6 +75,7 @@ public class PasswordResetService {
     return findUserByResetToken(token).isPresent();
   }
 
+  @CacheEvict(value = "users", allEntries = true)
   public void resetPassword(String token, String newPassword) {
     User user = findUserByResetToken(token)
         .orElseThrow(() -> new ValidationException("Reset link is invalid or has expired", "token"));
@@ -145,5 +149,15 @@ public class PasswordResetService {
       log.error("Failed to send password reset email to {}", user.getEmail(), ex);
       throw new IllegalStateException("Failed to send password reset email", ex);
     }
+  }
+
+  private String resolveMailFrom(String configuredMailFrom, String mailUsername) {
+    if (configuredMailFrom != null && !configuredMailFrom.isBlank()) {
+      return configuredMailFrom.trim();
+    }
+    if (mailUsername != null && !mailUsername.isBlank()) {
+      return mailUsername.trim();
+    }
+    return "no-reply@openmailer.local";
   }
 }

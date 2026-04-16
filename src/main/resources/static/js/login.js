@@ -20,22 +20,65 @@ function togglePasswordVisibility() {
     }
 }
 
-// Toggle Two-Factor authentication section
-function toggleTwoFactor() {
+function toggleTwoFactor(forceOpen = null) {
     const section = document.getElementById('twoFactorSection');
     const toggleButton = document.getElementById('twoFactorToggle');
-    const isHidden = section.classList.contains('hidden');
+    const shouldOpen = forceOpen === null ? section.classList.contains('hidden') : forceOpen;
 
-    section.classList.toggle('hidden');
-    toggleButton.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    section.classList.toggle('hidden', !shouldOpen);
+    toggleButton.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
 
-    // Focus on the 2FA input when shown
-    if (isHidden) {
+    if (shouldOpen) {
         setTimeout(() => {
-            document.getElementById('twoFactorCode').focus();
+            document.getElementById('twoFactorCode')?.focus();
         }, 100);
     }
 }
+
+function setTwoFactorStepActive(isActive) {
+    const buttonText = document.getElementById('buttonText');
+    const helpText = document.getElementById('twoFactorHelpText');
+    const toggleButton = document.getElementById('twoFactorToggle');
+    const stepIndicator = document.getElementById('loginStepIndicator');
+    const primaryCredentialSection = document.getElementById('primaryCredentialSection');
+    const formActions = document.getElementById('loginFormActions');
+    const submitButton = document.getElementById('submitButton');
+    const rememberMeInput = document.getElementById('rememberMe');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
+    if (isActive) {
+        toggleTwoFactor(true);
+        stepIndicator.classList.remove('hidden');
+        buttonText.textContent = 'Verify & Sign In';
+        helpText.textContent = 'This account has two-factor authentication enabled. Enter your 6-digit authenticator code or 8-character backup code to continue.';
+        toggleButton.textContent = 'Two-factor code required';
+        toggleButton.classList.add('text-slate-900');
+        primaryCredentialSection.classList.add('opacity-45');
+        formActions.classList.add('opacity-70');
+        submitButton.classList.remove('app-button-primary');
+        submitButton.classList.add('bg-[#171717]');
+        rememberMeInput.disabled = true;
+        emailInput.readOnly = true;
+        passwordInput.readOnly = true;
+    } else {
+        stepIndicator.classList.add('hidden');
+        toggleTwoFactor(false);
+        buttonText.textContent = 'Sign In';
+        helpText.textContent = 'Use a 6-digit authenticator code or an 8-character backup code.';
+        toggleButton.textContent = 'Need 2FA or backup code?';
+        toggleButton.classList.remove('text-slate-900');
+        primaryCredentialSection.classList.remove('opacity-45');
+        formActions.classList.remove('opacity-70');
+        submitButton.classList.add('app-button-primary');
+        submitButton.classList.remove('bg-[#171717]');
+        rememberMeInput.disabled = false;
+        emailInput.readOnly = false;
+        passwordInput.readOnly = false;
+    }
+}
+
+let pendingTwoFactorToken = null;
 
 // Show alert message
 function showAlert(message, type = 'error') {
@@ -63,6 +106,40 @@ function hideAlert() {
     document.getElementById('alertContainer').classList.add('hidden');
 }
 
+async function parseLoginResponse(response) {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+        return response.json();
+    }
+
+    const bodyText = await response.text();
+    return {
+        success: false,
+        message: extractLoginErrorMessage(response.status, bodyText)
+    };
+}
+
+function extractLoginErrorMessage(status, bodyText) {
+    if (status === 401) {
+        return 'Invalid email or password.';
+    }
+
+    if (status === 403) {
+        return 'This request was blocked. Refresh the page and try again.';
+    }
+
+    if (bodyText && !bodyText.trim().startsWith('<')) {
+        return bodyText.trim();
+    }
+
+    return 'An unexpected error occurred. Please try again later.';
+}
+
+function requiresTwoFactor(result) {
+    return Boolean(result?.data?.requiresTwoFactor);
+}
+
 // Handle form submission
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -71,6 +148,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const submitButton = document.getElementById('submitButton');
     const buttonText = document.getElementById('buttonText');
     const loadingSpinner = document.getElementById('loadingSpinner');
+    let keepTwoFactorStepActive = !document.getElementById('twoFactorSection').classList.contains('hidden');
 
     // Get form values
     const email = document.getElementById('email').value;
@@ -78,18 +156,20 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const twoFactorCode = document.getElementById('twoFactorCode').value || null;
     const rememberMe = document.getElementById('rememberMe').checked;
 
-    // Prepare request body
-    const loginData = {
+    let requestUrl = '/api/auth/login';
+    let requestBody = {
         email: email,
         password: password,
         rememberMe: rememberMe
     };
 
-    if (twoFactorCode) {
-        const normalizedTwoFactorCode = twoFactorCode.trim().toUpperCase();
-        if (normalizedTwoFactorCode.length === 6 || normalizedTwoFactorCode.length === 8) {
-            loginData.twoFactorCode = normalizedTwoFactorCode;
-        }
+    if (pendingTwoFactorToken) {
+        requestUrl = '/api/auth/login/2fa';
+        requestBody = {
+            pendingTwoFactorToken: pendingTwoFactorToken,
+            code: (twoFactorCode || '').trim().toUpperCase(),
+            rememberMe: rememberMe
+        };
     }
 
     // Disable button and show loading
@@ -117,22 +197,41 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             headers[csrfHeader] = csrfToken;
         }
 
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch(requestUrl, {
             method: 'POST',
             credentials: 'same-origin',
             headers: headers,
-            body: JSON.stringify(loginData)
+            body: JSON.stringify(requestBody)
         });
 
-        const result = await response.json();
+        const result = await parseLoginResponse(response);
 
-        if (response.ok && result.success) {
+        if (response.ok && result.success && requiresTwoFactor(result)) {
+            pendingTwoFactorToken = result.data.pendingTwoFactorToken;
+            keepTwoFactorStepActive = true;
+            setTwoFactorStepActive(true);
+            showAlert('Password verified. Enter your authenticator code or backup code to continue.', 'success');
+            const twoFactorCodeInput = document.getElementById('twoFactorCode');
+            if (twoFactorCodeInput) {
+                twoFactorCodeInput.value = '';
+                twoFactorCodeInput.focus();
+            }
+        } else if (response.ok && result.success) {
+            pendingTwoFactorToken = null;
             showAlert('Login successful! Redirecting...', 'success');
-
             window.location.href = '/dashboard';
         } else {
             // Handle error response
-            const errorMessage = result.message || 'Login failed. Please check your credentials.';
+            const errorMessage = result?.error?.message || result?.message || 'Login failed. Please check your credentials.';
+            if (pendingTwoFactorToken) {
+                keepTwoFactorStepActive = true;
+                setTwoFactorStepActive(true);
+                document.getElementById('twoFactorCode')?.focus();
+            } else {
+                pendingTwoFactorToken = null;
+                keepTwoFactorStepActive = false;
+                setTwoFactorStepActive(false);
+            }
             showAlert(errorMessage, 'error');
         }
     } catch (error) {
@@ -148,5 +247,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         if (loadingText) {
             loadingText.classList.add('hidden');
         }
+        setTwoFactorStepActive(keepTwoFactorStepActive);
     }
 });

@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.config;
 
 import com.openmailer.openmailer.service.security.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -74,9 +76,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           SecurityContextHolder.getContext().setAuthentication(authToken);
         }
       }
+    } catch (ExpiredJwtException e) {
+      clearAccessTokenCookie(response);
+      logger.debug("Ignoring expired JWT from request cookie");
     } catch (Exception e) {
-      // Invalid token - continue without authentication
-      logger.error("JWT validation failed", e);
+      clearAccessTokenCookie(response);
+      logger.debug("Ignoring invalid JWT from request", e);
     }
 
     filterChain.doFilter(request, response);
@@ -100,5 +105,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     return null;
+  }
+
+  private void clearAccessTokenCookie(HttpServletResponse response) {
+    ResponseCookie clearedCookie = ResponseCookie.from(ACCESS_TOKEN_COOKIE, "")
+        .httpOnly(true)
+        .path("/")
+        .sameSite("Lax")
+        .maxAge(0)
+        .build();
+    response.addHeader("Set-Cookie", clearedCookie.toString());
   }
 }

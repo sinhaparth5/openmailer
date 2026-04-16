@@ -1,9 +1,12 @@
 package com.openmailer.openmailer.controller;
 
+import com.openmailer.openmailer.dto.request.auth.ChangePasswordRequest;
 import com.openmailer.openmailer.dto.request.auth.ForgotPasswordRequest;
 import com.openmailer.openmailer.dto.request.auth.LoginRequest;
+import com.openmailer.openmailer.dto.request.auth.LoginTwoFactorRequest;
 import com.openmailer.openmailer.dto.request.auth.RegisterRequest;
 import com.openmailer.openmailer.dto.request.auth.ResetPasswordRequest;
+import com.openmailer.openmailer.dto.request.auth.UpdateProfileRequest;
 import com.openmailer.openmailer.dto.request.twofa.TwoFactorVerifyRequest;
 import com.openmailer.openmailer.dto.response.auth.LoginResponse;
 import com.openmailer.openmailer.dto.ApiResponse;
@@ -90,6 +93,18 @@ public class AuthController {
       HttpServletResponse servletResponse
   ) {
     LoginResponse response = authenticationService.login(request);
+    if (!Boolean.TRUE.equals(response.getRequiresTwoFactor())) {
+      attachAuthCookies(servletResponse, response, Boolean.TRUE.equals(request.getRememberMe()));
+    }
+    return ResponseEntity.ok(ApiResponse.success(response));
+  }
+
+  @PostMapping("/login/2fa")
+  public ResponseEntity<ApiResponse<LoginResponse>> verifyLoginTwoFactor(
+      @Valid @RequestBody LoginTwoFactorRequest request,
+      HttpServletResponse servletResponse
+  ) {
+    LoginResponse response = authenticationService.verifyTwoFactorLogin(request);
     attachAuthCookies(servletResponse, response, Boolean.TRUE.equals(request.getRememberMe()));
     return ResponseEntity.ok(ApiResponse.success(response));
   }
@@ -125,6 +140,34 @@ public class AuthController {
   @GetMapping("/me")
   public ResponseEntity<ApiResponse<LoginResponse.UserInfo>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
     return ResponseEntity.ok(ApiResponse.success(authenticationService.buildUserInfo(userDetails.getUser())));
+  }
+
+  @PutMapping("/me")
+  public ResponseEntity<ApiResponse<LoginResponse.UserInfo>> updateCurrentUser(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Valid @RequestBody UpdateProfileRequest request
+  ) {
+    User updatedUser = new User();
+    updatedUser.setUsername(request.getUsername().trim());
+    updatedUser.setEmail(request.getEmail().trim());
+    updatedUser.setFirstName(blankToNull(request.getFirstName()));
+    updatedUser.setLastName(blankToNull(request.getLastName()));
+
+    User savedUser = authenticationService.updateProfile(userDetails.getUser().getId(), updatedUser);
+    return ResponseEntity.ok(ApiResponse.success(authenticationService.buildUserInfo(savedUser), "Profile updated successfully."));
+  }
+
+  @PostMapping("/change-password")
+  public ResponseEntity<ApiResponse<Void>> changePassword(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Valid @RequestBody ChangePasswordRequest request
+  ) {
+    authenticationService.changePassword(
+        userDetails.getUser().getId(),
+        request.getCurrentPassword(),
+        request.getNewPassword()
+    );
+    return ResponseEntity.ok(ApiResponse.success(null, "Password changed successfully."));
   }
 
   /**
@@ -339,5 +382,12 @@ public class AuthController {
 
     servletResponse.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
     servletResponse.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+  }
+
+  private String blankToNull(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    return value.trim();
   }
 }

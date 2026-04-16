@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}"
+      lang="en">
+<head>
+    <title>Account Settings - OpenMailer</title>
+</head>
+<body>
+<div layout:fragment="content" class="space-y-6" id="securitySettingsRoot"
+     th:attr="data-two-factor-enabled=${twoFactorEnabled},data-backup-code-count=${backupCodeCount}">
+    <section class="app-shell overflow-hidden px-6 py-7 sm:px-8">
+        <div class="grid gap-6 lg:grid-cols-[1.12fr_0.88fr]">
+            <div>
+                <p class="app-kicker">Account Settings</p>
+                <h1 class="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-[2.8rem]">Keep your identity, password, and second-factor controls in one place.</h1>
+                <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600">This page now handles profile updates, password changes, and 2FA management without leaving the app or relying on API-only workflows.</p>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                <article class="app-soft-card bg-[var(--app-lilac)]/52 p-5">
+                    <p class="app-kicker">2FA</p>
+                    <p id="twoFactorSummary" class="mt-3 text-2xl font-semibold text-slate-900" th:text="${twoFactorEnabled} ? 'Enabled' : 'Not enabled'">Not enabled</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Authenticator apps plus one-time backup codes for recovery.</p>
+                </article>
+                <article class="app-soft-card bg-white/78 p-5">
+                    <p class="app-kicker">Last Login</p>
+                    <p class="mt-3 text-lg font-semibold text-slate-900" th:text="${lastLoginAt != null ? #temporals.format(lastLoginAt, 'dd MMM yyyy HH:mm') : 'No successful login recorded yet'}">No successful login recorded yet</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Recent access is tracked server-side during successful sign-in.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <div id="alertContainer" class="hidden" role="alert" aria-live="polite" aria-atomic="true">
+        <div id="alertBox" class="rounded-[20px] p-4">
+            <div class="flex items-start">
+                <svg id="alertIcon" class="mr-3 mt-0.5 h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"></svg>
+                <p id="alertMessage" class="text-sm font-medium"></p>
+            </div>
+        </div>
+    </div>
+
+    <section class="grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <article class="app-panel-strong p-6 sm:p-7">
+            <div>
+                <p class="app-kicker">Profile</p>
+                <h2 class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Identity and login details</h2>
+                <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600">Update the name, email, and username the app uses across authenticated views.</p>
+            </div>
+
+            <form id="profileForm" class="mt-6 space-y-5">
+                <div class="grid gap-5 md:grid-cols-2">
+                    <div>
+                        <label for="firstName" class="mb-2 block text-sm font-medium text-slate-700">First name</label>
+                        <input id="firstName" name="firstName" type="text" maxlength="100" class="app-input" th:value="${currentUser.firstName}">
+                    </div>
+                    <div>
+                        <label for="lastName" class="mb-2 block text-sm font-medium text-slate-700">Last name</label>
+                        <input id="lastName" name="lastName" type="text" maxlength="100" class="app-input" th:value="${currentUser.lastName}">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="username" class="mb-2 block text-sm font-medium text-slate-700">Username</label>
+                    <input id="username" name="username" type="text" minlength="3" maxlength="50" class="app-input" th:value="${currentUser.username}">
+                </div>
+
+                <div>
+                    <label for="email" class="mb-2 block text-sm font-medium text-slate-700">Email address</label>
+                    <input id="email" name="email" type="email" maxlength="255" class="app-input" th:value="${currentUser.email}">
+                </div>
+
+                <button id="saveProfileButton" type="submit" class="app-button-primary px-5 py-3 text-sm">Save profile</button>
+            </form>
+        </article>
+
+        <article class="app-panel-strong p-6 sm:p-7">
+            <div>
+                <p class="app-kicker">Password</p>
+                <h2 class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Change account password</h2>
+                <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600">Use your current password once, then replace it with a stronger one that matches the live rule checks.</p>
+            </div>
+
+            <form id="changePasswordForm" class="mt-6 space-y-5">
+                <div>
+                    <label for="currentPassword" class="mb-2 block text-sm font-medium text-slate-700">Current password</label>
+                    <input id="currentPassword" name="currentPassword" type="password" maxlength="100" class="app-input">
+                </div>
+
+                <div>
+                    <label for="newPassword" class="mb-2 block text-sm font-medium text-slate-700">New password</label>
+                    <input id="newPassword" name="newPassword" type="password" maxlength="100" class="app-input">
+                </div>
+
+                <div>
+                    <label for="confirmNewPassword" class="mb-2 block text-sm font-medium text-slate-700">Confirm new password</label>
+                    <input id="confirmNewPassword" name="confirmNewPassword" type="password" maxlength="100" class="app-input">
+                </div>
+
+                <div class="rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-white/70 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live password check</p>
+                    <ul class="mt-3 space-y-2 text-xs text-slate-600">
+                        <li id="passwordRuleLength" class="flex items-center gap-2">
+                            <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                            At least 8 characters
+                        </li>
+                        <li id="passwordRuleUpper" class="flex items-center gap-2">
+                            <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                            One uppercase letter
+                        </li>
+                        <li id="passwordRuleLower" class="flex items-center gap-2">
+                            <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                            One lowercase letter
+                        </li>
+                        <li id="passwordRuleNumber" class="flex items-center gap-2">
+                            <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                            One number
+                        </li>
+                        <li id="passwordRuleSpecial" class="flex items-center gap-2">
+                            <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                            One symbol
+                        </li>
+                        <li id="passwordRuleMatch" class="flex items-center gap-2">
+                            <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                            Passwords match
+                        </li>
+                    </ul>
+                </div>
+
+                <button id="changePasswordButton" type="submit" class="app-button-primary px-5 py-3 text-sm">Change password</button>
+            </form>
+        </article>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <article class="app-panel-strong p-6 sm:p-7">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="app-kicker">Authenticator App</p>
+                    <h2 class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Two-factor authentication</h2>
+                    <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600">Start setup, scan the QR code, then confirm with a 6-digit code from your authenticator app.</p>
+                </div>
+                <span id="twoFactorBadge" class="rounded-full bg-[var(--app-sun)]/65 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700" th:text="${twoFactorEnabled} ? 'Enabled' : 'Inactive'">Inactive</span>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+                <button id="startSetupButton" type="button" class="app-button-primary px-5 py-3 text-sm">Start 2FA Setup</button>
+                <button id="disableTwoFactorButton" type="button" class="rounded-full border border-[rgba(57,48,36,0.14)] bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50" th:classappend="${!twoFactorEnabled} ? ' hidden' : ''">Disable 2FA</button>
+            </div>
+
+            <div id="setupPanel" class="mt-6 hidden rounded-[24px] border border-[rgba(57,48,36,0.1)] bg-[rgba(255,255,255,0.72)] p-5">
+                <div class="grid gap-5 lg:grid-cols-[220px_1fr]">
+                    <div class="rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-white p-4">
+                        <img id="qrCodeImage" alt="Two-factor QR code" class="mx-auto h-auto w-full max-w-[180px] rounded-[14px]">
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">Setup secret</p>
+                        <p id="secretText" class="mt-2 break-all rounded-[16px] bg-[#171717] px-4 py-3 font-mono text-xs tracking-[0.18em] text-white"></p>
+                        <label for="enableCode" class="mt-5 block text-sm font-medium text-slate-700">Authenticator code</label>
+                        <input id="enableCode" name="enableCode" type="text" maxlength="6" inputmode="numeric" class="app-input mt-2" placeholder="000000">
+                        <div class="mt-4 flex flex-wrap gap-3">
+                            <button id="confirmEnableButton" type="button" class="app-button-primary px-5 py-3 text-sm">Enable 2FA</button>
+                            <button id="cancelSetupButton" type="button" class="rounded-full border border-[rgba(57,48,36,0.14)] bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="app-panel-strong p-6 sm:p-7">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="app-kicker">Recovery Codes</p>
+                    <h2 class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Backup code inventory</h2>
+                    <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600">These 8-character codes can get you back in if your authenticator is unavailable. Each one works once.</p>
+                </div>
+                <span id="backupCountBadge" class="rounded-full bg-[var(--app-mint)]/65 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700" th:text="${backupCodeCount} + ' left'">0 left</span>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+                <button id="regenerateCodesButton" type="button" class="rounded-full border border-[rgba(57,48,36,0.14)] bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50" th:classappend="${!twoFactorEnabled} ? ' hidden' : ''">Regenerate codes</button>
+            </div>
+
+            <div id="backupCodesPanel" class="mt-6 hidden rounded-[24px] border border-[rgba(57,48,36,0.1)] bg-[rgba(255,255,255,0.72)] p-5">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">Current recovery codes</p>
+                        <p class="mt-1 text-xs leading-6 text-slate-500">Store these outside your inbox and outside the same device as your authenticator app.</p>
+                    </div>
+                    <button id="copyBackupCodesButton" type="button" class="rounded-full border border-[rgba(57,48,36,0.14)] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-900 transition hover:bg-slate-50">Copy</button>
+                </div>
+                <div id="backupCodesList" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
+            </div>
+        </article>
+    </section>
+</div>
+
+<th:block layout:fragment="extra-scripts">
+    <script th:src="${assetMinified} ? @{/js/min/security-settings.min.js} : @{/js/security-settings.js}"></script>
+</th:block>
+</body>
+</html>

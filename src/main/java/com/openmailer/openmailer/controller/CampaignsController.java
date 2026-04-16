@@ -46,6 +46,7 @@ import java.util.Map;
 public class CampaignsController {
 
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+    private static final DateTimeFormatter DATE_TIME_INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
     private final CampaignService campaignService;
     private final CampaignSendingService campaignSendingService;
     private final EmailTemplateRepository templateRepository;
@@ -151,6 +152,8 @@ public class CampaignsController {
     ) {
         EmailCampaign campaign = campaignService.findByIdAndUserId(id, userDetails.getUser().getId());
         CampaignDetailView view = toDetailView(campaign);
+        LocalDateTime minimumScheduleTime = LocalDateTime.now().plusMinutes(15).withSecond(0).withNano(0);
+        LocalDateTime suggestedScheduleTime = minimumScheduleTime.plusHours(1);
 
         model.addAttribute("pageTitle", "Campaign Details - OpenMailer");
         model.addAttribute("campaign", view);
@@ -165,6 +168,12 @@ public class CampaignsController {
         model.addAttribute("clickRate", view.clickRate());
         model.addAttribute("bounceRate", view.bounceRate());
         model.addAttribute("complaintCount", view.complaintCount());
+        model.addAttribute("canSendNow", "DRAFT".equals(view.status()) || "SCHEDULED".equals(view.status()));
+        model.addAttribute("canSchedule", "DRAFT".equals(view.status()));
+        model.addAttribute("canCancelSchedule", "SCHEDULED".equals(view.status()));
+        model.addAttribute("minimumScheduledAt", minimumScheduleTime.format(DATE_TIME_INPUT_FORMAT));
+        model.addAttribute("suggestedScheduledAt", suggestedScheduleTime.format(DATE_TIME_INPUT_FORMAT));
+        model.addAttribute("actionStateMessage", actionStateMessage(view.status()));
 
         return "campaigns/view";
     }
@@ -398,6 +407,16 @@ public class CampaignsController {
     private void populateFormMetadata(Model model, String pageTitle, String mode) {
         model.addAttribute("pageTitle", pageTitle);
         model.addAttribute("mode", mode);
+    }
+
+    private String actionStateMessage(String status) {
+        return switch (status) {
+            case "DRAFT" -> "This draft is ready for a final review, an immediate send, or a scheduled delivery window.";
+            case "SCHEDULED" -> "This campaign is queued for later delivery. You can still send it immediately or cancel the scheduled time.";
+            case "SENDING" -> "Delivery has started. Configuration is locked while recipients are being processed.";
+            case "SENT" -> "This campaign has completed its send flow. Review the metrics and duplicate the setup pattern in a new draft if needed.";
+            default -> "This campaign is not in a state where delivery actions are available.";
+        };
     }
 
     private void bindValidationError(BindingResult bindingResult, ValidationException ex) {

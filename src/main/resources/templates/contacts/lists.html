@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${pageTitle}">Contact Lists</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="app-shell p-4 sm:p-6">
+        <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <p class="app-kicker">Contacts</p>
+                <h1 class="mt-3 text-4xl font-semibold tracking-tight text-slate-950">Contact lists</h1>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600">Create named audience buckets, keep related contacts together, and use those lists directly when you draft a campaign.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="/contacts" class="app-button-secondary px-5 py-3 text-sm">Back to Contacts</a>
+                <a href="/campaigns/create" class="app-button-primary px-5 py-3 text-sm">Create Campaign</a>
+            </div>
+        </div>
+
+        <div class="mb-5 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-[24px] bg-[var(--app-sun)]/62 p-5">
+                <p class="text-sm font-medium text-slate-600">Lists</p>
+                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${totalLists}">0</p>
+            </div>
+            <div class="rounded-[24px] bg-[var(--app-mint)]/62 p-5">
+                <p class="text-sm font-medium text-slate-600">Lists with contacts</p>
+                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${listsWithContacts}">0</p>
+            </div>
+            <div class="rounded-[24px] bg-[var(--app-lilac)]/62 p-5">
+                <p class="text-sm font-medium text-slate-600">Unassigned contacts</p>
+                <p class="mt-3 text-3xl font-semibold text-slate-950" th:text="${contactsWithoutLists}">0</p>
+            </div>
+        </div>
+
+        <div class="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+            <section class="app-panel-strong p-6">
+                <p class="app-kicker">New list</p>
+                <h2 class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Create an audience source</h2>
+                <p class="mt-3 text-sm leading-7 text-slate-600">Give the list a name people will recognize later in campaign setup. Description and opt-in mode are optional, but helpful.</p>
+
+                <form th:action="@{/contacts/lists}" th:object="${contactListForm}" method="post" class="mt-6 space-y-5">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div th:if="${#fields.hasGlobalErrors()}" class="rounded-[22px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Form error</p>
+                    </div>
+                    <div>
+                        <label for="name" class="mb-2 block text-sm font-medium text-slate-700">List name</label>
+                        <input id="name" th:field="*{name}" type="text" class="app-input" placeholder="Newsletter subscribers">
+                        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="mt-2 text-sm text-rose-700">Name error</p>
+                    </div>
+                    <div>
+                        <label for="description" class="mb-2 block text-sm font-medium text-slate-700">Description</label>
+                        <textarea id="description" th:field="*{description}" rows="4" class="app-textarea" placeholder="What this list is for, where contacts come from, or what campaigns will target it."></textarea>
+                    </div>
+                    <label class="app-soft-card flex items-start gap-3 px-4 py-4">
+                        <input type="checkbox" th:field="*{doubleOptInEnabled}" class="mt-1">
+                        <span class="text-sm text-slate-700">
+                            <span class="font-medium">Double opt-in enabled</span><br>
+                            <span class="text-slate-500">Keep this on when signups should confirm before they become an active audience.</span>
+                        </span>
+                    </label>
+                    <button type="submit" class="app-button-primary px-6 py-3 text-sm">Create List</button>
+                </form>
+            </section>
+
+            <section class="app-panel p-6">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <p class="app-kicker">Existing lists</p>
+                        <h2 class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Audience groups ready for campaigns</h2>
+                    </div>
+                    <span class="rounded-full bg-[var(--app-peach)]/62 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-800" th:text="${totalLists} + ' total'">0 total</span>
+                </div>
+
+                <div th:if="${#lists.isEmpty(lists)}" class="mt-6 rounded-[24px] border border-dashed border-[rgba(57,48,36,0.16)] bg-white/55 p-8 text-center">
+                    <h3 class="text-lg font-semibold text-slate-950">No contact lists yet</h3>
+                    <p class="mt-2 text-sm leading-7 text-slate-500">Create your first list here, then add contacts from the contact form or CSV import flow.</p>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(lists)}" class="mt-6 grid gap-4 md:grid-cols-2">
+                    <article th:each="list : ${lists}" class="rounded-[24px] border border-[rgba(57,48,36,0.08)] bg-white/72 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-950" th:text="${list.name}">List name</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-500" th:text="${list.description ?: 'No description yet.'}">Description</p>
+                            </div>
+                            <span th:classappend="${list.doubleOptInEnabled} ? 'bg-[var(--app-mint)]/72 text-emerald-950' : 'bg-[var(--app-sun)]/72 text-amber-950'"
+                                  class="inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
+                                <span th:text="${list.doubleOptInEnabled} ? 'Double opt-in' : 'Single opt-in'">Mode</span>
+                            </span>
+                        </div>
+
+                        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                            <div class="rounded-[18px] bg-[var(--app-lilac)]/58 px-4 py-3">
+                                <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Contacts</p>
+                                <p class="mt-2 text-2xl font-semibold text-slate-950" th:text="${list.totalContacts}">0</p>
+                            </div>
+                            <div class="rounded-[18px] bg-[var(--app-mint)]/50 px-4 py-3">
+                                <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Active memberships</p>
+                                <p class="mt-2 text-2xl font-semibold text-slate-950" th:text="${list.activeContacts}">0</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 flex items-center justify-between gap-3 text-sm">
+                            <p class="text-slate-500">Updated <span class="font-medium text-slate-800" th:text="${list.updatedAt}">Date</span></p>
+                            <a th:href="@{/contacts/lists/{id}(id=${list.id})}" class="font-semibold text-slate-900 transition hover:text-slate-700">Open list</a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+</body>
+</html>

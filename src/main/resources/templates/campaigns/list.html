@@ -103,7 +103,13 @@
                             </td>
                             <td class="px-5 py-5 text-sm text-slate-600" th:text="${campaign.sentDate}">Date</td>
                             <td class="px-5 py-5 text-right">
-                                <div class="flex justify-end gap-3 text-sm font-medium">
+                                <div class="flex flex-col items-end gap-2 text-sm font-medium">
+                                    <p class="text-xs text-slate-500"
+                                       th:text="${campaign.status == 'DRAFT'} ? 'Next step: finish review and send or schedule.' :
+                                                (campaign.status == 'SCHEDULED' ? 'Next step: confirm timing or send immediately from details.' :
+                                                (campaign.status == 'SENDING' ? 'Next step: monitor delivery progress.' : 'Next step: review results.'))">
+                                        Next step
+                                    </p>
                                     <a th:href="@{/campaigns/{id}(id=${campaign.id})}" class="text-slate-900 transition hover:text-slate-700">View</a>
                                     <a th:if="${campaign.status == 'DRAFT'}"
                                        th:href="@{/campaigns/{id}/edit(id=${campaign.id})}"

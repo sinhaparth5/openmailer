@@ -182,6 +182,14 @@ public class UserService {
     return userRepository.save(user);
   }
 
+  @CacheEvict(value = "users", allEntries = true)
+  public User updatePassword(String id, String encodedPassword) {
+    User user = findById(id);
+    user.setPassword(encodedPassword);
+    user.setUpdatedAt(LocalDateTime.now());
+    return userRepository.save(user);
+  }
+
   /**
    * Delete user (GDPR compliance).
    *

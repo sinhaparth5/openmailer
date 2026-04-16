@@ -1,24 +1,3 @@
-function togglePasswordVisibility() {
-    const passwordInput = document.getElementById('password');
-    const eyeIcon = document.getElementById('eyeIcon');
-    const eyeSlashIcon = document.getElementById('eyeSlashIcon');
-    const toggleButton = document.getElementById('togglePasswordButton');
-
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        eyeIcon.classList.add('hidden');
-        eyeSlashIcon.classList.remove('hidden');
-        toggleButton.setAttribute('aria-label', 'Hide password');
-        toggleButton.setAttribute('aria-pressed', 'true');
-    } else {
-        passwordInput.type = 'password';
-        eyeIcon.classList.remove('hidden');
-        eyeSlashIcon.classList.add('hidden');
-        toggleButton.setAttribute('aria-label', 'Show password');
-        toggleButton.setAttribute('aria-pressed', 'false');
-    }
-}
-
 function showAlert(message, type = 'error') {
     const container = document.getElementById('alertContainer');
     const box = document.getElementById('alertBox');
@@ -49,19 +28,28 @@ function setLoadingState(isLoading) {
     const loadingSpinner = document.getElementById('loadingSpinner');
 
     submitButton.disabled = isLoading;
-    submitButton.setAttribute('aria-busy', String(isLoading));
-    buttonText.textContent = isLoading ? 'Creating account...' : 'Create Account';
+    buttonText.textContent = isLoading ? 'Saving password...' : 'Save New Password';
     loadingSpinner.classList.toggle('hidden', !isLoading);
 }
 
-function getErrorMessage(result) {
-    if (result?.error?.message) {
-        return result.error.message;
+function setFormEnabled(enabled) {
+    document.querySelectorAll('#resetPasswordForm input, #resetPasswordForm button').forEach((element) => {
+        element.disabled = !enabled;
+    });
+}
+
+function getCsrfHeaders() {
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+
+    if (csrfToken && csrfHeader) {
+        headers[csrfHeader] = csrfToken;
     }
-    if (result?.message) {
-        return result.message;
-    }
-    return 'Registration failed. Please check your details and try again.';
+
+    return headers;
 }
 
 function getPasswordChecks(password, confirmPassword) {
@@ -103,14 +91,44 @@ function updatePasswordFeedback() {
     return checks;
 }
 
-document.getElementById('togglePasswordButton').addEventListener('click', togglePasswordVisibility);
-document.getElementById('password').addEventListener('input', updatePasswordFeedback);
-document.getElementById('confirmPassword').addEventListener('input', updatePasswordFeedback);
+async function validateToken() {
+    const root = document.getElementById('resetPasswordRoot');
+    const token = root.dataset.resetToken;
 
-document.getElementById('registerForm').addEventListener('submit', async (event) => {
+    if (!token) {
+        setFormEnabled(false);
+        showAlert('Reset link is missing. Request a new password reset email.');
+        return null;
+    }
+
+    try {
+        const response = await fetch(`/api/auth/reset-password/validate?token=${encodeURIComponent(token)}`, {
+            method: 'GET',
+            credentials: 'same-origin'
+        });
+        const result = await response.json();
+        const isValid = Boolean(result?.data);
+
+        if (!response.ok || !isValid) {
+            setFormEnabled(false);
+            showAlert('Reset link is invalid or has expired. Request a new one.');
+            return null;
+        }
+
+        return token;
+    } catch (error) {
+        console.error('Reset token validation error:', error);
+        setFormEnabled(false);
+        showAlert('Unable to validate reset link right now.');
+        return null;
+    }
+}
+
+document.getElementById('resetPasswordForm').addEventListener('submit', async (event) => {
     event.preventDefault();
     hideAlert();
 
+    const token = document.getElementById('resetPasswordRoot').dataset.resetToken;
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const checks = updatePasswordFeedback();
@@ -125,50 +143,37 @@ document.getElementById('registerForm').addEventListener('submit', async (event)
         return;
     }
 
-    const registerData = {
-        firstName: document.getElementById('firstName').value.trim() || null,
-        lastName: document.getElementById('lastName').value.trim() || null,
-        username: document.getElementById('username').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        password
-    };
-
     setLoadingState(true);
 
     try {
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-
-        if (csrfToken && csrfHeader) {
-            headers[csrfHeader] = csrfToken;
-        }
-
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch('/api/auth/reset-password', {
             method: 'POST',
             credentials: 'same-origin',
-            headers,
-            body: JSON.stringify(registerData)
+            headers: getCsrfHeaders(),
+            body: JSON.stringify({ token, password })
         });
-
         const result = await response.json();
 
         if (!response.ok || !result.success) {
-            showAlert(getErrorMessage(result));
+            showAlert(result?.error?.message || result?.message || 'Unable to reset password.');
             return;
         }
 
-        showAlert('Account created successfully. Redirecting...', 'success');
-        window.location.href = '/dashboard';
+        showAlert(result.message || 'Password reset successfully. Redirecting to sign in...', 'success');
+        setFormEnabled(false);
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, 1200);
     } catch (error) {
-        console.error('Registration error:', error);
+        console.error('Reset password error:', error);
         showAlert('An unexpected error occurred. Please try again.');
     } finally {
         setLoadingState(false);
     }
 });
 
+document.getElementById('password').addEventListener('input', updatePasswordFeedback);
+document.getElementById('confirmPassword').addEventListener('input', updatePasswordFeedback);
+
 updatePasswordFeedback();
+validateToken();
