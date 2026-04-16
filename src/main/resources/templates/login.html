@@ -73,6 +73,17 @@
                 </div>
 
                 <form id="loginForm" class="app-panel-strong space-y-5 p-6 sm:p-7" aria-labelledby="login-heading">
+                    <div id="loginStepIndicator" class="hidden rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-[var(--app-lilac)]/45 px-4 py-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Step 2</p>
+                                <p class="mt-1 text-sm font-medium text-slate-900">Verification required</p>
+                            </div>
+                            <span class="rounded-full bg-white/75 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-700">2FA</span>
+                        </div>
+                    </div>
+
+                    <div id="primaryCredentialSection" class="space-y-5 transition duration-200">
                     <div>
                         <label for="email" class="mb-2 block text-sm font-medium text-slate-700">Email address</label>
                         <input type="email" id="email" name="email" required autocomplete="email" aria-required="true"
@@ -99,22 +110,28 @@
                             </button>
                         </div>
                     </div>
-
-                    <div id="twoFactorSection" class="hidden">
-                        <label for="twoFactorCode" class="mb-2 block text-sm font-medium text-slate-700">Two-factor code <span class="text-slate-500">(optional)</span></label>
-                        <input type="text" id="twoFactorCode" name="twoFactorCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code"
-                               class="app-input"
-                               placeholder="000000">
-                        <p class="mt-2 text-xs text-slate-500">Enter the 6-digit code if your account uses 2FA.</p>
                     </div>
 
-                    <div class="flex items-center justify-between gap-4">
+                    <div id="twoFactorSection" class="hidden rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-white/55 p-4 transition duration-200">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <label for="twoFactorCode" class="mb-2 block text-sm font-medium text-slate-700">Two-factor code or backup code</label>
+                                <p id="twoFactorHelpText" class="text-xs leading-6 text-slate-500">Use a 6-digit authenticator code or an 8-character backup code.</p>
+                            </div>
+                            <span id="twoFactorStepBadge" class="rounded-full bg-[var(--app-lilac)]/62 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-700">Step 2</span>
+                        </div>
+                        <input type="text" id="twoFactorCode" name="twoFactorCode" maxlength="8" pattern="([0-9]{6}|[A-Z0-9]{8})" inputmode="text" autocomplete="one-time-code"
+                               class="app-input mt-4"
+                               placeholder="000000 or ABCD1234">
+                    </div>
+
+                    <div id="loginFormActions" class="flex items-center justify-between gap-4 transition duration-200">
                         <label for="rememberMe" class="flex items-center gap-2 text-sm text-slate-700">
                             <input type="checkbox" id="rememberMe" name="rememberMe" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-[var(--app-sun)]">
                             <span>Remember me</span>
                         </label>
                         <button type="button" id="twoFactorToggle" onclick="toggleTwoFactor()" class="text-sm font-medium text-slate-600 transition hover:text-slate-900" aria-label="Show two-factor authentication field" aria-expanded="false" aria-controls="twoFactorSection">
-                            Need 2FA?
+                            Need 2FA or backup code?
                         </button>
                     </div>
 
@@ -129,6 +146,7 @@
                 </form>
 
                 <div class="mt-5 flex items-center justify-between gap-3 rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-white/70 px-5 py-4 text-sm text-slate-600">
+                    <a href="/forgot-password" class="font-semibold text-slate-900 transition hover:text-slate-700">Forgot password?</a>
                     <span>New to OpenMailer?</span>
                     <a href="/register" class="font-semibold text-slate-900 transition hover:text-slate-700">Create an account</a>
                 </div>

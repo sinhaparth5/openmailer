@@ -1,16 +1,23 @@
 package com.openmailer.openmailer.controller;
 
+import com.openmailer.openmailer.dto.request.auth.ChangePasswordRequest;
+import com.openmailer.openmailer.dto.request.auth.ForgotPasswordRequest;
 import com.openmailer.openmailer.dto.request.auth.LoginRequest;
+import com.openmailer.openmailer.dto.request.auth.LoginTwoFactorRequest;
 import com.openmailer.openmailer.dto.request.auth.RegisterRequest;
+import com.openmailer.openmailer.dto.request.auth.ResetPasswordRequest;
+import com.openmailer.openmailer.dto.request.auth.UpdateProfileRequest;
 import com.openmailer.openmailer.dto.request.twofa.TwoFactorVerifyRequest;
 import com.openmailer.openmailer.dto.response.auth.LoginResponse;
 import com.openmailer.openmailer.dto.ApiResponse;
 import com.openmailer.openmailer.dto.response.twofa.TwoFactorBackupCodesResponse;
 import com.openmailer.openmailer.dto.response.twofa.TwoFactorSetupResponse;
+import com.openmailer.openmailer.dto.response.twofa.TwoFactorStatusResponse;
 import com.openmailer.openmailer.config.JwtAuthenticationFilter;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.auth.AuthenticationService;
+import com.openmailer.openmailer.service.auth.PasswordResetService;
 import com.openmailer.openmailer.service.auth.TwoFactorAuthService;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,6 +45,7 @@ public class AuthController {
   private static final long REFRESH_TOKEN_MAX_AGE_SECONDS = TimeUnit.DAYS.toSeconds(7);
 
   private final AuthenticationService authenticationService;
+  private final PasswordResetService passwordResetService;
   private final TwoFactorAuthService twoFactorAuthService;
   private final boolean secureCookies;
   private final String cookieDomain;
@@ -45,11 +53,13 @@ public class AuthController {
   @Autowired
   public AuthController(
       AuthenticationService authenticationService,
+      PasswordResetService passwordResetService,
       TwoFactorAuthService twoFactorAuthService,
       @Value("${app.security.cookies.secure:false}") boolean secureCookies,
       @Value("${app.security.cookies.domain:}") String cookieDomain
   ) {
     this.authenticationService = authenticationService;
+    this.passwordResetService = passwordResetService;
     this.twoFactorAuthService = twoFactorAuthService;
     this.secureCookies = secureCookies;
     this.cookieDomain = cookieDomain;
@@ -83,6 +93,18 @@ public class AuthController {
       HttpServletResponse servletResponse
   ) {
     LoginResponse response = authenticationService.login(request);
+    if (!Boolean.TRUE.equals(response.getRequiresTwoFactor())) {
+      attachAuthCookies(servletResponse, response, Boolean.TRUE.equals(request.getRememberMe()));
+    }
+    return ResponseEntity.ok(ApiResponse.success(response));
+  }
+
+  @PostMapping("/login/2fa")
+  public ResponseEntity<ApiResponse<LoginResponse>> verifyLoginTwoFactor(
+      @Valid @RequestBody LoginTwoFactorRequest request,
+      HttpServletResponse servletResponse
+  ) {
+    LoginResponse response = authenticationService.verifyTwoFactorLogin(request);
     attachAuthCookies(servletResponse, response, Boolean.TRUE.equals(request.getRememberMe()));
     return ResponseEntity.ok(ApiResponse.success(response));
   }
@@ -120,6 +142,34 @@ public class AuthController {
     return ResponseEntity.ok(ApiResponse.success(authenticationService.buildUserInfo(userDetails.getUser())));
   }
 
+  @PutMapping("/me")
+  public ResponseEntity<ApiResponse<LoginResponse.UserInfo>> updateCurrentUser(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Valid @RequestBody UpdateProfileRequest request
+  ) {
+    User updatedUser = new User();
+    updatedUser.setUsername(request.getUsername().trim());
+    updatedUser.setEmail(request.getEmail().trim());
+    updatedUser.setFirstName(blankToNull(request.getFirstName()));
+    updatedUser.setLastName(blankToNull(request.getLastName()));
+
+    User savedUser = authenticationService.updateProfile(userDetails.getUser().getId(), updatedUser);
+    return ResponseEntity.ok(ApiResponse.success(authenticationService.buildUserInfo(savedUser), "Profile updated successfully."));
+  }
+
+  @PostMapping("/change-password")
+  public ResponseEntity<ApiResponse<Void>> changePassword(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Valid @RequestBody ChangePasswordRequest request
+  ) {
+    authenticationService.changePassword(
+        userDetails.getUser().getId(),
+        request.getCurrentPassword(),
+        request.getNewPassword()
+    );
+    return ResponseEntity.ok(ApiResponse.success(null, "Password changed successfully."));
+  }
+
   /**
    * Logout user (client-side token removal).
    *
@@ -129,6 +179,26 @@ public class AuthController {
   public ResponseEntity<ApiResponse<Void>> logout(HttpServletResponse response) {
     clearAuthCookies(response);
     return ResponseEntity.ok(ApiResponse.success(null));
+  }
+
+  @PostMapping("/forgot-password")
+  public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+    passwordResetService.requestPasswordReset(request.getEmail());
+    return ResponseEntity.ok(ApiResponse.success(
+        null,
+        "If an account exists for that email, a reset link has been sent."
+    ));
+  }
+
+  @GetMapping("/reset-password/validate")
+  public ResponseEntity<ApiResponse<Boolean>> validateResetToken(@RequestParam("token") String token) {
+    return ResponseEntity.ok(ApiResponse.success(passwordResetService.isResetTokenValid(token)));
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+    passwordResetService.resetPassword(request.getToken(), request.getPassword());
+    return ResponseEntity.ok(ApiResponse.success(null, "Password reset successfully."));
   }
 
   /**
@@ -226,6 +296,18 @@ public class AuthController {
     return ResponseEntity.ok(ApiResponse.success(response));
   }
 
+  @GetMapping("/2fa/status")
+  public ResponseEntity<ApiResponse<TwoFactorStatusResponse>> getTwoFactorStatus(
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    User user = userDetails.getUser();
+    TwoFactorStatusResponse response = new TwoFactorStatusResponse(
+        twoFactorAuthService.isTwoFactorEnabled(user.getId()),
+        twoFactorAuthService.getRemainingBackupCodes(user.getId()).size()
+    );
+    return ResponseEntity.ok(ApiResponse.success(response));
+  }
+
   /**
    * Verify a 2FA code (for login or testing).
    *
@@ -300,5 +382,12 @@ public class AuthController {
 
     servletResponse.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
     servletResponse.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+  }
+
+  private String blankToNull(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    return value.trim();
   }
 }

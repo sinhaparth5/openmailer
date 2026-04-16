@@ -164,10 +164,42 @@
                 </section>
 
                 <section class="rounded-[28px] bg-[#1f2128] p-6 text-white shadow-[0_28px_60px_-34px_rgba(15,23,42,0.6)]">
-                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">Draft-Oriented Flow</p>
-                    <p class="mt-4 text-sm leading-7 text-white/72">
-                        The view page now follows the same calmer dashboard language and only exposes edit actions for draft campaigns,
-                        matching actual backend behavior rather than optimistic placeholder states.
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">Delivery Actions</p>
+                    <p class="mt-4 text-sm leading-7 text-white/72" th:text="${actionStateMessage}">
+                        Draft campaigns can be sent now or scheduled for later. Scheduled campaigns can be canceled and returned to draft before delivery starts.
+                    </p>
+                    <div class="mt-5 rounded-[20px] bg-white/6 px-4 py-3 text-sm text-white/78" th:if="${canSchedule}">
+                        Suggested schedule window: choose at least 15 minutes from now so any provider or domain changes have time to settle.
+                    </div>
+                    <div class="mt-6 space-y-4" th:if="${canSchedule}">
+                        <form th:action="@{/campaigns/{id}/send(id=${campaign.id})}" method="post" class="flex flex-wrap gap-3">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="app-button-primary px-5 py-3 text-sm">Send Now</button>
+                        </form>
+                        <form th:action="@{/campaigns/{id}/schedule(id=${campaign.id})}" method="post" class="space-y-3">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <label for="scheduledAt" class="block text-sm font-medium text-white/78">Schedule for later</label>
+                            <input id="scheduledAt" name="scheduledAt" type="datetime-local" class="app-input bg-white/95 text-slate-900"
+                                   th:attr="min=${minimumScheduledAt}"
+                                   th:value="${suggestedScheduledAt}">
+                            <button type="submit" class="app-button-secondary px-5 py-3 text-sm">Schedule Campaign</button>
+                        </form>
+                    </div>
+                    <div class="mt-6 space-y-4" th:if="${canCancelSchedule}">
+                        <form th:action="@{/campaigns/{id}/send(id=${campaign.id})}" method="post" class="flex flex-wrap gap-3">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="app-button-primary px-5 py-3 text-sm">Send Immediately</button>
+                        </form>
+                        <form th:action="@{/campaigns/{id}/cancel(id=${campaign.id})}" method="post" class="flex flex-wrap gap-3">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="app-button-secondary px-5 py-3 text-sm">Cancel Schedule</button>
+                        </form>
+                    </div>
+                    <div class="mt-6 flex flex-wrap gap-3" th:if="${campaign.status == 'DRAFT'}">
+                        <a th:href="@{/campaigns/{id}/edit(id=${campaign.id})}" class="rounded-full border border-white/12 px-5 py-3 text-sm font-semibold text-white/78 transition hover:bg-white/10 hover:text-white">Review configuration</a>
+                    </div>
+                    <p th:if="${!canSendNow && !canCancelSchedule}" class="mt-6 text-sm leading-7 text-white/72">
+                        This campaign is already in motion or completed, so send controls are no longer available.
                     </p>
                 </section>
             </div>

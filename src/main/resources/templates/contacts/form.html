@@ -21,10 +21,14 @@
         </div>
 
         <form th:action="${mode == 'edit'} ? @{/contacts/{id}/edit(id=${contactForm.id})} : @{/contacts}"
+              th:object="${contactForm}"
               method="post"
               data-enhanced-post="true"
               class="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <div th:if="${#fields.hasGlobalErrors()}" class="xl:col-span-2 rounded-[24px] border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-800">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Form error</p>
+            </div>
 
             <div class="space-y-5">
                 <section class="app-panel-strong p-6">
@@ -32,36 +36,55 @@
                     <div class="mt-5 grid gap-5 md:grid-cols-2">
                         <div>
                             <label for="firstName" class="mb-2 block text-sm font-medium text-slate-700">First name</label>
-                            <input id="firstName" name="firstName" type="text" th:value="${contactForm.firstName}" class="app-input">
+                            <input id="firstName" th:field="*{firstName}" type="text" class="app-input">
                         </div>
                         <div>
                             <label for="lastName" class="mb-2 block text-sm font-medium text-slate-700">Last name</label>
-                            <input id="lastName" name="lastName" type="text" th:value="${contactForm.lastName}" class="app-input">
+                            <input id="lastName" th:field="*{lastName}" type="text" class="app-input">
                         </div>
                         <div class="md:col-span-2">
                             <label for="email" class="mb-2 block text-sm font-medium text-slate-700">Email address</label>
-                            <input id="email" name="email" type="email" required th:value="${contactForm.email}" class="app-input">
+                            <input id="email" th:field="*{email}" type="email" required class="app-input">
+                            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="mt-2 text-sm text-rose-700">Email error</p>
                         </div>
                         <div>
                             <label for="company" class="mb-2 block text-sm font-medium text-slate-700">Company</label>
-                            <input id="company" name="company" type="text" th:value="${contactForm.company}" class="app-input">
+                            <input id="company" th:field="*{company}" type="text" class="app-input">
                         </div>
                         <div>
                             <label for="phone" class="mb-2 block text-sm font-medium text-slate-700">Phone</label>
-                            <input id="phone" name="phone" type="text" th:value="${contactForm.phone}" class="app-input">
+                            <input id="phone" th:field="*{phone}" type="text" class="app-input">
                         </div>
                         <div class="md:col-span-2">
                             <label for="country" class="mb-2 block text-sm font-medium text-slate-700">Country</label>
-                            <input id="country" name="country" type="text" th:value="${contactForm.country}" class="app-input">
+                            <input id="country" th:field="*{country}" type="text" class="app-input">
                         </div>
                     </div>
+                </section>
+
+                <section class="app-panel p-6">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <p class="app-kicker">List Assignment</p>
+                            <p class="mt-4 text-sm leading-7 text-slate-600">Assign this contact to one or more lists directly from the record form.</p>
+                        </div>
+                        <a href="/contacts/lists" class="app-button-secondary px-4 py-2 text-sm">Manage Lists</a>
+                    </div>
+                    <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                        <label class="app-soft-card flex items-center gap-3 px-4 py-3" th:each="list : ${listOptions}">
+                            <input type="checkbox" th:field="*{selectedListIds}" th:value="${list.id}">
+                            <span class="text-sm text-slate-700" th:text="${list.name}">List</span>
+                        </label>
+                    </div>
+                    <p th:if="${#lists.isEmpty(listOptions)}" class="mt-4 text-sm text-slate-500">No lists exist yet. Create one first so contacts can be grouped for campaigns.</p>
+                    <p th:if="${#fields.hasErrors('selectedListIds')}" th:errors="*{selectedListIds}" class="mt-2 text-sm text-rose-700">List error</p>
                 </section>
 
                 <section class="app-panel p-6">
                     <p class="app-kicker">Internal Notes</p>
                     <div class="mt-5">
                         <label for="notes" class="mb-2 block text-sm font-medium text-slate-700">Notes</label>
-                        <textarea id="notes" name="notes" rows="6" th:text="${contactForm.notes}" class="app-textarea" placeholder="Anything useful for your team about this contact."></textarea>
+                        <textarea id="notes" th:field="*{notes}" rows="6" class="app-textarea" placeholder="Anything useful for your team about this contact."></textarea>
                     </div>
                 </section>
             </div>
@@ -74,15 +97,15 @@
                             <label class="mb-3 block text-sm font-medium text-slate-700">Status</label>
                             <div class="grid gap-3">
                                 <label class="app-soft-card flex items-center gap-3 px-4 py-3">
-                                    <input type="radio" name="status" value="SUBSCRIBED" th:checked="${contactForm.status == 'SUBSCRIBED'}">
+                                    <input type="radio" th:field="*{status}" value="SUBSCRIBED">
                                     <span class="text-sm text-slate-700">Subscribed</span>
                                 </label>
                                 <label class="app-soft-card flex items-center gap-3 px-4 py-3">
-                                    <input type="radio" name="status" value="PENDING" th:checked="${contactForm.status == 'PENDING'}">
+                                    <input type="radio" th:field="*{status}" value="PENDING">
                                     <span class="text-sm text-slate-700">Pending</span>
                                 </label>
                                 <label class="app-soft-card flex items-center gap-3 px-4 py-3">
-                                    <input type="radio" name="status" value="UNSUBSCRIBED" th:checked="${contactForm.status == 'UNSUBSCRIBED'}">
+                                    <input type="radio" th:field="*{status}" value="UNSUBSCRIBED">
                                     <span class="text-sm text-slate-700">Unsubscribed</span>
                                 </label>
                             </div>
@@ -92,14 +115,14 @@
                             <label class="mb-3 block text-sm font-medium text-slate-700">Tags</label>
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <label class="app-soft-card flex items-center gap-3 px-4 py-3" th:each="tagOption : ${tagFilters}" th:if="${tagOption.value != ''}">
-                                    <input type="checkbox" name="tags" th:value="${tagOption.value}" th:checked="${#lists.contains(contactForm.tags, tagOption.value)}">
+                                    <input type="checkbox" th:field="*{tags}" th:value="${tagOption.value}">
                                     <span class="text-sm text-slate-700" th:text="${tagOption.label}">Tag</span>
                                 </label>
                             </div>
                         </div>
 
                         <label class="rounded-[22px] bg-[var(--app-mint)]/45 p-4 flex items-start gap-3">
-                            <input type="checkbox" name="gdprConsent" th:checked="${contactForm.gdprConsent}" class="mt-1">
+                            <input type="checkbox" th:field="*{gdprConsent}" class="mt-1">
                             <span class="text-sm text-slate-700">
                                 <span class="font-medium">GDPR consent recorded</span><br>
                                 <span class="text-slate-500">Keep this checked only when you have a valid consent trail.</span>

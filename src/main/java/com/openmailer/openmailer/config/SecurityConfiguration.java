@@ -16,9 +16,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.http.HttpStatus;
 
 /**
  * Security configuration for the application.
@@ -70,10 +72,10 @@ public class SecurityConfiguration {
                 .contentSecurityPolicy(csp -> csp
                     .policyDirectives("default-src 'self'; " +
                         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; " +
-                        "style-src 'self' 'unsafe-inline'; " +
+                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                         "img-src 'self' data: https:; " +
-                        "font-src 'self' data:; " +
-                        "connect-src 'self' https://cdn.jsdelivr.net; " +
+                        "font-src 'self' data: https://fonts.gstatic.com; " +
+                        "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; " +
                         "frame-ancestors 'none';")
                 )
                 .xssProtection(xss -> xss
@@ -95,12 +97,19 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/webhooks/**", "/api/v1/webhooks/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers("/login", "/register").permitAll()
+                .requestMatchers("/login", "/register", "/forgot-password", "/reset-password").permitAll()
                 // Swagger/OpenAPI endpoints
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
                 .requestMatchers("/swagger-resources/**", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .defaultAuthenticationEntryPointFor(
+                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                    request -> request.getRequestURI().startsWith("/api/")
+                )
+                .authenticationEntryPoint((request, response, authException) -> response.sendRedirect("/login"))
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

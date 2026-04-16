@@ -72,6 +72,12 @@ public class User {
     @Column(name = "two_factor_backup_codes", columnDefinition = "TEXT")
     private String twoFactorBackupCodes;
 
+    @Column(name = "password_reset_token_hash", length = 64)
+    private String passwordResetTokenHash;
+
+    @Column(name = "password_reset_token_expires_at")
+    private LocalDateTime passwordResetTokenExpiresAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -293,5 +299,21 @@ public class User {
 
     public void setTwoFactorBackupCodes(String twoFactorBackupCodes) {
         this.twoFactorBackupCodes = twoFactorBackupCodes;
+    }
+
+    public String getPasswordResetTokenHash() {
+        return passwordResetTokenHash;
+    }
+
+    public void setPasswordResetTokenHash(String passwordResetTokenHash) {
+        this.passwordResetTokenHash = passwordResetTokenHash;
+    }
+
+    public LocalDateTime getPasswordResetTokenExpiresAt() {
+        return passwordResetTokenExpiresAt;
+    }
+
+    public void setPasswordResetTokenExpiresAt(LocalDateTime passwordResetTokenExpiresAt) {
+        this.passwordResetTokenExpiresAt = passwordResetTokenExpiresAt;
     }
 }

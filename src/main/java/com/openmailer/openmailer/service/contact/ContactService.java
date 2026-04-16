@@ -138,21 +138,13 @@ public class ContactService {
       contact.setEmail(updatedContact.getEmail());
     }
 
-    if (updatedContact.getFirstName() != null) {
-      contact.setFirstName(updatedContact.getFirstName());
-    }
-    if (updatedContact.getLastName() != null) {
-      contact.setLastName(updatedContact.getLastName());
-    }
-    if (updatedContact.getStatus() != null) {
-      contact.setStatus(updatedContact.getStatus());
-    }
-    if (updatedContact.getTags() != null) {
-      contact.setTags(updatedContact.getTags());
-    }
-    if (updatedContact.getCustomFields() != null) {
-      contact.setCustomFields(updatedContact.getCustomFields());
-    }
+    contact.setFirstName(updatedContact.getFirstName());
+    contact.setLastName(updatedContact.getLastName());
+    contact.setStatus(updatedContact.getStatus());
+    contact.setTags(updatedContact.getTags());
+    contact.setCustomFields(updatedContact.getCustomFields());
+    contact.setNotes(updatedContact.getNotes());
+    contact.setGdprConsent(updatedContact.getGdprConsent());
 
     contact.setUpdatedAt(LocalDateTime.now());
     return contactRepository.save(contact);

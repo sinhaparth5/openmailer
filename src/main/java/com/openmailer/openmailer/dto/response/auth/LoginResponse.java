@@ -12,6 +12,8 @@ public class LoginResponse {
   private String refreshToken;
   private String tokenType = "Bearer";
   private Integer expiresIn;
+  private Boolean requiresTwoFactor;
+  private String pendingTwoFactorToken;
   private UserInfo user;
 
   public LoginResponse() {
@@ -22,6 +24,14 @@ public class LoginResponse {
     this.refreshToken = refreshToken;
     this.expiresIn = expiresIn;
     this.user = user;
+  }
+
+  public static LoginResponse pendingTwoFactor(String pendingTwoFactorToken, UserInfo user) {
+    LoginResponse response = new LoginResponse();
+    response.setRequiresTwoFactor(true);
+    response.setPendingTwoFactorToken(pendingTwoFactorToken);
+    response.setUser(user);
+    return response;
   }
 
   // Nested UserInfo class
@@ -155,6 +165,22 @@ public class LoginResponse {
 
   public void setExpiresIn(Integer expiresIn) {
     this.expiresIn = expiresIn;
+  }
+
+  public Boolean getRequiresTwoFactor() {
+    return requiresTwoFactor;
+  }
+
+  public void setRequiresTwoFactor(Boolean requiresTwoFactor) {
+    this.requiresTwoFactor = requiresTwoFactor;
+  }
+
+  public String getPendingTwoFactorToken() {
+    return pendingTwoFactorToken;
+  }
+
+  public void setPendingTwoFactorToken(String pendingTwoFactorToken) {
+    this.pendingTwoFactorToken = pendingTwoFactorToken;
   }
 
   public UserInfo getUser() {

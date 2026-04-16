@@ -1,5 +1,6 @@
 package com.openmailer.openmailer.controller;
 
+import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.ContactList;
 import com.openmailer.openmailer.model.Domain;
 import com.openmailer.openmailer.model.EmailCampaign;
@@ -13,9 +14,14 @@ import com.openmailer.openmailer.repository.EmailProviderRepository;
 import com.openmailer.openmailer.repository.EmailTemplateRepository;
 import com.openmailer.openmailer.repository.SegmentRepository;
 import com.openmailer.openmailer.security.CustomUserDetails;
+import com.openmailer.openmailer.service.campaign.CampaignSendingService;
 import com.openmailer.openmailer.service.campaign.CampaignService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,7 +46,9 @@ import java.util.Map;
 public class CampaignsController {
 
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+    private static final DateTimeFormatter DATE_TIME_INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
     private final CampaignService campaignService;
+    private final CampaignSendingService campaignSendingService;
     private final EmailTemplateRepository templateRepository;
     private final ContactListRepository listRepository;
     private final SegmentRepository segmentRepository;
@@ -49,6 +57,7 @@ public class CampaignsController {
 
     public CampaignsController(
         CampaignService campaignService,
+        CampaignSendingService campaignSendingService,
         EmailTemplateRepository templateRepository,
         ContactListRepository listRepository,
         SegmentRepository segmentRepository,
@@ -56,6 +65,7 @@ public class CampaignsController {
         EmailProviderRepository providerRepository
     ) {
         this.campaignService = campaignService;
+        this.campaignSendingService = campaignSendingService;
         this.templateRepository = templateRepository;
         this.listRepository = listRepository;
         this.segmentRepository = segmentRepository;
@@ -103,8 +113,7 @@ public class CampaignsController {
 
     @GetMapping("/create")
     public String create(Model model) {
-        model.addAttribute("pageTitle", "Create Campaign - OpenMailer");
-        model.addAttribute("mode", "create");
+        populateFormMetadata(model, "Create Campaign - OpenMailer", "create");
         model.addAttribute("campaignForm", new CampaignForm());
         return "campaigns/form";
     }
@@ -112,11 +121,25 @@ public class CampaignsController {
     @PostMapping
     public String createCampaign(
         @AuthenticationPrincipal CustomUserDetails userDetails,
-        @ModelAttribute CampaignForm campaignForm,
+        @Valid @ModelAttribute("campaignForm") CampaignForm campaignForm,
+        BindingResult bindingResult,
+        Model model,
         RedirectAttributes redirectAttributes
     ) {
+        if (bindingResult.hasErrors()) {
+            populateFormMetadata(model, "Create Campaign - OpenMailer", "create");
+            return "campaigns/form";
+        }
+
         String userId = userDetails.getUser().getId();
-        EmailCampaign saved = campaignService.createCampaign(toEntity(campaignForm, userDetails.getUser(), userId));
+        EmailCampaign saved;
+        try {
+            saved = campaignService.createCampaign(toEntity(campaignForm, userDetails.getUser(), userId));
+        } catch (ValidationException ex) {
+            bindValidationError(bindingResult, ex);
+            populateFormMetadata(model, "Create Campaign - OpenMailer", "create");
+            return "campaigns/form";
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Campaign created successfully.");
         return "redirect:/campaigns/" + saved.getId();
     }
@@ -129,6 +152,8 @@ public class CampaignsController {
     ) {
         EmailCampaign campaign = campaignService.findByIdAndUserId(id, userDetails.getUser().getId());
         CampaignDetailView view = toDetailView(campaign);
+        LocalDateTime minimumScheduleTime = LocalDateTime.now().plusMinutes(15).withSecond(0).withNano(0);
+        LocalDateTime suggestedScheduleTime = minimumScheduleTime.plusHours(1);
 
         model.addAttribute("pageTitle", "Campaign Details - OpenMailer");
         model.addAttribute("campaign", view);
@@ -143,6 +168,12 @@ public class CampaignsController {
         model.addAttribute("clickRate", view.clickRate());
         model.addAttribute("bounceRate", view.bounceRate());
         model.addAttribute("complaintCount", view.complaintCount());
+        model.addAttribute("canSendNow", "DRAFT".equals(view.status()) || "SCHEDULED".equals(view.status()));
+        model.addAttribute("canSchedule", "DRAFT".equals(view.status()));
+        model.addAttribute("canCancelSchedule", "SCHEDULED".equals(view.status()));
+        model.addAttribute("minimumScheduledAt", minimumScheduleTime.format(DATE_TIME_INPUT_FORMAT));
+        model.addAttribute("suggestedScheduledAt", suggestedScheduleTime.format(DATE_TIME_INPUT_FORMAT));
+        model.addAttribute("actionStateMessage", actionStateMessage(view.status()));
 
         return "campaigns/view";
     }
@@ -153,8 +184,7 @@ public class CampaignsController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         Model model
     ) {
-        model.addAttribute("pageTitle", "Edit Campaign - OpenMailer");
-        model.addAttribute("mode", "edit");
+        populateFormMetadata(model, "Edit Campaign - OpenMailer", "edit");
         model.addAttribute("campaignForm", toForm(campaignService.findByIdAndUserId(id, userDetails.getUser().getId())));
         return "campaigns/form";
     }
@@ -163,11 +193,74 @@ public class CampaignsController {
     public String updateCampaign(
         @PathVariable String id,
         @AuthenticationPrincipal CustomUserDetails userDetails,
-        @ModelAttribute CampaignForm campaignForm,
+        @Valid @ModelAttribute("campaignForm") CampaignForm campaignForm,
+        BindingResult bindingResult,
+        Model model,
         RedirectAttributes redirectAttributes
     ) {
-        campaignService.updateCampaign(id, userDetails.getUser().getId(), toEntity(campaignForm, userDetails.getUser(), userDetails.getUser().getId()));
+        if (bindingResult.hasErrors()) {
+            populateFormMetadata(model, "Edit Campaign - OpenMailer", "edit");
+            return "campaigns/form";
+        }
+
+        try {
+            campaignService.updateCampaign(id, userDetails.getUser().getId(), toEntity(campaignForm, userDetails.getUser(), userDetails.getUser().getId()));
+        } catch (ValidationException ex) {
+            bindValidationError(bindingResult, ex);
+            populateFormMetadata(model, "Edit Campaign - OpenMailer", "edit");
+            return "campaigns/form";
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Campaign updated successfully.");
+        return "redirect:/campaigns/" + id;
+    }
+
+    @PostMapping("/{id}/send")
+    public String sendCampaign(
+        @PathVariable String id,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        RedirectAttributes redirectAttributes
+    ) {
+        try {
+            campaignService.startSendingCampaign(id, userDetails.getUser().getId());
+            campaignSendingService.sendCampaignAsync(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Campaign send started successfully.");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/campaigns/" + id;
+    }
+
+    @PostMapping("/{id}/schedule")
+    public String scheduleCampaign(
+        @PathVariable String id,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam("scheduledAt") String scheduledAt,
+        RedirectAttributes redirectAttributes
+    ) {
+        try {
+            if (scheduledAt == null || scheduledAt.isBlank()) {
+                throw new ValidationException("Choose a future date and time for scheduling.", "scheduledAt");
+            }
+            campaignService.scheduleCampaign(id, userDetails.getUser().getId(), LocalDateTime.parse(scheduledAt));
+            redirectAttributes.addFlashAttribute("successMessage", "Campaign scheduled successfully.");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/campaigns/" + id;
+    }
+
+    @PostMapping("/{id}/cancel")
+    public String cancelCampaign(
+        @PathVariable String id,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        RedirectAttributes redirectAttributes
+    ) {
+        try {
+            campaignService.cancelScheduledCampaign(id, userDetails.getUser().getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Scheduled send canceled.");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/campaigns/" + id;
     }
 
@@ -277,11 +370,18 @@ public class CampaignsController {
     }
 
     private EmailCampaign toEntity(CampaignForm form, User user, String userId) {
-        EmailTemplate template = templateRepository.findByIdAndUserId(form.templateId, userId).orElseThrow();
-        ContactList list = listRepository.findByIdAndUser_Id(form.listId, userId).orElseThrow();
-        Domain domain = domainRepository.findByIdAndUserId(form.domainId, userId).orElseThrow();
-        EmailProvider provider = providerRepository.findByIdAndUserId(form.providerId, userId).orElseThrow();
-        Segment segment = blank(form.segmentId) ? null : segmentRepository.findByIdAndUserId(form.segmentId, userId).orElse(null);
+        EmailTemplate template = templateRepository.findByIdAndUserId(form.templateId, userId)
+            .orElseThrow(() -> new ValidationException("Selected template is invalid.", "templateId"));
+        ContactList list = listRepository.findByIdAndUser_Id(form.listId, userId)
+            .orElseThrow(() -> new ValidationException("Selected contact list is invalid.", "listId"));
+        Domain domain = domainRepository.findByIdAndUserId(form.domainId, userId)
+            .orElseThrow(() -> new ValidationException("Selected domain is invalid.", "domainId"));
+        EmailProvider provider = providerRepository.findByIdAndUserId(form.providerId, userId)
+            .orElseThrow(() -> new ValidationException("Selected provider is invalid.", "providerId"));
+        Segment segment = blank(form.segmentId)
+            ? null
+            : segmentRepository.findByIdAndUserId(form.segmentId, userId)
+                .orElseThrow(() -> new ValidationException("Selected segment is invalid.", "segmentId"));
 
         EmailCampaign campaign = new EmailCampaign();
         campaign.setName(form.name.trim());
@@ -302,6 +402,29 @@ public class CampaignsController {
         campaign.setCreatedBy(user);
         campaign.setUserId(userId);
         return campaign;
+    }
+
+    private void populateFormMetadata(Model model, String pageTitle, String mode) {
+        model.addAttribute("pageTitle", pageTitle);
+        model.addAttribute("mode", mode);
+    }
+
+    private String actionStateMessage(String status) {
+        return switch (status) {
+            case "DRAFT" -> "This draft is ready for a final review, an immediate send, or a scheduled delivery window.";
+            case "SCHEDULED" -> "This campaign is queued for later delivery. You can still send it immediately or cancel the scheduled time.";
+            case "SENDING" -> "Delivery has started. Configuration is locked while recipients are being processed.";
+            case "SENT" -> "This campaign has completed its send flow. Review the metrics and duplicate the setup pattern in a new draft if needed.";
+            default -> "This campaign is not in a state where delivery actions are available.";
+        };
+    }
+
+    private void bindValidationError(BindingResult bindingResult, ValidationException ex) {
+        if (ex.getField() != null && !ex.getField().isBlank()) {
+            bindingResult.rejectValue(ex.getField(), "validation", ex.getMessage());
+            return;
+        }
+        bindingResult.reject("validation", ex.getMessage());
     }
 
     private boolean blank(String value) {
@@ -390,16 +513,25 @@ public class CampaignsController {
 
     public static class CampaignForm {
         private String id;
+        @NotBlank(message = "Campaign name is required.")
         private String name;
+        @NotBlank(message = "Select a template.")
         private String templateId;
+        @NotBlank(message = "Select a contact list.")
         private String listId;
         private String segmentId;
+        @NotBlank(message = "Subject line is required.")
         private String subjectLine;
         private String previewText;
+        @NotBlank(message = "From name is required.")
         private String fromName;
+        @NotBlank(message = "From email is required.")
+        @Email(message = "Enter a valid from email address.")
         private String fromEmail;
         private String replyToEmail;
+        @NotBlank(message = "Select a verified domain.")
         private String domainId;
+        @NotBlank(message = "Select an active provider.")
         private String providerId;
         private boolean trackOpens = true;
         private boolean trackClicks = true;

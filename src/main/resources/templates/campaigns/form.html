@@ -21,6 +21,46 @@
             Campaign creation still depends on a template, a list, a verified domain, and an active provider.
         </div>
 
+        <section class="mb-5 app-panel p-5">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="app-kicker">Readiness</p>
+                    <h2 class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Prerequisites for a sendable draft</h2>
+                    <p class="mt-2 max-w-2xl text-sm leading-7 text-slate-600">A campaign can only move cleanly through draft, schedule, and send states if these dependencies already exist on the account.</p>
+                </div>
+                <span th:classappend="${campaignDependenciesReady} ? 'bg-[var(--app-mint)]/72 text-emerald-950' : 'bg-[var(--app-sun)]/72 text-amber-950'"
+                      class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]">
+                    <span th:text="${campaignDependenciesReady} ? 'Ready' : 'Needs setup'">Ready</span>
+                </span>
+            </div>
+            <div class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="app-soft-card p-4">
+                    <p class="text-sm font-medium text-slate-500">Templates</p>
+                    <p class="mt-3 text-2xl font-semibold text-slate-950" th:text="${#lists.size(templateOptions)}">0</p>
+                    <p class="mt-2 text-xs" th:classappend="${#lists.size(templateOptions) > 0} ? 'text-emerald-700' : 'text-amber-700'"
+                       th:text="${#lists.size(templateOptions) > 0} ? 'Available for campaign content.' : 'Add at least one template before sending.'">Status</p>
+                </div>
+                <div class="app-soft-card p-4">
+                    <p class="text-sm font-medium text-slate-500">Contact lists</p>
+                    <p class="mt-3 text-2xl font-semibold text-slate-950" th:text="${#lists.size(listOptions)}">0</p>
+                    <p class="mt-2 text-xs" th:classappend="${#lists.size(listOptions) > 0} ? 'text-emerald-700' : 'text-amber-700'"
+                       th:text="${#lists.size(listOptions) > 0} ? 'Audience source is available.' : 'Create or import a list first.'">Status</p>
+                </div>
+                <div class="app-soft-card p-4">
+                    <p class="text-sm font-medium text-slate-500">Verified domains</p>
+                    <p class="mt-3 text-2xl font-semibold text-slate-950" th:text="${#lists.size(domainOptions)}">0</p>
+                    <p class="mt-2 text-xs" th:classappend="${#lists.size(domainOptions) > 0} ? 'text-emerald-700' : 'text-amber-700'"
+                       th:text="${#lists.size(domainOptions) > 0} ? 'At least one sender domain is ready.' : 'Verify a domain before delivery.'">Status</p>
+                </div>
+                <div class="app-soft-card p-4">
+                    <p class="text-sm font-medium text-slate-500">Active providers</p>
+                    <p class="mt-3 text-2xl font-semibold text-slate-950" th:text="${#lists.size(providerOptions)}">0</p>
+                    <p class="mt-2 text-xs" th:classappend="${#lists.size(providerOptions) > 0} ? 'text-emerald-700' : 'text-amber-700'"
+                       th:text="${#lists.size(providerOptions) > 0} ? 'A delivery provider is ready.' : 'Activate a provider to unlock sending.'">Status</p>
+                </div>
+            </div>
+        </section>
+
         <div class="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div class="rounded-[24px] bg-[var(--app-sun)]/62 p-5">
                 <p class="text-sm font-medium text-slate-600">Templates</p>
@@ -41,10 +81,14 @@
         </div>
 
         <form th:action="${mode == 'edit'} ? @{/campaigns/{id}/edit(id=${campaignForm.id})} : @{/campaigns}"
+              th:object="${campaignForm}"
               method="post"
               data-enhanced-post="true"
               class="grid gap-5 xl:grid-cols-[1.12fr_0.88fr]">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <div th:if="${#fields.hasGlobalErrors()}" class="xl:col-span-2 rounded-[24px] border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-800">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Form error</p>
+            </div>
 
             <div class="space-y-5">
                 <section class="app-panel-strong p-6">
@@ -52,27 +96,32 @@
                     <div class="mt-5 grid gap-5 md:grid-cols-2">
                         <div class="md:col-span-2">
                             <label for="name" class="mb-2 block text-sm font-medium text-slate-700">Campaign name</label>
-                            <input id="name" name="name" type="text" required th:value="${campaignForm.name}" class="app-input">
+                            <input id="name" th:field="*{name}" type="text" required class="app-input">
+                            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="mt-2 text-sm text-rose-700">Name error</p>
                         </div>
                         <div class="md:col-span-2">
                             <label for="subjectLine" class="mb-2 block text-sm font-medium text-slate-700">Subject line</label>
-                            <input id="subjectLine" name="subjectLine" type="text" required th:value="${campaignForm.subjectLine}" class="app-input">
+                            <input id="subjectLine" th:field="*{subjectLine}" type="text" required class="app-input">
+                            <p th:if="${#fields.hasErrors('subjectLine')}" th:errors="*{subjectLine}" class="mt-2 text-sm text-rose-700">Subject error</p>
                         </div>
                         <div class="md:col-span-2">
                             <label for="previewText" class="mb-2 block text-sm font-medium text-slate-700">Preview text</label>
-                            <input id="previewText" name="previewText" type="text" th:value="${campaignForm.previewText}" class="app-input">
+                            <input id="previewText" th:field="*{previewText}" type="text" class="app-input">
                         </div>
                         <div>
                             <label for="fromName" class="mb-2 block text-sm font-medium text-slate-700">From name</label>
-                            <input id="fromName" name="fromName" type="text" required th:value="${campaignForm.fromName}" class="app-input">
+                            <input id="fromName" th:field="*{fromName}" type="text" required class="app-input">
+                            <p th:if="${#fields.hasErrors('fromName')}" th:errors="*{fromName}" class="mt-2 text-sm text-rose-700">From name error</p>
                         </div>
                         <div>
                             <label for="fromEmail" class="mb-2 block text-sm font-medium text-slate-700">From email</label>
-                            <input id="fromEmail" name="fromEmail" type="email" required th:value="${campaignForm.fromEmail}" class="app-input">
+                            <input id="fromEmail" th:field="*{fromEmail}" type="email" required class="app-input">
+                            <p th:if="${#fields.hasErrors('fromEmail')}" th:errors="*{fromEmail}" class="mt-2 text-sm text-rose-700">From email error</p>
                         </div>
                         <div class="md:col-span-2">
                             <label for="replyToEmail" class="mb-2 block text-sm font-medium text-slate-700">Reply-to email</label>
-                            <input id="replyToEmail" name="replyToEmail" type="email" th:value="${campaignForm.replyToEmail}" class="app-input">
+                            <input id="replyToEmail" th:field="*{replyToEmail}" type="email" class="app-input">
+                            <p th:if="${#fields.hasErrors('replyToEmail')}" th:errors="*{replyToEmail}" class="mt-2 text-sm text-rose-700">Reply-to error</p>
                         </div>
                     </div>
                 </section>
@@ -82,38 +131,47 @@
                     <div class="mt-5 grid gap-5 md:grid-cols-2">
                         <div>
                             <label for="templateId" class="mb-2 block text-sm font-medium text-slate-700">Template</label>
-                            <select id="templateId" name="templateId" required class="app-select">
+                            <select id="templateId" th:field="*{templateId}" required class="app-select">
                                 <option value="">Select template</option>
-                                <option th:each="template : ${templateOptions}" th:value="${template.id}" th:text="${template.name}" th:selected="${template.id == campaignForm.templateId}">Template</option>
+                                <option th:each="template : ${templateOptions}" th:value="${template.id}" th:text="${template.name}">Template</option>
                             </select>
+                            <p th:if="${#fields.hasErrors('templateId')}" th:errors="*{templateId}" class="mt-2 text-sm text-rose-700">Template error</p>
                         </div>
                         <div>
-                            <label for="listId" class="mb-2 block text-sm font-medium text-slate-700">Contact list</label>
-                            <select id="listId" name="listId" required class="app-select">
+                            <div class="mb-2 flex items-center justify-between gap-3">
+                                <label for="listId" class="block text-sm font-medium text-slate-700">Contact list</label>
+                                <a href="/contacts/lists" class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 transition hover:text-slate-900">Manage lists</a>
+                            </div>
+                            <select id="listId" th:field="*{listId}" required class="app-select">
                                 <option value="">Select list</option>
-                                <option th:each="list : ${listOptions}" th:value="${list.id}" th:text="${list.name}" th:selected="${list.id == campaignForm.listId}">List</option>
+                                <option th:each="list : ${listOptions}" th:value="${list.id}" th:text="${list.name}">List</option>
                             </select>
+                            <p th:if="${#lists.isEmpty(listOptions)}" class="mt-2 text-sm text-slate-500">No contact lists yet. Create one before saving this campaign.</p>
+                            <p th:if="${#fields.hasErrors('listId')}" th:errors="*{listId}" class="mt-2 text-sm text-rose-700">List error</p>
                         </div>
                         <div>
                             <label for="segmentId" class="mb-2 block text-sm font-medium text-slate-700">Segment</label>
-                            <select id="segmentId" name="segmentId" class="app-select">
+                            <select id="segmentId" th:field="*{segmentId}" class="app-select">
                                 <option value="">No segment override</option>
-                                <option th:each="segment : ${segmentOptions}" th:value="${segment.id}" th:text="${segment.name}" th:selected="${segment.id == campaignForm.segmentId}">Segment</option>
+                                <option th:each="segment : ${segmentOptions}" th:value="${segment.id}" th:text="${segment.name}">Segment</option>
                             </select>
+                            <p th:if="${#fields.hasErrors('segmentId')}" th:errors="*{segmentId}" class="mt-2 text-sm text-rose-700">Segment error</p>
                         </div>
                         <div>
                             <label for="domainId" class="mb-2 block text-sm font-medium text-slate-700">Verified domain</label>
-                            <select id="domainId" name="domainId" required class="app-select">
+                            <select id="domainId" th:field="*{domainId}" required class="app-select">
                                 <option value="">Select verified domain</option>
-                                <option th:each="domain : ${domainOptions}" th:value="${domain.id}" th:text="${domain.domainName}" th:selected="${domain.id == campaignForm.domainId}">Domain</option>
+                                <option th:each="domain : ${domainOptions}" th:value="${domain.id}" th:text="${domain.domainName}">Domain</option>
                             </select>
+                            <p th:if="${#fields.hasErrors('domainId')}" th:errors="*{domainId}" class="mt-2 text-sm text-rose-700">Domain error</p>
                         </div>
                         <div class="md:col-span-2">
                             <label for="providerId" class="mb-2 block text-sm font-medium text-slate-700">Active provider</label>
-                            <select id="providerId" name="providerId" required class="app-select">
+                            <select id="providerId" th:field="*{providerId}" required class="app-select">
                                 <option value="">Select provider</option>
-                                <option th:each="provider : ${providerOptions}" th:value="${provider.id}" th:text="${provider.providerName}" th:selected="${provider.id == campaignForm.providerId}">Provider</option>
+                                <option th:each="provider : ${providerOptions}" th:value="${provider.id}" th:text="${provider.providerName}">Provider</option>
                             </select>
+                            <p th:if="${#fields.hasErrors('providerId')}" th:errors="*{providerId}" class="mt-2 text-sm text-rose-700">Provider error</p>
                         </div>
                     </div>
                 </section>
@@ -124,11 +182,11 @@
                     <p class="app-kicker">Tracking</p>
                     <div class="mt-5 space-y-4">
                         <label class="app-soft-card flex items-center gap-3 px-4 py-3">
-                            <input type="checkbox" name="trackOpens" th:checked="${campaignForm.trackOpens}">
+                            <input type="checkbox" th:field="*{trackOpens}">
                             <span class="text-sm text-slate-700">Track opens</span>
                         </label>
                         <label class="app-soft-card flex items-center gap-3 px-4 py-3">
-                            <input type="checkbox" name="trackClicks" th:checked="${campaignForm.trackClicks}">
+                            <input type="checkbox" th:field="*{trackClicks}">
                             <span class="text-sm text-slate-700">Track clicks</span>
                         </label>
                     </div>
@@ -137,7 +195,7 @@
                 <section class="rounded-[28px] bg-[#1f2128] p-6 text-white shadow-[0_28px_60px_-34px_rgba(15,23,42,0.6)]">
                     <p class="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">Save Draft</p>
                     <h2 class="mt-4 text-2xl font-semibold">Keep campaign creation deliberate.</h2>
-                    <p class="mt-3 text-sm leading-7 text-white/70">This draft-oriented workflow is styled to match the new dashboard direction and only enables edit flows the backend actually supports.</p>
+                    <p class="mt-3 text-sm leading-7 text-white/70" th:text="${campaignDependenciesReady} ? 'All required pieces are in place, so this draft can move directly into schedule or send actions once saved.' : 'You can still shape the draft, but delivery actions stay blocked until all required dependencies exist.'">This draft-oriented workflow is styled to match the new dashboard direction and only enables edit flows the backend actually supports.</p>
                     <div class="mt-6 flex flex-wrap gap-3">
                         <a href="/campaigns" class="app-button-secondary px-5 py-3 text-sm">Back</a>
                         <button type="submit"

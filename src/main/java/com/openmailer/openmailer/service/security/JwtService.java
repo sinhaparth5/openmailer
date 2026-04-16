@@ -23,6 +23,8 @@ public class JwtService {
   private static final String DEFAULT_SECRET = "openmailer-secret-key-change-this-in-production-to-a-secure-random-value";
   private static final String TOKEN_TYPE_ACCESS = "access";
   private static final String TOKEN_TYPE_REFRESH = "refresh";
+  private static final String TOKEN_TYPE_PENDING_2FA = "pending-2fa";
+  private static final long PENDING_TWO_FACTOR_EXPIRATION = 5 * 60 * 1000L;
 
   private final String secret;
 
@@ -76,6 +78,10 @@ public class JwtService {
    */
   public String generateRefreshToken(String userId, String email, String username, String role) {
     return generateToken(buildClaims(userId, email, username, role, TOKEN_TYPE_REFRESH), email, refreshTokenExpiration);
+  }
+
+  public String generatePendingTwoFactorToken(String userId, String email, String username, String role) {
+    return generateToken(buildClaims(userId, email, username, role, TOKEN_TYPE_PENDING_2FA), email, PENDING_TWO_FACTOR_EXPIRATION);
   }
 
   /**

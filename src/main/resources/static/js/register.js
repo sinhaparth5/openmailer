@@ -64,7 +64,48 @@ function getErrorMessage(result) {
     return 'Registration failed. Please check your details and try again.';
 }
 
+function getPasswordChecks(password, confirmPassword) {
+    return {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /\d/.test(password),
+        special: /[^A-Za-z\d]/.test(password),
+        match: password.length > 0 && password === confirmPassword
+    };
+}
+
+function setRuleState(elementId, isValid) {
+    const element = document.getElementById(elementId);
+    if (!element) {
+        return;
+    }
+
+    const dot = element.querySelector('span');
+    element.classList.toggle('text-emerald-700', isValid);
+    element.classList.toggle('text-slate-600', !isValid);
+    dot.classList.toggle('bg-emerald-500', isValid);
+    dot.classList.toggle('bg-slate-300', !isValid);
+}
+
+function updatePasswordFeedback() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const checks = getPasswordChecks(password, confirmPassword);
+
+    setRuleState('passwordRuleLength', checks.length);
+    setRuleState('passwordRuleUpper', checks.upper);
+    setRuleState('passwordRuleLower', checks.lower);
+    setRuleState('passwordRuleNumber', checks.number);
+    setRuleState('passwordRuleSpecial', checks.special);
+    setRuleState('passwordRuleMatch', checks.match);
+
+    return checks;
+}
+
 document.getElementById('togglePasswordButton').addEventListener('click', togglePasswordVisibility);
+document.getElementById('password').addEventListener('input', updatePasswordFeedback);
+document.getElementById('confirmPassword').addEventListener('input', updatePasswordFeedback);
 
 document.getElementById('registerForm').addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -72,6 +113,12 @@ document.getElementById('registerForm').addEventListener('submit', async (event)
 
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
+    const checks = updatePasswordFeedback();
+
+    if (!checks.length || !checks.upper || !checks.lower || !checks.number || !checks.special) {
+        showAlert('Password does not meet the required rules yet.');
+        return;
+    }
 
     if (password !== confirmPassword) {
         showAlert('Passwords do not match.');
@@ -123,3 +170,5 @@ document.getElementById('registerForm').addEventListener('submit', async (event)
         setLoadingState(false);
     }
 });
+
+updatePasswordFeedback();

@@ -155,24 +155,20 @@ public class CampaignService {
       throw new ValidationException("Can only edit campaigns in DRAFT status", "status");
     }
 
-    if (updatedCampaign.getName() != null) {
-      campaign.setName(updatedCampaign.getName());
-    }
-    if (updatedCampaign.getSubject() != null) {
-      campaign.setSubject(updatedCampaign.getSubject());
-    }
-    if (updatedCampaign.getPreviewText() != null) {
-      campaign.setPreviewText(updatedCampaign.getPreviewText());
-    }
-    if (updatedCampaign.getFromName() != null) {
-      campaign.setFromName(updatedCampaign.getFromName());
-    }
-    if (updatedCampaign.getFromEmail() != null) {
-      campaign.setFromEmail(updatedCampaign.getFromEmail());
-    }
-    if (updatedCampaign.getReplyToEmail() != null) {
-      campaign.setReplyToEmail(updatedCampaign.getReplyToEmail());
-    }
+    campaign.setName(updatedCampaign.getName());
+    campaign.setTemplate(updatedCampaign.getTemplate());
+    campaign.setContactList(updatedCampaign.getContactList());
+    campaign.setSegment(updatedCampaign.getSegment());
+    campaign.setSubject(updatedCampaign.getSubject());
+    campaign.setPreviewText(updatedCampaign.getPreviewText());
+    campaign.setFromName(updatedCampaign.getFromName());
+    campaign.setFromEmail(updatedCampaign.getFromEmail());
+    campaign.setReplyToEmail(updatedCampaign.getReplyToEmail());
+    campaign.setDomain(updatedCampaign.getDomain());
+    campaign.setProvider(updatedCampaign.getProvider());
+    campaign.setTrackOpens(updatedCampaign.getTrackOpens());
+    campaign.setTrackClicks(updatedCampaign.getTrackClicks());
+    campaign.setTotalRecipients(updatedCampaign.getTotalRecipients());
 
     campaign.setUpdatedAt(LocalDateTime.now());
     return campaignRepository.save(campaign);
@@ -206,12 +202,58 @@ public class CampaignService {
   public EmailCampaign scheduleCampaign(String id, String userId, LocalDateTime scheduledAt) {
     EmailCampaign campaign = findByIdAndUserId(id, userId);
 
+    if (!"DRAFT".equals(campaign.getStatus())) {
+      throw new ValidationException("Can only schedule campaigns in DRAFT status", "status");
+    }
+
     if (scheduledAt.isBefore(LocalDateTime.now())) {
       throw new ValidationException("Scheduled time must be in the future", "scheduledAt");
     }
 
     campaign.setScheduledAt(scheduledAt);
     campaign.setStatus("SCHEDULED");
+    campaign.setUpdatedAt(LocalDateTime.now());
+    return campaignRepository.save(campaign);
+  }
+
+  /**
+   * Start sending a campaign immediately.
+   *
+   * @param id the ID (String)
+   * @param userId the ID (String)
+   * @return the updated campaign
+   */
+  @CacheEvict(value = "campaignStats", allEntries = true)
+  public EmailCampaign startSendingCampaign(String id, String userId) {
+    EmailCampaign campaign = findByIdAndUserId(id, userId);
+
+    if (!"DRAFT".equals(campaign.getStatus()) && !"SCHEDULED".equals(campaign.getStatus())) {
+      throw new ValidationException("Campaign is not in a sendable state", "status");
+    }
+
+    campaign.setStatus("SENDING");
+    campaign.setSentAt(LocalDateTime.now());
+    campaign.setUpdatedAt(LocalDateTime.now());
+    return campaignRepository.save(campaign);
+  }
+
+  /**
+   * Cancel a scheduled campaign and move it back to draft.
+   *
+   * @param id the ID (String)
+   * @param userId the ID (String)
+   * @return the updated campaign
+   */
+  @CacheEvict(value = "campaignStats", allEntries = true)
+  public EmailCampaign cancelScheduledCampaign(String id, String userId) {
+    EmailCampaign campaign = findByIdAndUserId(id, userId);
+
+    if (!"SCHEDULED".equals(campaign.getStatus())) {
+      throw new ValidationException("Can only cancel scheduled campaigns", "status");
+    }
+
+    campaign.setStatus("DRAFT");
+    campaign.setScheduledAt(null);
     campaign.setUpdatedAt(LocalDateTime.now());
     return campaignRepository.save(campaign);
   }

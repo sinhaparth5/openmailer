@@ -147,6 +147,50 @@ public class UserService {
   }
 
   /**
+   * Record a successful login timestamp for the user.
+   *
+   * @param id the user ID
+   * @param loginAt when the login succeeded
+   * @return the updated user
+   */
+  @CacheEvict(value = "users", allEntries = true)
+  public User recordSuccessfulLogin(String id, LocalDateTime loginAt) {
+    User user = findById(id);
+    user.setLastLoginAt(loginAt);
+    user.setFailedLoginAttempts(0);
+    user.setAccountLockedUntil(null);
+    user.setUpdatedAt(LocalDateTime.now());
+    return userRepository.save(user);
+  }
+
+  /**
+   * Record a failed login attempt and optionally lock the account.
+   *
+   * @param id the user ID
+   * @param lockUntil lock timestamp when threshold is reached, otherwise null
+   * @return the updated user
+   */
+  @CacheEvict(value = "users", allEntries = true)
+  public User recordFailedLoginAttempt(String id, LocalDateTime lockUntil) {
+    User user = findById(id);
+    int failedAttempts = user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts();
+    user.setFailedLoginAttempts(failedAttempts + 1);
+    if (lockUntil != null) {
+      user.setAccountLockedUntil(lockUntil);
+    }
+    user.setUpdatedAt(LocalDateTime.now());
+    return userRepository.save(user);
+  }
+
+  @CacheEvict(value = "users", allEntries = true)
+  public User updatePassword(String id, String encodedPassword) {
+    User user = findById(id);
+    user.setPassword(encodedPassword);
+    user.setUpdatedAt(LocalDateTime.now());
+    return userRepository.save(user);
+  }
+
+  /**
    * Delete user (GDPR compliance).
    *
    * @param id the user ID
