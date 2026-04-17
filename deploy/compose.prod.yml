@@ -1,5 +1,5 @@
 services:
-  app:
+  openmailer-app:
     image: ${OPENMAILER_IMAGE}
     container_name: openmailer-app
     restart: unless-stopped
