@@ -3,6 +3,7 @@ package com.openmailer.openmailer.model;
 import com.openmailer.openmailer.util.IdGenerator;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "contact_list_memberships")
@@ -78,6 +79,7 @@ public class ContactListMembership {
 
     public void setContact(Contact contact) {
         this.contact = contact;
+        this.contactId = contact != null ? contact.getId() : null;
     }
 
     public ContactList getContactList() {
@@ -86,6 +88,7 @@ public class ContactListMembership {
 
     public void setContactList(ContactList contactList) {
         this.contactList = contactList;
+        this.listId = contactList != null ? contactList.getId() : null;
     }
 
     public String getStatus() {
@@ -126,6 +129,15 @@ public class ContactListMembership {
 
     public void setContactId(String contactId) {
         this.contactId = contactId;
+        if (contactId == null) {
+            this.contact = null;
+            return;
+        }
+        if (this.contact == null || !Objects.equals(this.contact.getId(), contactId)) {
+            Contact contact = new Contact();
+            contact.setId(contactId);
+            this.contact = contact;
+        }
     }
 
     public String getListId() {
@@ -134,6 +146,15 @@ public class ContactListMembership {
 
     public void setListId(String listId) {
         this.listId = listId;
+        if (listId == null) {
+            this.contactList = null;
+            return;
+        }
+        if (this.contactList == null || !Objects.equals(this.contactList.getId(), listId)) {
+            ContactList contactList = new ContactList();
+            contactList.setId(listId);
+            this.contactList = contactList;
+        }
     }
 
     public LocalDateTime getAddedAt() {

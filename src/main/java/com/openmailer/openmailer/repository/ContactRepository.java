@@ -57,6 +57,12 @@ public interface ContactRepository extends JpaRepository<Contact, String> {
    */
   Optional<Contact> findByEmailAndUser_Id(String email, String userId);
 
+  @Query("""
+      SELECT c FROM Contact c
+      WHERE c.user.id = :userId AND LOWER(c.email) = LOWER(:email)
+  """)
+  Optional<Contact> findByEmailIgnoreCaseAndUserId(@Param("email") String email, @Param("userId") String userId);
+
   /**
    * Find contacts by status.
    *
@@ -163,6 +169,13 @@ public interface ContactRepository extends JpaRepository<Contact, String> {
    * @return true if email exists, false otherwise
    */
   boolean existsByEmailAndUser_Id(String email, String userId);
+
+  @Query("""
+      SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END
+      FROM Contact c
+      WHERE c.user.id = :userId AND LOWER(c.email) = LOWER(:email)
+  """)
+  boolean existsByEmailIgnoreCaseAndUserId(@Param("email") String email, @Param("userId") String userId);
 
   /**
    * Delete all contacts for a specific user.
