@@ -94,6 +94,8 @@ public class ContactImportService {
                     Contact contact = processRow(row, user, skipDuplicates);
                     if (contact != null) {
                         contactsToSave.add(contact);
+                    } else {
+                        job.setSkippedCount(job.getSkippedCount() + 1);
                     }
 
                     // Batch insert
@@ -348,6 +350,7 @@ public class ContactImportService {
         private String status;
         private int totalRows;
         private int importedCount = 0;
+        private int skippedCount = 0;
         private int errorCount = 0;
         private LocalDateTime startedAt;
         private LocalDateTime completedAt;
@@ -407,6 +410,14 @@ public class ContactImportService {
 
         public void setErrorCount(int errorCount) {
             this.errorCount = errorCount;
+        }
+
+        public int getSkippedCount() {
+            return skippedCount;
+        }
+
+        public void setSkippedCount(int skippedCount) {
+            this.skippedCount = skippedCount;
         }
 
         public LocalDateTime getStartedAt() {

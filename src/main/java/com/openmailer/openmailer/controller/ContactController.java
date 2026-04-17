@@ -123,11 +123,11 @@ public class ContactController {
         // Check if contact already exists
         if (contactService.emailExists(request.getEmail(), user.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.error("CONTACT_EXISTS", "Contact with this email already exists", "email"));
+                    .body(ApiResponse.error("CONTACT_EXISTS", "A contact with this email already exists for your account.", "email"));
         }
 
         Contact contact = new Contact();
-        contact.setEmail(request.getEmail());
+        contact.setEmail(request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null);
         contact.setFirstName(request.getFirstName());
         contact.setLastName(request.getLastName());
 
@@ -170,13 +170,13 @@ public class ContactController {
         }
 
         // Check if email is being changed and already exists
-        if (!contact.getEmail().equals(request.getEmail()) &&
+        if (!contact.getEmail().equalsIgnoreCase(request.getEmail()) &&
                 contactService.emailExists(request.getEmail(), user.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.error("CONTACT_EXISTS", "Contact with this email already exists", "email"));
+                    .body(ApiResponse.error("CONTACT_EXISTS", "A contact with this email already exists for your account.", "email"));
         }
 
-        contact.setEmail(request.getEmail());
+        contact.setEmail(request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null);
         contact.setFirstName(request.getFirstName());
         contact.setLastName(request.getLastName());
 

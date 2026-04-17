@@ -36,12 +36,14 @@ public class ContactService {
    * @throws ValidationException if email already exists for user
    */
   public Contact createContact(Contact contact) {
+    String normalizedEmail = normalizeEmail(contact.getEmail());
+    contact.setEmail(normalizedEmail);
 
-    if (contactRepository.existsByEmailAndUser_Id(
-        contact.getEmail(),
+    if (contactRepository.existsByEmailIgnoreCaseAndUserId(
+        normalizedEmail,
         contact.getUser().getId()
     )) {
-      throw new ValidationException("Contact with this email already exists", "email");
+      throw new ValidationException("A contact with this email already exists for your account.", "email");
     }
 
     if (contact.getStatus() == null) {
@@ -77,7 +79,7 @@ public class ContactService {
    */
   @Transactional(readOnly = true)
   public Contact findByEmail(String email, String userId) {
-    return contactRepository.findByEmailAndUser_Id(email, userId)
+    return contactRepository.findByEmailIgnoreCaseAndUserId(normalizeEmail(email), userId)
         .orElseThrow(() -> new ResourceNotFoundException("Contact", "email", email));
   }
 
@@ -128,14 +130,17 @@ public class ContactService {
 
     Contact contact = findByIdAndUserId(id, userId);
 
-    if (updatedContact.getEmail() != null &&
-        !updatedContact.getEmail().equals(contact.getEmail())) {
+    String normalizedExistingEmail = normalizeEmail(contact.getEmail());
+    String normalizedUpdatedEmail = normalizeEmail(updatedContact.getEmail());
 
-      if (contactRepository.existsByEmailAndUser_Id(updatedContact.getEmail(), userId)) {
-        throw new ValidationException("Contact with this email already exists", "email");
+    if (normalizedUpdatedEmail != null &&
+        !normalizedUpdatedEmail.equals(normalizedExistingEmail)) {
+
+      if (contactRepository.existsByEmailIgnoreCaseAndUserId(normalizedUpdatedEmail, userId)) {
+        throw new ValidationException("A contact with this email already exists for your account.", "email");
       }
 
-      contact.setEmail(updatedContact.getEmail());
+      contact.setEmail(normalizedUpdatedEmail);
     }
 
     contact.setFirstName(updatedContact.getFirstName());
@@ -221,7 +226,11 @@ public class ContactService {
    */
   @Transactional(readOnly = true)
   public boolean emailExists(String email, String userId) {
-    return contactRepository.existsByEmailAndUser_Id(email, userId);
+    return contactRepository.existsByEmailIgnoreCaseAndUserId(normalizeEmail(email), userId);
+  }
+
+  private String normalizeEmail(String email) {
+    return email == null ? null : email.trim().toLowerCase();
   }
 
   /**

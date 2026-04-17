@@ -23,7 +23,6 @@
         <form th:action="${mode == 'edit'} ? @{/contacts/{id}/edit(id=${contactForm.id})} : @{/contacts}"
               th:object="${contactForm}"
               method="post"
-              data-enhanced-post="true"
               class="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <div th:if="${#fields.hasGlobalErrors()}" class="xl:col-span-2 rounded-[24px] border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-800">

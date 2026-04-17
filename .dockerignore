@@ -49,6 +49,9 @@ src/main/resources/static/css/output.css
 # Logs
 *.log
 
+# Local runtime state for experimental proxy stacks
+docker/open-appsec/
+
 # Railway specific
 railway.yaml
 .railway/

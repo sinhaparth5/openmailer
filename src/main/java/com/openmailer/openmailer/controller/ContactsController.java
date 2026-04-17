@@ -150,9 +150,9 @@ public class ContactsController {
         try {
             ContactList list = new ContactList();
             list.setUser(userDetails.getUser());
-            list.setName(contactListForm.name != null ? contactListForm.name.trim() : null);
-            list.setDescription(blankToNull(contactListForm.description));
-            list.setDoubleOptInEnabled(contactListForm.doubleOptInEnabled);
+            list.setName(contactListForm.getName() != null ? contactListForm.getName().trim() : null);
+            list.setDescription(blankToNull(contactListForm.getDescription()));
+            list.setDoubleOptInEnabled(contactListForm.getDoubleOptInEnabled());
             contactListService.createContactList(list);
         } catch (ValidationException ex) {
             bindValidationError(bindingResult, ex);
@@ -208,9 +208,9 @@ public class ContactsController {
 
         try {
             ContactList updatedList = new ContactList();
-            updatedList.setName(contactListForm.name != null ? contactListForm.name.trim() : null);
-            updatedList.setDescription(blankToNull(contactListForm.description));
-            updatedList.setDoubleOptInEnabled(contactListForm.doubleOptInEnabled);
+            updatedList.setName(contactListForm.getName() != null ? contactListForm.getName().trim() : null);
+            updatedList.setDescription(blankToNull(contactListForm.getDescription()));
+            updatedList.setDoubleOptInEnabled(contactListForm.getDoubleOptInEnabled());
             contactListService.updateContactList(id, userId, updatedList);
         } catch (ValidationException ex) {
             bindValidationError(bindingResult, ex);
@@ -429,7 +429,7 @@ public class ContactsController {
     private Contact toEntity(ContactForm form, User user) {
         Contact contact = new Contact();
         contact.setUser(user);
-        contact.setEmail(form.email != null ? form.email.trim() : null);
+        contact.setEmail(form.email != null ? form.email.trim().toLowerCase(Locale.ROOT) : null);
         contact.setFirstName(blankToNull(form.firstName));
         contact.setLastName(blankToNull(form.lastName));
         contact.setStatus(blankToNull(form.status) != null ? form.status : "SUBSCRIBED");
@@ -590,9 +590,9 @@ public class ContactsController {
 
     private ContactListForm toListForm(ContactList list) {
         ContactListForm form = new ContactListForm();
-        form.name = list.getName();
-        form.description = list.getDescription();
-        form.doubleOptInEnabled = Boolean.TRUE.equals(list.getDoubleOptInEnabled());
+        form.setName(list.getName());
+        form.setDescription(list.getDescription());
+        form.setDoubleOptInEnabled(Boolean.TRUE.equals(list.getDoubleOptInEnabled()));
         return form;
     }
 
@@ -657,9 +657,33 @@ public class ContactsController {
 
     public static class ContactListForm {
         @NotBlank(message = "List name is required.")
-        public String name;
-        public String description;
-        public Boolean doubleOptInEnabled = true;
+        private String name;
+        private String description;
+        private Boolean doubleOptInEnabled = true;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public Boolean getDoubleOptInEnabled() {
+            return doubleOptInEnabled;
+        }
+
+        public void setDoubleOptInEnabled(Boolean doubleOptInEnabled) {
+            this.doubleOptInEnabled = doubleOptInEnabled;
+        }
     }
 
     private record ContactListSummaryView(

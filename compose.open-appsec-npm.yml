@@ -1,0 +1,98 @@
+name: openmailer-openappsec
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: 8080
+      APP_BASE_URL: http://localhost:8081
+      DATABASE_URL: jdbc:postgresql://postgres:5432/openmailer
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      CACHE_TYPE: redis
+      ENCRYPTION_KEY: cd18b33b46ab2d5ccced4f4ea20da280
+      JWT_SECRET: hbJkYjW4i9KxlUb9LU7+QjP5UIphJqzWH6IqAP5gYuo=
+      JWT_ACCESS_TOKEN_EXPIRATION: 3600000
+      JWT_REFRESH_TOKEN_EXPIRATION: 604800000
+      MAIL_HOST: smtp.ethereal.email
+      MAIL_PORT: 587
+      MAIL_USERNAME: cory.mills@ethereal.email
+      MAIL_PASSWORD: 1k1zdXapjsuyV8TCD2
+      APP_MAIL_FROM: cory.mills@ethereal.email
+      APP_TEST_EMAIL_RECIPIENT: cory.mills@ethereal.email
+      APP_ASSETS_MINIFIED: "true"
+    expose:
+      - "8080"
+
+  openappsec-npm:
+    image: ghcr.io/openappsec/nginx-proxy-manager-attachment:latest
+    container_name: openmailer-openappsec-npm
+    ipc: host
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "8081:80"
+      - "8444:443"
+      - "8181:81"
+    volumes:
+      - ./docker/open-appsec/npm-data:/data
+      - ./docker/open-appsec/letsencrypt:/etc/letsencrypt
+      - ./docker/open-appsec/appsec-logs:/ext/appsec-logs
+      - ./docker/open-appsec/localconfig:/ext/appsec
+
+  appsec-agent:
+    image: ghcr.io/openappsec/agent:latest
+    container_name: openmailer-openappsec-agent
+    network_mode: service:openappsec-npm
+    ipc: host
+    restart: unless-stopped
+    environment:
+      user_email: cory.mills@ethereal.email
+      nginxproxymanager: "true"
+      autoPolicyLoad: "true"
+    volumes:
+      - ./docker/open-appsec/appsec-config:/etc/cp/conf
+      - ./docker/open-appsec/appsec-data:/etc/cp/data
+      - ./docker/open-appsec/appsec-logs:/var/log/nano_agent
+      - ./docker/open-appsec/localconfig:/ext/appsec
+    command: /cp-nano-agent --standalone
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: openmailer
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d openmailer"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

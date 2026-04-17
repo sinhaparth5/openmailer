@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const jobStatus = document.getElementById("jobStatus");
     const jobRows = document.getElementById("jobRows");
     const jobImported = document.getElementById("jobImported");
+    const jobSkipped = document.getElementById("jobSkipped");
     const jobErrors = document.getElementById("jobErrors");
     const jobErrorList = document.getElementById("jobErrorList");
     const validationRows = document.getElementById("validationRows");
@@ -93,6 +94,9 @@ document.addEventListener("DOMContentLoaded", () => {
             jobStatus.textContent = "PROCESSING";
             jobRows.textContent = validationRows.textContent === "-" ? "0" : validationRows.textContent;
             jobImported.textContent = "0";
+            if (jobSkipped) {
+                jobSkipped.textContent = "0";
+            }
             jobErrors.textContent = "0";
             jobErrorList.classList.add("hidden");
             jobErrorList.textContent = "";
@@ -121,6 +125,9 @@ document.addEventListener("DOMContentLoaded", () => {
             jobStatus.textContent = job.status || "UNKNOWN";
             jobRows.textContent = String(job.totalRows ?? 0);
             jobImported.textContent = String(job.importedCount ?? 0);
+            if (jobSkipped) {
+                jobSkipped.textContent = String(job.skippedCount ?? 0);
+            }
             jobErrors.textContent = String(job.errorCount ?? 0);
 
             if (Array.isArray(job.errors) && job.errors.length > 0) {
@@ -135,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     job.status === "COMPLETED" ? "success" : "error",
                     job.status === "COMPLETED" ? "Import complete" : "Import failed",
                     job.status === "COMPLETED"
-                        ? `${job.importedCount ?? 0} contacts imported.`
+                        ? `${job.importedCount ?? 0} contacts imported${(job.skippedCount ?? 0) > 0 ? `, ${job.skippedCount} duplicates skipped` : ""}.`
                         : "Check the import status panel for details."
                 );
             }
