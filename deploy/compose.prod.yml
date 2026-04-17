@@ -3,20 +3,15 @@ services:
     image: ${OPENMAILER_IMAGE}
     container_name: openmailer-app
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8080
       APP_BASE_URL: ${APP_BASE_URL}
-      DATABASE_URL: jdbc:postgresql://postgres:5432/openmailer
+      DATABASE_URL: ${DATABASE_URL}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT:-6379}
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       REDIS_USERNAME: ${REDIS_USERNAME:-}
       CACHE_TYPE: redis
@@ -32,37 +27,11 @@ services:
       JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-604800000}
       APP_ASSETS_MINIFIED: "true"
     ports:
-      - "127.0.0.1:8080:8080"
+      - "${APP_BIND_IP:-127.0.0.1}:${APP_HOST_PORT:-8080}:8080"
+    networks:
+      - openmailer-runtime
 
-  postgres:
-    image: postgres:17-alpine
-    container_name: openmailer-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: openmailer
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d openmailer"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:8-alpine
-    container_name: openmailer-redis
-    restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
-  redis_data:
+networks:
+  openmailer-runtime:
+    external: true
+    name: ${DOCKER_NETWORK}

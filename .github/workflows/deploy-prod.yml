@@ -57,11 +57,11 @@ jobs:
       - name: Copy compose file to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USER }}
-          key: ${{ secrets.PROD_SSH_KEY }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
           source: "deploy-bundle/compose.yml"
-          target: "${{ secrets.PROD_APP_PATH }}"
+          target: "${{ secrets.DEPLOY_APP_PATH }}"
           strip_components: 1
 
       - name: Deploy on VPS
@@ -69,17 +69,17 @@ jobs:
         env:
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
         with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USER }}
-          key: ${{ secrets.PROD_SSH_KEY }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
           envs: IMAGE_NAME
           script: |
             set -e
-            mkdir -p "${{ secrets.PROD_APP_PATH }}"
-            cd "${{ secrets.PROD_APP_PATH }}"
+            mkdir -p "${{ secrets.DEPLOY_APP_PATH }}"
+            cd "${{ secrets.DEPLOY_APP_PATH }}"
             test -f openmailer.env || { echo "Missing openmailer.env on VPS"; exit 1; }
             docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" -p "${{ secrets.GHCR_TOKEN }}"
             export OPENMAILER_IMAGE="${IMAGE_NAME}:latest"
             docker compose --env-file openmailer.env -f compose.yml pull
-            docker compose --env-file openmailer.env -f compose.yml up -d
+            docker compose --env-file openmailer.env -f compose.yml up -d --remove-orphans
             docker image prune -f
