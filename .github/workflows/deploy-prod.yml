@@ -75,11 +75,10 @@ jobs:
           envs: IMAGE_NAME
           script: |
             set -e
-            mkdir -p "${{ secrets.DEPLOY_APP_PATH }}"
             cd "${{ secrets.DEPLOY_APP_PATH }}"
             test -f openmailer.env || { echo "Missing openmailer.env on VPS"; exit 1; }
             docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" -p "${{ secrets.GHCR_TOKEN }}"
             export OPENMAILER_IMAGE="${IMAGE_NAME}:latest"
-            docker compose --env-file openmailer.env -f compose.yml pull openmailer-app
-            docker compose --env-file openmailer.env -f compose.yml up -d --no-deps openmailer-app
+            docker compose --env-file openmailer.env -f compose.prod.yml pull openmailer-app
+            docker compose --env-file openmailer.env -f compose.prod.yml up -d --no-deps openmailer-app
             docker image prune -f
