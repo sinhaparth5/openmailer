@@ -50,7 +50,7 @@ services:
       - ./docker/open-appsec/npm-data:/data
       - ./docker/open-appsec/letsencrypt:/etc/letsencrypt
       - ./docker/open-appsec/appsec-logs:/ext/appsec-logs
-      - ./docker/open-appsec/localconfig:/ext/appsec
+      - ./deploy/open-appsec/local_policy.yaml:/ext/appsec/local_policy.yaml
 
   appsec-agent:
     image: ghcr.io/openappsec/agent:latest
@@ -66,7 +66,7 @@ services:
       - ./docker/open-appsec/appsec-config:/etc/cp/conf
       - ./docker/open-appsec/appsec-data:/etc/cp/data
       - ./docker/open-appsec/appsec-logs:/var/log/nano_agent
-      - ./docker/open-appsec/localconfig:/ext/appsec
+      - ./deploy/open-appsec/local_policy.yaml:/ext/appsec/local_policy.yaml
     command: /cp-nano-agent --standalone
 
   postgres:

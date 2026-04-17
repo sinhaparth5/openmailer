@@ -249,6 +249,69 @@ public class ContactsController {
         return "contacts/form";
     }
 
+    @PostMapping("/bulk-lists")
+    public String bulkUpdateLists(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam(name = "contactIds", required = false) List<String> contactIds,
+        @RequestParam String listId,
+        @RequestParam String bulkAction,
+        RedirectAttributes redirectAttributes
+    ) {
+        String userId = userDetails.getUser().getId();
+
+        List<String> validatedContactIds = contactIds == null ? Collections.emptyList() : contactIds.stream()
+            .filter(Objects::nonNull)
+            .map(String::trim)
+            .filter(value -> !value.isEmpty())
+            .distinct()
+            .toList();
+
+        if (validatedContactIds.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Select at least one contact first.");
+            return "redirect:/contacts";
+        }
+
+        ContactList list;
+        try {
+            list = contactListRepository.findByIdAndUser_Id(listId, userId)
+                .orElseThrow(() -> new ValidationException("Selected list is invalid", "listId"));
+            validatedContactIds.forEach(contactId -> contactService.findByIdAndUserId(contactId, userId));
+        } catch (ValidationException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/contacts";
+        }
+
+        if ("add".equalsIgnoreCase(bulkAction)) {
+            int addedCount = membershipService.addContactsToList(validatedContactIds, list.getId()).size();
+            refreshListStatistics(list.getId(), userId);
+            redirectAttributes.addFlashAttribute(
+                "successMessage",
+                addedCount > 0
+                    ? addedCount + " contact" + (addedCount == 1 ? "" : "s") + " added to " + list.getName() + "."
+                    : "All selected contacts were already in " + list.getName() + "."
+            );
+            return "redirect:/contacts";
+        }
+
+        if ("remove".equalsIgnoreCase(bulkAction)) {
+            int removableCount = (int) validatedContactIds.stream()
+                .filter(contactId -> membershipService.isContactInList(contactId, list.getId()))
+                .count();
+            membershipService.removeContactsFromList(validatedContactIds, list.getId());
+            refreshListStatistics(list.getId(), userId);
+            redirectAttributes.addFlashAttribute(
+                "successMessage",
+                removableCount > 0
+                    ? removableCount + " contact" + (removableCount == 1 ? "" : "s") + " removed from " + list.getName() + "."
+                    : "None of the selected contacts were in " + list.getName() + "."
+            );
+            return "redirect:/contacts";
+        }
+
+        redirectAttributes.addFlashAttribute("errorMessage", "Choose a valid bulk action.");
+        return "redirect:/contacts";
+    }
+
     @PostMapping
     public String create(
         @AuthenticationPrincipal CustomUserDetails userDetails,
