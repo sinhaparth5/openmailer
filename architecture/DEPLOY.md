@@ -33,6 +33,10 @@ SafeLine should proxy to:
 
 - `127.0.0.1:8080`
 
+Production hostname:
+
+- `openmailer.astrareconslab.com`
+
 ---
 
 ## 1. Create The Docker Network
@@ -155,7 +159,7 @@ Example production file:
 ```env
 OPENMAILER_IMAGE=ghcr.io/your-github-user/openmailer:latest
 
-APP_BASE_URL=https://mail.example.com
+APP_BASE_URL=https://openmailer.astrareconslab.com
 APP_BIND_IP=127.0.0.1
 APP_HOST_PORT=8080
 DOCKER_NETWORK=openmailer-runtime
@@ -173,7 +177,7 @@ MAIL_HOST=smtp.example.com
 MAIL_PORT=587
 MAIL_USERNAME=your-smtp-user
 MAIL_PASSWORD=your-smtp-password
-APP_MAIL_FROM=no-reply@example.com
+APP_MAIL_FROM=no-reply@openmailer.astrareconslab.com
 APP_TEST_EMAIL_RECIPIENT=
 
 ENCRYPTION_KEY=replace-with-a-32-char-secret-key
@@ -250,8 +254,82 @@ Your public hostname should match:
 
 Example:
 
-- public URL: `https://mail.example.com`
+- public URL: `https://openmailer.astrareconslab.com`
 - local upstream: `http://127.0.0.1:8080`
+
+### SafeLine UI Setup
+
+Using the SafeLine UI, create the protected app roughly like this:
+
+1. Open SafeLine dashboard
+2. Add a new site / protected application
+3. Domain / host:
+   - `openmailer.astrareconslab.com`
+4. Upstream / backend:
+   - protocol: `http`
+   - host: `127.0.0.1`
+   - port: `8080`
+5. Enable HTTPS on the public site
+6. Save and apply the configuration
+
+The important separation is:
+
+- public side:
+  - `https://openmailer.astrareconslab.com`
+- internal upstream:
+  - `http://127.0.0.1:8080`
+
+OpenMailer itself should not be exposed directly on a public IP/port.
+
+---
+
+## 8.1 Cloudflare DNS Setup
+
+In Cloudflare DNS for `astrareconslab.com`, add a record for:
+
+- name: `openmailer`
+- type: `A`
+- content/value: `YOUR_VPS_PUBLIC_IP`
+
+That creates:
+
+- `openmailer.astrareconslab.com -> YOUR_VPS_PUBLIC_IP`
+
+Typical setup:
+
+1. Open Cloudflare
+2. Select `astrareconslab.com`
+3. Go to `DNS`
+4. Click `Add record`
+5. Use:
+   - Type: `A`
+   - Name: `openmailer`
+   - IPv4 address: `YOUR_VPS_PUBLIC_IP`
+   - Proxy status: `Proxied` or `DNS only` depending on your preference
+   - TTL: `Auto`
+
+### Cloudflare Proxy Recommendation
+
+If SafeLine is the main public edge/WAF you want to use, the simpler model is:
+
+- Cloudflare record: `DNS only`
+- SafeLine handles public traffic directly on the VPS
+
+If you still want Cloudflare in front as an extra layer, then:
+
+- Cloudflare record: `Proxied`
+- SafeLine still receives traffic from Cloudflare instead of directly from users
+
+For a first clean setup with SafeLine, `DNS only` is usually easier to reason about.
+
+### SSL/TLS Recommendation
+
+In Cloudflare SSL/TLS mode:
+
+- use `Full` if SafeLine serves HTTPS with a valid cert
+- use `Full (strict)` if the certificate on the VPS is fully valid and trusted
+
+Avoid `Flexible` for this setup.
 
 ---
 
