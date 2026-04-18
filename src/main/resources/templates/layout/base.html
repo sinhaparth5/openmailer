@@ -9,26 +9,21 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-    <title th:text="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">OpenMailer</title>
+    <title th:text="${pageTitle} ?: 'OpenMailer'">OpenMailer</title>
     <meta name="description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
     <meta name="keywords" th:content="${pageKeywords} ?: 'bulk email, email marketing, email templates, open source, email campaigns'">
     <meta name="author" content="OpenMailer">
-    <meta name="robots" content="index, follow">
-
-    <meta property="og:type" content="website">
-    <meta property="og:url" th:content="${pageUrl} ?: 'https://openmailer.com'">
-    <meta property="og:title" th:content="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">
-    <meta property="og:description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
-    <meta property="og:image" th:content="${pageImage} ?: '/images/og-image.png'">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" th:content="${pageUrl} ?: 'https://openmailer.com'">
-    <meta name="twitter:title" th:content="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">
-    <meta name="twitter:description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
-    <meta name="twitter:image" th:content="${pageImage} ?: '/images/og-image.png'">
+    <!-- App pages are private — keep crawlers out -->
+    <meta name="robots" content="noindex, nofollow">
 
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
+    <link rel="manifest" th:href="@{/site.webmanifest}">
+    <meta name="theme-color" content="#ddf04e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OpenMailer">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,10 +31,8 @@
 
     <link rel="stylesheet" th:href="@{/css/output.css}">
 
-    <!-- Alpine.js Components (must load before Alpine.js) -->
     <script th:src="${assetMinified} ? @{/js/min/alpine-components.min.js} : @{/js/alpine-components.js}"></script>
 
-    <!-- Alpine.js -->
     <script defer th:src="@{/js/vendor/alpinejs.min.js}"></script>
 
     <th:block layout:fragment="extra-head"></th:block>
@@ -49,18 +42,14 @@
         Skip to main content
     </a>
 
-    <!-- Mobile sidebar backdrop -->
     <div id="sidebarBackdrop"
          class="fixed inset-0 z-30 hidden bg-black/60 backdrop-blur-[2px] md:hidden"
          aria-hidden="true"></div>
 
-    <!-- Left sidebar -->
     <aside th:replace="~{layout/fragments :: sidebar}"></aside>
 
-    <!-- Main scrollable column -->
     <div class="flex min-w-0 flex-1 flex-col overflow-y-auto">
 
-        <!-- Mobile top bar -->
         <div class="sticky top-0 z-20 flex flex-shrink-0 items-center gap-3 border-b border-[var(--app-border)] bg-[var(--app-bg)]/95 px-4 py-3 backdrop-blur-md md:hidden">
             <button id="sidebarToggle"
                     type="button"
@@ -75,14 +64,11 @@
             <span class="text-sm font-semibold tracking-tight text-[var(--app-text)]">OpenMailer</span>
         </div>
 
-        <!-- Flash messages -->
-        <div class="shrink-0 px-4 pt-4 sm:px-5 sm:pt-5">
+        <div class="shrink-0 px-4 pt-4 sm:px-6 sm:pt-5 md:px-8 lg:px-10">
             <div th:replace="~{layout/fragments :: flash-messages}"></div>
         </div>
 
-        <!-- Page content -->
-        <main id="main-content" class="flex-1 px-4 pb-6 pt-3 sm:px-5 sm:pb-8 sm:pt-4" layout:fragment="content" role="main">
-            <!-- Page content will be inserted here -->
+        <main id="main-content" class="flex-1 animate-page-in px-4 pb-8 pt-4 sm:px-6 sm:pb-10 md:px-8 md:pt-5 lg:px-10 lg:pt-6" layout:fragment="content" role="main">
         </main>
     </div>
 

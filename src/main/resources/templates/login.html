@@ -4,11 +4,33 @@
       layout:decorate="~{layout/auth}"
       lang="en">
 <head>
-    <title>Login - OpenMailer</title>
-    <th:block th:with="pageTitle='Login - OpenMailer',
-                       pageDescription='Sign in to your OpenMailer account to manage email campaigns, templates, and subscribers.',
-                       pageKeywords='login, sign in, email marketing, openmailer'">
-    </th:block>
+    <title>Sign In — OpenMailer</title>
+    <meta name="description" content="Sign in to your OpenMailer account to manage email campaigns, contact lists, templates, and delivery settings.">
+    <meta name="keywords" content="openmailer login, sign in, email campaigns, self-hosted email platform">
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="/login">
+
+    <!-- OG overrides for login page -->
+    <meta property="og:title" content="Sign In — OpenMailer">
+    <meta property="og:description" content="Sign in to your OpenMailer workspace to manage campaigns, contacts, and email delivery.">
+    <meta property="og:url" content="/login">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter overrides -->
+    <meta name="twitter:title" content="Sign In — OpenMailer">
+    <meta name="twitter:description" content="Sign in to your OpenMailer workspace to manage campaigns, contacts, and email delivery.">
+
+    <!-- JSON-LD: WebPage for login -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Sign In — OpenMailer",
+      "description": "Sign in to your OpenMailer account to manage email campaigns, contact lists, and delivery settings.",
+      "url": "/login",
+      "isPartOf": { "@type": "WebSite", "name": "OpenMailer", "url": "https://openmailer.astrareconslabs.com" }
+    }
+    </script>
 </head>
 <body>
 <div layout:fragment="content" class="flex w-full items-stretch">

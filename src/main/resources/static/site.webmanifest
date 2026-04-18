@@ -1,0 +1,56 @@
+{
+  "name": "OpenMailer",
+  "short_name": "OpenMailer",
+  "description": "Free, open-source self-hosted email campaign platform. Send bulk emails with your own AWS SES, SendGrid, or SMTP provider.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#ddf04e",
+  "orientation": "any",
+  "lang": "en",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/openmailer_seo_image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "label": "OpenMailer dashboard overview"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Campaign",
+      "short_name": "Campaign",
+      "description": "Create a new email campaign",
+      "url": "/campaigns/create",
+      "icons": [{ "src": "/favicon.ico", "sizes": "48x48" }]
+    },
+    {
+      "name": "Contacts",
+      "short_name": "Contacts",
+      "description": "View and manage your contacts",
+      "url": "/contacts",
+      "icons": [{ "src": "/favicon.ico", "sizes": "48x48" }]
+    }
+  ]
+}

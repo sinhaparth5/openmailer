@@ -4,190 +4,241 @@
       layout:decorate="~{layout/base}">
 <head>
     <title th:text="${pageTitle}">Contacts</title>
+    <style>
+        @keyframes fade-up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        .k1{animation:fade-up .45s .04s ease both}
+        .k2{animation:fade-up .45s .10s ease both}
+        .k3{animation:fade-up .45s .16s ease both}
+        .k4{animation:fade-up .45s .22s ease both}
+    </style>
 </head>
 <body>
 <main layout:fragment="content">
-    <div class="app-shell p-4 sm:p-6" x-data="tableSelection()">
-        <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+<div class="space-y-5" x-data="tableSelection()">
+
+    <!-- ── Header ────────────────────────────────────────────────────── -->
+    <div class="k1 flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Contacts</p>
+            <h1 class="mt-2 text-[2rem] font-extrabold tracking-[-0.025em] text-[#111] sm:text-[2.4rem]">Audience records.</h1>
+            <p class="mt-2 max-w-xl text-[0.875rem] leading-6 text-slate-500">Filter by status or tag, manage segments, and import subscribers.</p>
+        </div>
+        <div class="flex flex-wrap gap-2.5">
+            <a href="/contacts/lists" class="app-button-secondary px-4 py-2.5 text-sm">Manage lists</a>
+            <a href="/contacts/import" class="app-button-secondary px-4 py-2.5 text-sm">Import CSV</a>
+            <a href="/contacts/add" class="app-button-primary px-4 py-2.5 text-sm">+ Add contact</a>
+        </div>
+    </div>
+
+    <!-- ── Stat cards ─────────────────────────────────────────────────── -->
+    <div class="k2 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div class="relative flex min-h-[110px] flex-col overflow-hidden rounded-[22px] bg-[var(--app-sun)]/70 p-5 transition hover:-translate-y-0.5 duration-200">
+            <!-- decorative: connected nodes -->
+            <svg class="pointer-events-none absolute -bottom-3 -right-3 h-28 w-28 opacity-[0.12]" viewBox="0 0 100 100" fill="currentColor">
+                <circle cx="50" cy="20" r="10"/>
+                <circle cx="20" cy="70" r="10"/>
+                <circle cx="80" cy="70" r="10"/>
+                <circle cx="50" cy="50" r="8"/>
+                <path fill="none" stroke="currentColor" stroke-width="5" d="M50 28 L50 42 M50 56 L24 64 M50 56 L76 64"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Total</p>
+            <p class="mt-auto text-[2.2rem] font-extrabold leading-none tracking-tight text-[#111]"
+               th:text="${#numbers.formatInteger(totalContacts, 0, 'COMMA')}">0</p>
+        </div>
+        <div class="relative flex min-h-[110px] flex-col overflow-hidden rounded-[22px] bg-[var(--app-mint)]/70 p-5 transition hover:-translate-y-0.5 duration-200">
+            <!-- decorative: checkmark in circle -->
+            <svg class="pointer-events-none absolute -bottom-4 -right-4 h-28 w-28 opacity-[0.12]" viewBox="0 0 100 100" fill="currentColor">
+                <circle cx="50" cy="50" r="44"/>
+                <path fill="none" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" d="M28 52 L44 68 L72 34"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Subscribed</p>
+            <p class="mt-auto text-[2.2rem] font-extrabold leading-none tracking-tight text-[#111]"
+               th:text="${#numbers.formatInteger(subscribedContacts, 0, 'COMMA')}">0</p>
+        </div>
+        <div class="relative flex min-h-[110px] flex-col overflow-hidden rounded-[22px] bg-[var(--app-lilac)]/70 p-5 transition hover:-translate-y-0.5 duration-200">
+            <!-- decorative: wave / broken line -->
+            <svg class="pointer-events-none absolute -bottom-3 -right-3 h-28 w-28 opacity-[0.12]" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round">
+                <path d="M8 70 Q20 50 32 70 Q44 90 56 70 Q68 50 80 70 Q88 82 96 76"/>
+                <path d="M8 48 Q20 28 32 48 Q44 68 56 48 Q68 28 80 48 Q88 60 96 54" opacity="0.45"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Unsubscribed</p>
+            <p class="mt-auto text-[2.2rem] font-extrabold leading-none tracking-tight text-[#111]"
+               th:text="${#numbers.formatInteger(unsubscribedContacts, 0, 'COMMA')}">0</p>
+        </div>
+        <div class="relative flex min-h-[110px] flex-col overflow-hidden rounded-[22px] bg-[var(--app-peach)]/70 p-5 transition hover:-translate-y-0.5 duration-200">
+            <!-- decorative: bounce/return arrow -->
+            <svg class="pointer-events-none absolute -bottom-3 -right-3 h-28 w-28 opacity-[0.12]" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M85 18 C85 18 60 14 40 28 C20 42 18 66 18 66 L10 54 L14 82 L42 74 L30 66 C30 66 30 46 48 34 C66 22 85 26 85 26 Z"/>
+                <circle cx="82" cy="76" r="14"/>
+                <path fill="white" d="M76 76 L82 68 L88 76 L84 76 L84 82 L80 82 L80 76 Z"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Bounced</p>
+            <p class="mt-auto text-[2.2rem] font-extrabold leading-none tracking-tight text-[#111]"
+               th:text="${#numbers.formatInteger(bouncedContacts, 0, 'COMMA')}">0</p>
+        </div>
+    </div>
+
+    <!-- ── Filters ───────────────────────────────────────────────────── -->
+    <div class="k3 app-panel p-5">
+        <form method="get" action="/contacts" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_180px_180px_auto_auto]">
             <div>
-                <p class="app-kicker">Contacts</p>
-                <h1 class="mt-3 text-4xl font-semibold tracking-tight text-slate-950">Audience records</h1>
-                <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600">Review real subscriber data, filter by state or tag, and work from a calmer view of the audience you already store.</p>
+                <label for="search" class="mb-2 block text-sm font-medium text-slate-700">Search</label>
+                <input type="text" id="search" name="search" th:value="${searchQuery}"
+                       placeholder="Search by name or email…" class="app-input">
             </div>
-            <div class="flex flex-wrap gap-3">
-                <a href="/contacts/lists" class="app-button-secondary px-5 py-3 text-sm">Manage Lists</a>
-                <a href="/contacts/import" class="app-button-secondary px-5 py-3 text-sm">Import Contacts</a>
-                <a href="/contacts/add" class="app-button-primary px-5 py-3 text-sm">Add Contact</a>
+            <div>
+                <label for="status" class="mb-2 block text-sm font-medium text-slate-700">Status</label>
+                <select id="status" name="status" class="app-select">
+                    <option th:each="filter : ${statusFilters}"
+                            th:value="${filter.value}"
+                            th:text="${filter.label}"
+                            th:selected="${filter.value == currentStatus}">All Statuses</option>
+                </select>
             </div>
-        </div>
+            <div>
+                <label for="tag" class="mb-2 block text-sm font-medium text-slate-700">Tag</label>
+                <select id="tag" name="tag" class="app-select">
+                    <option th:each="filter : ${tagFilters}"
+                            th:value="${filter.value}"
+                            th:text="${filter.label}"
+                            th:selected="${filter.value == currentTag}">All Tags</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="app-button-primary w-full px-5 py-3 text-sm">Filter</button>
+            </div>
+            <div class="flex items-end">
+                <a href="/contacts" class="app-button-secondary w-full px-5 py-3 text-center text-sm">Clear</a>
+            </div>
+        </form>
+    </div>
 
-        <div class="mb-5 grid gap-4 grid-cols-2 sm:grid-cols-4">
-            <div class="flex flex-col rounded-[24px] bg-[var(--app-sun)]/62 p-5 min-h-[100px]">
-                <p class="text-sm font-medium text-slate-600">Total</p>
-                <p class="mt-auto text-3xl font-semibold text-slate-950" th:text="${#numbers.formatInteger(totalContacts, 0, 'COMMA')}">0</p>
-            </div>
-            <div class="flex flex-col rounded-[24px] bg-[var(--app-mint)]/62 p-5 min-h-[100px]">
-                <p class="text-sm font-medium text-slate-600">Subscribed</p>
-                <p class="mt-auto text-3xl font-semibold text-slate-950" th:text="${#numbers.formatInteger(subscribedContacts, 0, 'COMMA')}">0</p>
-            </div>
-            <div class="flex flex-col rounded-[24px] bg-[var(--app-lilac)]/62 p-5 min-h-[100px]">
-                <p class="text-sm font-medium text-slate-600">Unsubscribed</p>
-                <p class="mt-auto text-3xl font-semibold text-slate-950" th:text="${#numbers.formatInteger(unsubscribedContacts, 0, 'COMMA')}">0</p>
-            </div>
-            <div class="flex flex-col rounded-[24px] bg-[var(--app-peach)]/62 p-5 min-h-[100px]">
-                <p class="text-sm font-medium text-slate-600">Bounced</p>
-                <p class="mt-auto text-3xl font-semibold text-slate-950" th:text="${#numbers.formatInteger(bouncedContacts, 0, 'COMMA')}">0</p>
-            </div>
-        </div>
-
-        <section class="app-panel p-5">
-            <form method="get" action="/contacts" class="grid gap-4 lg:grid-cols-[1.3fr_0.7fr_0.7fr_auto_auto]">
-                <div>
-                    <label for="search" class="mb-2 block text-sm font-medium text-slate-700">Search</label>
-                    <input type="text" id="search" name="search" th:value="${searchQuery}" placeholder="Search by name or email..." class="app-input">
-                </div>
-                <div>
-                    <label for="status" class="mb-2 block text-sm font-medium text-slate-700">Status</label>
-                    <select id="status" name="status" class="app-select">
-                        <option th:each="filter : ${statusFilters}"
-                                th:value="${filter.value}"
-                                th:text="${filter.label}"
-                                th:selected="${filter.value == currentStatus}">All Statuses</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="tag" class="mb-2 block text-sm font-medium text-slate-700">Tag</label>
-                    <select id="tag" name="tag" class="app-select">
-                        <option th:each="filter : ${tagFilters}"
-                                th:value="${filter.value}"
-                                th:text="${filter.label}"
-                                th:selected="${filter.value == currentTag}">All Tags</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="app-button-primary w-full px-4 py-3 text-sm">Filter</button>
-                </div>
-                <div class="flex items-end">
-                    <a href="/contacts" class="app-button-secondary w-full px-4 py-3 text-center text-sm">Clear</a>
-                </div>
-            </form>
-        </section>
+    <!-- ── Table + bulk actions ───────────────────────────────────────── -->
+    <div class="k4 space-y-3">
 
         <form method="post" action="/contacts/bulk-lists">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <div x-show="showBulkActions" x-cloak class="mt-5 rounded-[24px] border border-[rgba(57,48,36,0.08)] bg-[var(--app-lilac)]/55 p-4">
+
+            <!-- Bulk action bar -->
+            <div x-show="showBulkActions" x-cloak
+                 class="rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-[var(--app-lilac)]/45 p-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <span class="text-sm font-medium text-slate-800"><span x-text="selectedCount">0</span> contacts selected</span>
+                    <span class="text-sm font-semibold text-slate-800"><span x-text="selectedCount">0</span> contacts selected</span>
                     <div class="flex flex-wrap items-center gap-2">
-                        <select name="listId" class="app-select min-w-[220px] text-sm">
-                            <option value="">Choose list</option>
+                        <select name="listId" class="app-select min-w-[200px] text-sm">
+                            <option value="">Choose a list…</option>
                             <option th:each="list : ${listOptions}" th:value="${list.id}" th:text="${list.name}">List</option>
                         </select>
-                        <button type="submit" name="bulkAction" value="add" class="app-button-primary px-4 py-2 text-sm">Add To List</button>
-                        <button type="submit" name="bulkAction" value="remove" class="app-button-secondary px-4 py-2 text-sm">Remove From List</button>
+                        <button type="submit" name="bulkAction" value="add" class="app-button-primary px-4 py-2.5 text-sm">Add to list</button>
+                        <button type="submit" name="bulkAction" value="remove" class="app-button-secondary px-4 py-2.5 text-sm">Remove</button>
                     </div>
                 </div>
             </div>
 
-        <section class="app-panel-strong mt-5 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-left">
-                    <thead class="border-b border-[rgba(57,48,36,0.08)] bg-white/65">
-                        <tr class="text-xs uppercase tracking-[0.18em] text-slate-500">
-                            <th class="relative w-14 px-5 py-4">
-                                <input type="checkbox"
-                                       x-model="selectedAll"
-                                       @change="toggleAll()"
-                                       class="absolute left-5 top-1/2 -mt-2 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-[var(--app-sun)]">
-                            </th>
-                            <th class="px-5 py-4">Contact</th>
-                            <th class="px-5 py-4">Status</th>
-                            <th class="px-5 py-4">Tags</th>
-                            <th class="px-5 py-4">Company</th>
-                            <th class="px-5 py-4">Subscribed</th>
-                            <th class="px-5 py-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody th:if="${!#lists.isEmpty(contacts)}" class="divide-y divide-[rgba(57,48,36,0.08)] bg-white/70">
-                        <tr th:each="contact : ${contacts}" class="transition hover:bg-white/95">
-                            <td class="relative w-14 px-5 py-5">
-                                <input type="checkbox"
-                                       name="contactIds"
-                                       th:value="${contact.id}"
-                                       @change="updateSelection()"
-                                       class="row-checkbox absolute left-5 top-1/2 -mt-2 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-[var(--app-sun)]">
-                            </td>
-                            <td class="px-5 py-5">
-                                <div class="flex items-center gap-4">
-                                    <div class="flex h-11 w-11 items-center justify-center rounded-[18px] bg-[var(--app-peach)]/65 text-sm font-semibold text-slate-700"
-                                         th:text="${#strings.substring(contact.name, 0, 1)}">C</div>
-                                    <div>
-                                        <p class="text-sm font-semibold text-slate-950" th:text="${contact.name}">Name</p>
-                                        <p class="mt-1 text-sm text-slate-500" th:text="${contact.email}">Email</p>
+            <div class="app-panel-strong overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left">
+                        <thead class="border-b border-[rgba(57,48,36,0.08)] bg-white/65">
+                            <tr class="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                                <th class="relative w-14 px-5 py-4">
+                                    <input type="checkbox"
+                                           x-model="selectedAll"
+                                           @change="toggleAll()"
+                                           class="absolute left-5 top-1/2 -mt-2 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-[var(--app-sun)]">
+                                </th>
+                                <th class="px-5 py-4">Contact</th>
+                                <th class="px-5 py-4">Status</th>
+                                <th class="hidden px-5 py-4 sm:table-cell">Tags</th>
+                                <th class="hidden px-5 py-4 lg:table-cell">Company</th>
+                                <th class="hidden px-5 py-4 md:table-cell">Subscribed</th>
+                                <th class="px-5 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody th:if="${!#lists.isEmpty(contacts)}" class="divide-y divide-[rgba(57,48,36,0.07)] bg-white/68">
+                            <tr th:each="contact : ${contacts}" class="transition hover:bg-white">
+                                <td class="relative w-14 px-5 py-4">
+                                    <input type="checkbox"
+                                           name="contactIds"
+                                           th:value="${contact.id}"
+                                           @change="updateSelection()"
+                                           class="row-checkbox absolute left-5 top-1/2 -mt-2 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-[var(--app-sun)]">
+                                </td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3.5">
+                                        <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] bg-[var(--app-peach)]/60 text-sm font-bold text-slate-700"
+                                             th:text="${#strings.substring(contact.name, 0, 1)}">C</div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-semibold text-slate-950" th:text="${contact.name}">Name</p>
+                                            <p class="mt-0.5 truncate text-[13px] text-slate-500" th:text="${contact.email}">email@example.com</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-5 py-5">
-                                <span th:with="status=${contact.status}"
-                                      th:classappend="${status == 'SUBSCRIBED'} ? 'bg-[var(--app-mint)]/72 text-emerald-950' :
-                                                      (${status == 'UNSUBSCRIBED'} ? 'bg-[var(--app-sun)]/72 text-amber-950' :
-                                                      (${status == 'PENDING'} ? 'bg-[var(--app-lilac)]/72 text-slate-900' : 'bg-[var(--app-peach)]/72 text-rose-950'))"
-                                      class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold">
-                                    <span th:text="${contact.status}">Status</span>
-                                </span>
-                            </td>
-                            <td class="px-5 py-5">
-                                <div class="flex flex-wrap gap-1.5">
-                                    <span th:each="tag : ${contact.tags}"
-                                          class="inline-flex max-w-[120px] items-center rounded-full bg-[var(--app-lilac)]/62 px-2.5 py-0.5 text-xs font-medium text-slate-800">
-                                        <span class="truncate" th:text="${tag}">Tag</span>
+                                </td>
+                                <td class="px-5 py-4">
+                                    <span th:with="status=${contact.status}"
+                                          th:classappend="${status == 'SUBSCRIBED'} ? 'bg-[var(--app-mint)]/72 text-emerald-950' :
+                                                          (${status == 'UNSUBSCRIBED'} ? 'bg-[var(--app-sun)]/72 text-amber-950' :
+                                                          (${status == 'PENDING'} ? 'bg-[var(--app-lilac)]/72 text-slate-900' : 'bg-[var(--app-peach)]/72 text-rose-950'))"
+                                          class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold">
+                                        <span th:text="${contact.status}">Status</span>
                                     </span>
-                                </div>
-                            </td>
-                            <td class="px-5 py-5 text-sm text-slate-600" th:text="${contact.company ?: '—'}">Company</td>
-                            <td class="px-5 py-5 text-sm text-slate-600" th:text="${contact.subscribedDate}">Date</td>
-                            <td class="px-5 py-5 text-right">
-                                <div class="flex justify-end gap-3 text-sm font-medium">
-                                    <a th:href="@{/contacts/{id}(id=${contact.id})}" class="text-slate-900 transition hover:text-slate-700">View</a>
-                                    <a th:href="@{/contacts/{id}/edit(id=${contact.id})}" class="text-slate-500 transition hover:text-slate-800">Edit</a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                                </td>
+                                <td class="hidden px-5 py-4 sm:table-cell">
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <span th:each="tag : ${contact.tags}"
+                                              class="inline-flex max-w-[110px] items-center rounded-full bg-[var(--app-lilac)]/55 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700">
+                                            <span class="truncate" th:text="${tag}">Tag</span>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="hidden px-5 py-4 text-[13px] text-slate-600 lg:table-cell" th:text="${contact.company ?: '—'}">Company</td>
+                                <td class="hidden px-5 py-4 text-[13px] text-slate-600 md:table-cell" th:text="${contact.subscribedDate}">Date</td>
+                                <td class="px-5 py-4 text-right">
+                                    <div class="flex flex-col items-end gap-1.5">
+                                        <a th:href="@{/contacts/{id}(id=${contact.id})}"
+                                           class="text-sm font-semibold text-slate-900 transition hover:text-slate-700">View</a>
+                                        <a th:href="@{/contacts/{id}/edit(id=${contact.id})}"
+                                           class="text-[13px] font-medium text-slate-400 transition hover:text-slate-700">Edit</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <div th:if="${#lists.isEmpty(contacts)}" class="p-12 text-center">
-                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-[24px] bg-[var(--app-sun)]/65 text-slate-500">
-                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
+                <!-- Empty state -->
+                <div th:if="${#lists.isEmpty(contacts)}" class="px-6 py-14 text-center sm:py-20">
+                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] bg-[var(--app-sun)]/60">
+                        <svg class="h-8 w-8 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="mt-5 text-lg font-bold text-slate-950">No contacts found</h3>
+                    <p class="mt-2 text-[14px] text-slate-500">Add contacts manually or import from a CSV file.</p>
+                    <div class="mt-6 flex flex-wrap justify-center gap-3">
+                        <a href="/contacts/import" class="app-button-secondary px-5 py-3 text-sm">Import CSV</a>
+                        <a href="/contacts/add" class="app-button-primary px-5 py-3 text-sm">Add contact</a>
+                    </div>
                 </div>
-                <h3 class="mt-5 text-lg font-semibold text-slate-950">No contacts found</h3>
-                <p class="mt-2 text-sm text-slate-500">Start by adding a record manually or importing a CSV audience file.</p>
-                <div class="mt-6 flex justify-center gap-3">
-                    <a href="/contacts/lists" class="app-button-secondary px-5 py-3 text-sm">Create List</a>
-                    <a href="/contacts/add" class="app-button-primary px-5 py-3 text-sm">Add Contact</a>
-                    <a href="/contacts/import" class="app-button-secondary px-5 py-3 text-sm">Import Contacts</a>
-                </div>
-            </div>
 
-            <div th:if="${!#lists.isEmpty(contacts)}" class="flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(57,48,36,0.08)] bg-white/65 px-5 py-4 text-sm text-slate-500">
-                <p>Showing <span class="font-medium text-slate-900">1</span> to <span class="font-medium text-slate-900" th:text="${#lists.size(contacts)}">20</span> of <span class="font-medium text-slate-900" th:text="${totalContacts}">0</span> contacts</p>
-                <div class="flex items-center gap-2">
-                    <a href="#" class="app-button-secondary px-3 py-2 text-sm opacity-60 pointer-events-none">Previous</a>
-                    <a th:each="page : ${pages}"
-                       th:href="@{/contacts(page=${page})}"
-                       th:classappend="${page == currentPage} ? ' bg-[var(--app-sun)]/70 border-transparent text-slate-950' : ''"
-                       class="app-button-secondary px-3 py-2 text-sm">
-                        <span th:text="${page}">1</span>
-                    </a>
-                    <a href="#" class="app-button-secondary px-3 py-2 text-sm opacity-60 pointer-events-none">Next</a>
+                <!-- Pagination -->
+                <div th:if="${!#lists.isEmpty(contacts)}"
+                     class="flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(57,48,36,0.08)] bg-white/60 px-5 py-4 text-sm text-slate-500">
+                    <p>Showing <span class="font-medium text-slate-900">1</span>–<span class="font-medium text-slate-900" th:text="${#lists.size(contacts)}">20</span> of <span class="font-medium text-slate-900" th:text="${totalContacts}">0</span></p>
+                    <div class="flex items-center gap-2">
+                        <a href="#" class="app-button-secondary px-3 py-2 text-sm opacity-50 pointer-events-none">←</a>
+                        <a th:each="page : ${pages}"
+                           th:href="@{/contacts(page=${page})}"
+                           th:classappend="${page == currentPage} ? ' bg-[var(--app-sun)]/70 border-transparent text-slate-950 font-bold' : ''"
+                           class="app-button-secondary px-3.5 py-2 text-sm">
+                            <span th:text="${page}">1</span>
+                        </a>
+                        <a href="#" class="app-button-secondary px-3 py-2 text-sm opacity-50 pointer-events-none">→</a>
+                    </div>
                 </div>
             </div>
-        </section>
         </form>
     </div>
+</div>
 </main>
 </body>
 </html>

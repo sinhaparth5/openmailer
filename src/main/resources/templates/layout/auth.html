@@ -9,32 +9,64 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-    <title th:text="${pageTitle} ?: 'OpenMailer - Sign In'">OpenMailer - Sign In</title>
-    <meta name="description" th:content="${pageDescription} ?: 'Sign in to your OpenMailer account to manage email campaigns, templates, and subscribers.'">
-    <meta name="keywords" th:content="${pageKeywords} ?: 'login, sign in, email marketing, bulk email, openmailer'">
+    <title th:text="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'">OpenMailer — Self-Hosted Email Campaigns</title>
+    <meta name="description" th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'">
+    <meta name="keywords" th:content="${pageKeywords} ?: 'self-hosted email, open source email marketing, bulk email campaigns, DKIM, email delivery, openmailer'">
     <meta name="author" content="OpenMailer">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" th:content="${pageRobots} ?: 'index, follow'">
+    <link rel="canonical" th:href="${pageCanonical} ?: '#'" th:if="${pageCanonical != null}">
 
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" th:content="${pageUrl} ?: 'https://openmailer.com/login'">
-    <meta property="og:title" th:content="${pageTitle} ?: 'OpenMailer - Sign In'">
-    <meta property="og:description" th:content="${pageDescription} ?: 'Sign in to your OpenMailer account to manage email campaigns, templates, and subscribers.'">
-    <meta property="og:image" th:content="${pageImage} ?: '/images/og-image.png'">
+    <meta property="og:site_name" content="OpenMailer">
+    <meta property="og:url" th:content="${pageCanonical} ?: 'https://openmailer.astrareconslabs.com'">
+    <meta property="og:title" th:content="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'">
+    <meta property="og:description" th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'">
+    <meta property="og:image" th:content="@{/images/openmailer_seo_image.png}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="OpenMailer — Self-Hosted Email Campaigns">
 
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" th:content="${pageUrl} ?: 'https://openmailer.com/login'">
-    <meta name="twitter:title" th:content="${pageTitle} ?: 'OpenMailer - Sign In'">
-    <meta name="twitter:description" th:content="${pageDescription} ?: 'Sign in to your OpenMailer account to manage email campaigns, templates, and subscribers.'">
-    <meta name="twitter:image" th:content="${pageImage} ?: '/images/og-image.png'">
+    <meta name="twitter:site" content="@openmailer">
+    <meta name="twitter:title" th:content="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'">
+    <meta name="twitter:description" th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'">
+    <meta name="twitter:image" th:content="@{/images/openmailer_seo_image.png}">
+    <meta name="twitter:image:alt" content="OpenMailer — Self-Hosted Email Campaigns">
 
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
+    <link rel="manifest" th:href="@{/site.webmanifest}">
+    <meta name="theme-color" content="#ddf04e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OpenMailer">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" th:href="@{/css/output.css}">
+
+    <!-- JSON-LD structured data (base — pages can add their own via extra-head) -->
+    <script type="application/ld+json" th:if="${pageJsonLd == null}" th:inline="javascript">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "OpenMailer",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "description": "Free, open-source self-hosted email campaign platform with DKIM support, contact management, and multi-provider delivery.",
+      "url": "https://openmailer.astrareconslabs.com",
+      "image": "/images/openmailer_seo_image.png",
+      "author": { "@type": "Organization", "name": "OpenMailer" },
+      "license": "https://opensource.org/licenses/MIT"
+    }
+    </script>
+    <script type="application/ld+json" th:if="${pageJsonLd != null}" th:utext="${pageJsonLd}"></script>
 
     <th:block layout:fragment="extra-head"></th:block>
 </head>
