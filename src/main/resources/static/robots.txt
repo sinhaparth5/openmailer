@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Allow: /images/
+Allow: /css/
+Allow: /js/
+
+# Block authenticated app pages — no value for crawlers
+Disallow: /dashboard
+Disallow: /campaigns
+Disallow: /contacts
+Disallow: /templates
+Disallow: /settings
+Disallow: /api/
+
+# Block auth flows
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://openmailer.astrareconslabs.com/sitemap.xml

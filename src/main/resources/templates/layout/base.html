@@ -9,26 +9,21 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-    <title th:text="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">OpenMailer</title>
+    <title th:text="${pageTitle} ?: 'OpenMailer'">OpenMailer</title>
     <meta name="description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
     <meta name="keywords" th:content="${pageKeywords} ?: 'bulk email, email marketing, email templates, open source, email campaigns'">
     <meta name="author" content="OpenMailer">
-    <meta name="robots" content="index, follow">
-
-    <meta property="og:type" content="website">
-    <meta property="og:url" th:content="${pageUrl} ?: 'https://openmailer.com'">
-    <meta property="og:title" th:content="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">
-    <meta property="og:description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
-    <meta property="og:image" th:content="${pageImage} ?: '/images/og-image.png'">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" th:content="${pageUrl} ?: 'https://openmailer.com'">
-    <meta name="twitter:title" th:content="${pageTitle} ?: 'OpenMailer - Open Source Bulk Email System'">
-    <meta name="twitter:description" th:content="${pageDescription} ?: 'OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.'">
-    <meta name="twitter:image" th:content="${pageImage} ?: '/images/og-image.png'">
+    <!-- App pages are private — keep crawlers out -->
+    <meta name="robots" content="noindex, nofollow">
 
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
+    <link rel="manifest" th:href="@{/site.webmanifest}">
+    <meta name="theme-color" content="#ddf04e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OpenMailer">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,33 +31,51 @@
 
     <link rel="stylesheet" th:href="@{/css/output.css}">
 
-    <!-- Alpine.js Components (must load before Alpine.js) -->
     <script th:src="${assetMinified} ? @{/js/min/alpine-components.min.js} : @{/js/alpine-components.js}"></script>
 
-    <!-- Alpine.js -->
     <script defer th:src="@{/js/vendor/alpinejs.min.js}"></script>
 
     <th:block layout:fragment="extra-head"></th:block>
 </head>
-<body class="min-h-screen flex flex-col antialiased">
+<body class="flex h-screen overflow-hidden antialiased">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:m-2 focus:rounded">
         Skip to main content
     </a>
 
-    <div class="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 py-3 sm:px-6 sm:py-5">
-        <nav th:replace="~{layout/fragments :: navbar}"></nav>
-        <div th:replace="~{layout/fragments :: flash-messages}"></div>
+    <div id="sidebarBackdrop"
+         class="fixed inset-0 z-30 hidden bg-black/60 backdrop-blur-[2px] md:hidden"
+         aria-hidden="true"></div>
 
-        <main id="main-content" class="flex-grow" layout:fragment="content" role="main">
-            <!-- Page content will be inserted here -->
+    <aside th:replace="~{layout/fragments :: sidebar}"></aside>
+
+    <div class="flex min-w-0 flex-1 flex-col overflow-y-auto">
+
+        <div class="sticky top-0 z-20 flex flex-shrink-0 items-center gap-3 border-b border-[var(--app-border)] bg-[var(--app-bg)]/95 px-4 py-3 backdrop-blur-md md:hidden">
+            <button id="sidebarToggle"
+                    type="button"
+                    class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--app-border)] bg-white/80 text-slate-600 transition hover:bg-white"
+                    aria-label="Open navigation menu"
+                    aria-expanded="false"
+                    aria-controls="app-sidebar">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            <span class="text-sm font-semibold tracking-tight text-[var(--app-text)]">OpenMailer</span>
+        </div>
+
+        <div class="shrink-0 px-4 pt-4 sm:px-6 sm:pt-5 md:px-8 lg:px-10">
+            <div th:replace="~{layout/fragments :: flash-messages}"></div>
+        </div>
+
+        <main id="main-content" class="flex-1 animate-page-in px-4 pb-8 pt-4 sm:px-6 sm:pb-10 md:px-8 md:pt-5 lg:px-10 lg:pt-6" layout:fragment="content" role="main">
         </main>
-
-        <footer th:replace="~{layout/fragments :: footer}"></footer>
     </div>
 
     <th:block layout:fragment="extra-scripts"></th:block>
     <script th:src="${assetMinified} ? @{/js/min/flash-messages.min.js} : @{/js/flash-messages.js}"></script>
     <script th:src="${assetMinified} ? @{/js/min/form-post.min.js} : @{/js/form-post.js}"></script>
     <script th:src="${assetMinified} ? @{/js/min/auth.min.js} : @{/js/auth.js}"></script>
+    <script th:src="${assetMinified} ? @{/js/min/sidebar-toggle.min.js} : @{/js/sidebar-toggle.js}"></script>
 </body>
 </html>

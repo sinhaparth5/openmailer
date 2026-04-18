@@ -54,16 +54,6 @@ jobs:
           mkdir -p deploy-bundle
           cp deploy/compose.prod.yml deploy-bundle/compose.yml
 
-      - name: Copy compose file to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: "deploy-bundle/compose.yml"
-          target: "${{ secrets.DEPLOY_APP_PATH }}"
-          strip_components: 1
-
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1.0.3
         env:

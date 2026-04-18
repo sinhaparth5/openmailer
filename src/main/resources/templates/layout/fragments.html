@@ -6,6 +6,177 @@
     <title>Fragments</title>
 </head>
 <body>
+    <aside th:fragment="sidebar"
+           id="app-sidebar"
+           class="fixed inset-y-0 left-0 z-40 flex w-[240px] flex-shrink-0 -translate-x-full flex-col bg-[#141414] transition-transform duration-300 ease-in-out md:relative md:inset-auto md:z-auto md:translate-x-0"
+           role="navigation"
+           aria-label="Main navigation">
+
+        <!-- Logo -->
+        <div class="flex flex-shrink-0 items-center gap-3 border-b border-white/[0.06] px-5 py-[17px]">
+            <div class="relative flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[10px] bg-[var(--card-lime)] text-[11px] font-extrabold text-[#1a1a1a]">
+                OM
+                <span class="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-[#141414] bg-[var(--card-lime)]"
+                      style="animation:pulse-green 2.4s ease-in-out infinite"></span>
+            </div>
+            <div>
+                <span class="text-[14px] font-bold tracking-tight text-white">OpenMailer</span>
+                <p class="text-[10px] text-white/28 leading-none mt-0.5">your mailer, your rules</p>
+            </div>
+        </div>
+
+        <style>
+            @keyframes pulse-green { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.75)} }
+            .nav-item { position:relative; display:flex; align-items:center; gap:12px; border-radius:12px; padding:9px 12px; font-size:0.875rem; font-weight:500; transition:background 140ms ease, color 140ms ease; }
+            .nav-item .nav-icon { flex-shrink:0; width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; transition:background 140ms ease, transform 140ms ease; }
+            .nav-item:hover .nav-icon { transform:scale(1.08); }
+            .nav-item.active .nav-icon { transform:scale(1.04); }
+
+            /* colors per section */
+            .nav-lime .nav-icon    { background: rgba(221,240,78,0.12); color: var(--card-lime); }
+            .nav-lime.active       { background: rgba(221,240,78,0.10); color: var(--card-lime); }
+            .nav-lime:hover        { background: rgba(221,240,78,0.07); color: rgba(221,240,78,0.85); }
+            .nav-lime.active .nav-icon { background: rgba(221,240,78,0.22); }
+
+            .nav-pink .nav-icon    { background: rgba(244,114,182,0.12); color: var(--card-pink); }
+            .nav-pink.active       { background: rgba(244,114,182,0.10); color: var(--card-pink); }
+            .nav-pink:hover        { background: rgba(244,114,182,0.07); color: rgba(244,114,182,0.85); }
+            .nav-pink.active .nav-icon { background: rgba(244,114,182,0.22); }
+
+            .nav-mauve .nav-icon   { background: rgba(147,196,253,0.12); color: var(--card-mauve); }
+            .nav-mauve.active      { background: rgba(147,196,253,0.10); color: var(--card-mauve); }
+            .nav-mauve:hover       { background: rgba(147,196,253,0.07); color: rgba(147,196,253,0.85); }
+            .nav-mauve.active .nav-icon { background: rgba(147,196,253,0.22); }
+
+            .nav-sage .nav-icon    { background: rgba(168,224,99,0.12); color: var(--card-sage); }
+            .nav-sage.active       { background: rgba(168,224,99,0.10); color: var(--card-sage); }
+            .nav-sage:hover        { background: rgba(168,224,99,0.07); color: rgba(168,224,99,0.85); }
+            .nav-sage.active .nav-icon { background: rgba(168,224,99,0.22); }
+
+            .nav-sun .nav-icon     { background: rgba(248,217,106,0.12); color: #f8d96a; }
+            .nav-sun.active        { background: rgba(248,217,106,0.10); color: #f8d96a; }
+            .nav-sun:hover         { background: rgba(248,217,106,0.07); color: rgba(248,217,106,0.85); }
+            .nav-sun.active .nav-icon { background: rgba(248,217,106,0.22); }
+
+            /* inactive text */
+            .nav-item:not(.active):not(:hover) { color: rgba(255,255,255,0.38); }
+            .nav-item:not(.active):not(:hover) .nav-icon { color: rgba(255,255,255,0.25); }
+        </style>
+
+        <nav class="flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-3 py-4">
+
+            <div class="mb-5">
+                <p class="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.28em] text-white/18">Workspace</p>
+                <div class="space-y-0.5">
+
+                    <a th:href="@{/dashboard}"
+                       th:classappend="${#strings.startsWith(currentUri, '/dashboard')} ? 'active' : ''"
+                       class="nav-item nav-lime">
+                        <span class="nav-icon">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="1.9"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="1.9"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="1.9"/>
+                                <rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="1.9"/>
+                            </svg>
+                        </span>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a th:href="@{/campaigns}"
+                       th:classappend="${#strings.startsWith(currentUri, '/campaigns')} ? 'active' : ''"
+                       class="nav-item nav-pink">
+                        <span class="nav-icon">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </span>
+                        <span>Campaigns</span>
+                    </a>
+
+                    <a th:href="@{/contacts}"
+                       th:classappend="${#strings.startsWith(currentUri, '/contacts')} ? 'active' : ''"
+                       class="nav-item nav-mauve">
+                        <span class="nav-icon">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </span>
+                        <span>Contacts</span>
+                    </a>
+
+                    <a th:href="@{/templates}"
+                       th:classappend="${#strings.startsWith(currentUri, '/templates')} ? 'active' : ''"
+                       class="nav-item nav-sage">
+                        <span class="nav-icon">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </span>
+                        <span>Templates</span>
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <p class="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.28em] text-white/18">Account</p>
+                <div class="space-y-0.5">
+
+                    <a th:href="@{/settings/security}"
+                       th:classappend="${#strings.startsWith(currentUri, '/settings')} ? 'active' : ''"
+                       class="nav-item nav-sun">
+                        <span class="nav-icon">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </span>
+                        <span>Settings</span>
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="flex-1"></div>
+
+            <!-- Fun little status strip -->
+            <div class="mb-3 flex items-center gap-2 rounded-[10px] bg-[var(--card-lime)]/8 px-3 py-2">
+                <span class="inline-block h-1.5 w-1.5 rounded-full bg-[var(--card-lime)]"
+                      style="animation:pulse-green 2s ease-in-out infinite"></span>
+                <span class="text-[10px] font-semibold text-[var(--card-lime)]/70">All systems go 🚀</span>
+            </div>
+
+            <!-- Logout -->
+            <div sec:authorize="isAuthenticated()" class="border-t border-white/[0.06] pt-3">
+                <form class="js-logout-form">
+                    <button type="submit"
+                            class="flex w-full items-center gap-3 rounded-[11px] px-3 py-2.5 text-[13px] font-medium text-white/30 transition hover:bg-white/[0.05] hover:text-white/60">
+                        <span class="flex h-[30px] w-[30px] items-center justify-center rounded-[8px] bg-white/5">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </span>
+                        <span>Log out</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- User card -->
+            <div sec:authorize="isAuthenticated()"
+                 class="mt-2 flex items-center gap-3 rounded-[13px] border border-white/[0.06] bg-white/[0.04] px-3 py-2.5 transition hover:bg-white/[0.07]">
+                <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--card-lime)]/60 to-[var(--card-mauve)]/60 text-[11px] font-extrabold text-white shadow-[0_0_0_2px_rgba(255,255,255,0.08)]"
+                      th:text="${currentUserInitials} ?: 'U'">U</span>
+                <div class="min-w-0 flex-1">
+                    <p class="truncate text-[13px] font-semibold leading-tight text-white"
+                       th:text="${currentUserDisplayName} ?: 'User'">User</p>
+                    <p class="mt-0.5 text-[10px] text-white/30">✦ logged in</p>
+                </div>
+            </div>
+
+        </nav>
+    </aside>
+
     <nav th:fragment="navbar" class="relative z-40 mb-5 overflow-visible rounded-[24px] border border-white/[0.07] bg-[rgba(18,18,18,0.88)] px-5 py-4 sm:px-7 shadow-[0_20px_64px_-16px_rgba(0,0,0,0.60),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-2xl" role="navigation" aria-label="Main navigation">
         <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">

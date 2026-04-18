@@ -1,106 +1,357 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}"
+      layout:decorate="~{layout/auth}"
       lang="en">
 <head>
-    <title>OpenMailer - Bulk Email System</title>
-    <th:block th:with="pageTitle='OpenMailer - Open Source Bulk Email System',
-                       pageDescription='OpenMailer is an open source bulk email system with templates, designed to help you manage and send email campaigns efficiently.',
-                       pageKeywords='bulk email, email marketing, email campaigns, email templates, open source'">
-    </th:block>
+    <title>OpenMailer — Free Self-Hosted Bulk Email Platform</title>
+    <meta name="description" content="OpenMailer is a free, open-source self-hosted email campaign platform. Send bulk emails with your own AWS SES, SendGrid, or SMTP provider. DKIM signing, contact management, and full delivery control — no monthly fees.">
+    <meta name="keywords" content="self-hosted email campaigns, open source email marketing, bulk email platform, AWS SES bulk email, SendGrid alternative, DKIM email, free email marketing software, openmailer">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="/">
+
+    <meta property="og:title" content="OpenMailer — Free Self-Hosted Bulk Email Platform">
+    <meta property="og:description" content="Send bulk email campaigns with your own infrastructure. DKIM signing, contact management, AWS SES / SendGrid / SMTP support. Free and open-source.">
+    <meta property="og:url" content="https://openmailer.astrareconslabs.com">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:title" content="OpenMailer — Free Self-Hosted Bulk Email Platform">
+    <meta name="twitter:description" content="Send bulk email campaigns with your own infrastructure. DKIM signing, contact management, AWS SES / SendGrid / SMTP support. Free and open-source.">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "OpenMailer",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Linux, Docker, Railway",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "description": "Free, open-source self-hosted email campaign platform with DKIM support, contact management, and multi-provider delivery (AWS SES, SendGrid, SMTP).",
+          "url": "https://openmailer.astrareconslabs.com",
+          "image": "https://openmailer.astrareconslabs.com/images/openmailer_seo_image.png",
+          "author": { "@type": "Organization", "name": "OpenMailer" },
+          "license": "https://opensource.org/licenses/MIT",
+          "featureList": [
+            "Bulk email campaigns",
+            "DKIM domain signing",
+            "Contact import via CSV",
+            "AWS SES, SendGrid, SMTP support",
+            "Open and click tracking",
+            "Two-factor authentication",
+            "Self-hosted on Docker or Railway"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "name": "OpenMailer",
+          "url": "https://openmailer.astrareconslabs.com",
+          "description": "Free open-source self-hosted email campaign platform",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://openmailer.astrareconslabs.com/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
+    <style>
+        @keyframes float-a { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes float-b { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+        @keyframes slide-up { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+        .float-a { animation: float-a 4s ease-in-out infinite; }
+        .float-b { animation: float-b 5.5s ease-in-out infinite; }
+        .anim-1 { animation: slide-up 0.6s ease both; }
+        .anim-2 { animation: slide-up 0.6s 0.1s ease both; }
+        .anim-3 { animation: slide-up 0.6s 0.2s ease both; }
+        .anim-4 { animation: slide-up 0.6s 0.3s ease both; }
+        .anim-5 { animation: slide-up 0.6s 0.4s ease both; }
+    </style>
 </head>
 <body>
-    <div layout:fragment="content">
-        <div class="px-1 py-2 sm:px-2 sm:py-3">
-            <div class="app-shell p-4 sm:p-6">
-                <section class="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
-                    <div class="rounded-[32px] bg-[#1f2128] px-6 py-8 text-white shadow-[0_34px_70px_-40px_rgba(15,23,42,0.58)] sm:px-8">
-                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/55">Open Source Delivery System</p>
-                        <h1 class="mt-5 max-w-xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-                            A quieter starting point for audience imports, campaigns, and sender setup.
-                        </h1>
-                        <p class="mt-5 max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
-                            OpenMailer keeps the product server-rendered and operationally focused. The shell now matches the new dashboard language, so setup pages, forms, and daily workflows all feel like one system instead of separate demos.
-                        </p>
-                        <div class="mt-8 flex flex-wrap gap-3">
-                            <a th:href="@{/dashboard}" class="app-button-primary px-5 py-3 text-sm">Open Dashboard</a>
-                            <a th:href="@{/login}" class="app-button-secondary border-white/15 bg-white/10 px-5 py-3 text-sm text-white hover:bg-white/18">Sign In</a>
+<main layout:fragment="content">
+<div class="w-full">
+
+    <nav class="mb-6 flex items-center justify-between rounded-[20px] border border-[var(--app-border)] bg-[var(--app-panel)] px-5 py-3.5 shadow-[0_4px_24px_-8px_rgba(33,29,24,0.10)] anim-1">
+        <a th:href="@{/}" class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#1a1a1a] text-[11px] font-extrabold text-white">OM</div>
+            <span class="text-[15px] font-bold tracking-tight text-[var(--app-text)]">OpenMailer</span>
+        </a>
+        <div class="flex items-center gap-2">
+            <a th:href="@{/login}" class="app-button-secondary px-4 py-2 text-sm">Sign in</a>
+            <a th:href="@{/register}" class="app-button-primary px-4 py-2 text-sm">Get started</a>
+        </div>
+    </nav>
+
+    <section class="overflow-hidden rounded-[32px] bg-[#1a1a1a] p-7 shadow-[0_40px_100px_-32px_rgba(26,26,26,0.55)] sm:p-10 lg:p-12 anim-2">
+        <div class="grid items-center gap-10 lg:grid-cols-[1fr_420px]">
+
+            <div>
+                <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">
+                    <span class="h-1.5 w-1.5 rounded-full bg-[var(--card-lime)]"></span>
+                    Open source &amp; self-hosted
+                </span>
+
+                <h1 class="mt-5 text-[3rem] font-extrabold leading-[1.06] tracking-[-0.035em] text-white sm:text-[3.8rem]">
+                    Email campaigns<br>
+                    <span class="text-[var(--card-lime)]">on your terms.</span>
+                </h1>
+
+                <p class="mt-5 max-w-[480px] text-[15px] leading-7 text-white/50">
+                    OpenMailer gives you a full bulk email stack — campaigns, contacts, templates, DKIM domains, and delivery analytics — running on infrastructure you control.
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a th:href="@{/register}"
+                       class="inline-flex items-center gap-2 rounded-full bg-[var(--card-lime)] px-6 py-3.5 text-sm font-bold text-[#1a1a1a] shadow-[0_8px_24px_-8px_rgba(221,240,78,0.55)] transition hover:brightness-110 hover:-translate-y-0.5">
+                        Create free account
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </a>
+                    <a th:href="@{/login}"
+                       class="inline-flex items-center rounded-full border border-white/12 bg-white/8 px-6 py-3.5 text-sm font-semibold text-white/75 transition hover:bg-white/14 hover:text-white">
+                        Sign in
+                    </a>
+                </div>
+
+                <div class="mt-8 flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-2 rounded-full border border-white/8 bg-white/6 px-3.5 py-1.5">
+                        <span class="text-[var(--card-sage)]">
+                            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </span>
+                        <span class="text-[11px] font-medium text-white/45">DKIM &amp; SPF ready</span>
+                    </div>
+                    <div class="flex items-center gap-2 rounded-full border border-white/8 bg-white/6 px-3.5 py-1.5">
+                        <span class="text-[var(--card-pink)]">
+                            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </span>
+                        <span class="text-[11px] font-medium text-white/45">SendGrid / AWS SES / SMTP</span>
+                    </div>
+                    <div class="flex items-center gap-2 rounded-full border border-white/8 bg-white/6 px-3.5 py-1.5">
+                        <span class="text-[var(--card-mauve)]">
+                            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </span>
+                        <span class="text-[11px] font-medium text-white/45">Docker &amp; Railway deploy</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative hidden lg:block">
+                <div class="absolute inset-0 rounded-[28px] bg-[var(--card-lime)]/6 blur-3xl"></div>
+
+                <div class="relative space-y-3">
+                    <div class="grid grid-cols-2 gap-2.5 float-a">
+                        <div class="rounded-[18px] bg-[var(--card-lime)] p-4">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#111]/50">Contacts</p>
+                            <p class="mt-2 text-[2rem] font-extrabold leading-none text-[#111]">4,821</p>
+                            <div class="mt-3 flex items-end gap-[2px]" style="height:28px">
+                                <div class="flex-1 rounded-sm bg-[#111]/14" style="height:40%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/14" style="height:65%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/16" style="height:50%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/18" style="height:80%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/22" style="height:100%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/20" style="height:72%"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-[18px] bg-[var(--card-pink)] p-4">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#111]/50">Campaigns</p>
+                            <p class="mt-2 text-[2rem] font-extrabold leading-none text-[#111]">12</p>
+                            <div class="mt-3 flex items-end gap-[2px]" style="height:28px">
+                                <div class="flex-1 rounded-sm bg-[#111]/12" style="height:55%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/14" style="height:35%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/16" style="height:70%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/18" style="height:50%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/22" style="height:100%"></div>
+                                <div class="flex-1 rounded-sm bg-[#111]/20" style="height:68%"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div class="rounded-[28px] bg-[var(--app-sun)]/65 p-5">
-                            <p class="text-sm font-medium text-slate-600">Running status</p>
-                            <p class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Application online</p>
-                            <p class="mt-3 text-sm leading-6 text-slate-700">Core pages, JWT auth flow, and Docker-backed local infrastructure are in place.</p>
+                    <div class="float-b rounded-[18px] border border-white/[0.07] bg-[#232323] p-4">
+                        <div class="mb-3 flex items-center justify-between">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-white/30">Recent campaigns</p>
+                            <span class="rounded-full bg-[var(--card-lime)]/20 px-2 py-0.5 text-[10px] font-bold text-[var(--card-lime)]">3 active</span>
                         </div>
-                        <div class="rounded-[28px] bg-[var(--app-mint)]/65 p-5">
-                            <p class="text-sm font-medium text-slate-600">Workflow coverage</p>
-                            <p class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Contacts and campaigns</p>
-                            <p class="mt-3 text-sm leading-6 text-slate-700">Create, view, list, and import screens now share the same product design language.</p>
-                        </div>
-                        <div class="rounded-[28px] bg-[var(--app-lilac)]/65 p-5 sm:col-span-2">
-                            <p class="text-sm font-medium text-slate-600">What to do next</p>
-                            <ul class="mt-4 space-y-3 text-sm leading-6 text-slate-700">
-                                <li>Connect your mail provider and domain records.</li>
-                                <li>Import or add contacts and define your sending audience.</li>
-                                <li>Build a campaign draft, review sender settings, and schedule delivery.</li>
-                            </ul>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between rounded-[10px] bg-white/5 px-3 py-2.5">
+                                <div>
+                                    <p class="text-[12px] font-semibold text-white/80">Spring Newsletter</p>
+                                    <p class="text-[10px] text-white/30">2,140 recipients</p>
+                                </div>
+                                <span class="rounded-full bg-[var(--card-sage)]/25 px-2 py-0.5 text-[10px] font-bold text-[var(--card-sage)]">Sent</span>
+                            </div>
+                            <div class="flex items-center justify-between rounded-[10px] bg-white/5 px-3 py-2.5">
+                                <div>
+                                    <p class="text-[12px] font-semibold text-white/80">Product Update</p>
+                                    <p class="text-[10px] text-white/30">890 recipients</p>
+                                </div>
+                                <span class="rounded-full bg-[var(--card-lime)]/20 px-2 py-0.5 text-[10px] font-bold text-[var(--card-lime)]">Draft</span>
+                            </div>
+                            <div class="flex items-center justify-between rounded-[10px] bg-white/5 px-3 py-2.5">
+                                <div>
+                                    <p class="text-[12px] font-semibold text-white/80">Weekly Digest</p>
+                                    <p class="text-[10px] text-white/30">1,560 recipients</p>
+                                </div>
+                                <span class="rounded-full bg-[var(--app-sun)]/25 px-2 py-0.5 text-[10px] font-bold text-amber-300">Scheduled</span>
+                            </div>
                         </div>
                     </div>
-                </section>
 
-                <section class="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]" aria-labelledby="next-steps-heading">
-                    <div class="app-panel-strong p-6 sm:p-7">
-                        <p class="app-kicker">Next Steps</p>
-                        <h2 id="next-steps-heading" class="mt-3 text-3xl font-semibold tracking-tight text-slate-950">Bring the stack from running to ready.</h2>
-                        <ul class="mt-6 space-y-4" role="list">
-                            <li class="flex items-start gap-3 rounded-[22px] bg-white/62 px-4 py-4">
-                                <span class="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--app-sun)] text-sm font-semibold text-slate-900">1</span>
-                                <div>
-                                    <p class="text-sm font-semibold text-slate-900">Confirm database and cache settings</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">Use the Docker defaults or point the app at your own Postgres and Redis environment.</p>
-                                </div>
-                            </li>
-                            <li class="flex items-start gap-3 rounded-[22px] bg-white/62 px-4 py-4">
-                                <span class="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--app-mint)] text-sm font-semibold text-slate-900">2</span>
-                                <div>
-                                    <p class="text-sm font-semibold text-slate-900">Wire sender infrastructure</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">Add provider credentials, verify domains, and make your campaign defaults match the sender setup.</p>
-                                </div>
-                            </li>
-                            <li class="flex items-start gap-3 rounded-[22px] bg-white/62 px-4 py-4">
-                                <span class="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--app-lilac)] text-sm font-semibold text-slate-900">3</span>
-                                <div>
-                                    <p class="text-sm font-semibold text-slate-900">Move into real sending flow</p>
-                                    <p class="mt-1 text-sm leading-6 text-slate-600">Add audience data, create a draft, and validate the campaign path end to end.</p>
-                                </div>
-                            </li>
-                        </ul>
+                    <div class="flex items-center gap-3 rounded-[14px] bg-[var(--card-mauve)]/20 p-4 float-a">
+                        <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--card-mauve)]/30">
+                            <svg class="h-5 w-5 text-[var(--card-mauve)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-white/35">Average open rate</p>
+                            <p class="text-[1.4rem] font-extrabold leading-tight text-white">38.4%</p>
+                        </div>
+                        <div class="ml-auto flex items-center gap-1 rounded-full bg-[var(--card-sage)]/20 px-2.5 py-1">
+                            <svg class="h-3 w-3 text-[var(--card-sage)]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+                            <span class="text-[10px] font-bold text-[var(--card-sage)]">+4.2%</span>
+                        </div>
                     </div>
-
-                    <aside class="space-y-5">
-                        <section class="app-panel p-6">
-                            <p class="app-kicker">Current Direction</p>
-                            <p class="mt-4 text-sm leading-7 text-slate-700">
-                                The app now favors a restrained editorial dashboard style over the older template-heavy admin look. That same system carries through auth, list pages, forms, and detail views.
-                            </p>
-                        </section>
-                        <section class="rounded-[28px] bg-[var(--app-peach)]/72 p-6">
-                            <p class="text-sm font-semibold text-slate-900">Practical reminder</p>
-                            <p class="mt-3 text-sm leading-7 text-slate-700">
-                                Sensitive business logic still belongs on the backend. Minified frontend assets reduce readability, but they do not hide browser code.
-                            </p>
-                        </section>
-                    </aside>
-                </section>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <th:block layout:fragment="extra-scripts">
-        <script th:replace="~{layout/fragments :: mobile-menu-script}"></script>
-    </th:block>
+    <section class="mt-5 anim-3">
+        <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+
+            <div class="group flex flex-col rounded-[24px] bg-[var(--card-lime)] p-6 transition hover:-translate-y-1 hover:shadow-[0_20px_48px_-16px_rgba(221,240,78,0.35)]">
+                <div class="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#111]/10">
+                    <svg class="h-5 w-5 text-[#111]/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-[15px] font-bold text-[#111]">Campaigns</h3>
+                <p class="mt-1.5 text-[13px] leading-5 text-[#111]/55">Draft, schedule, and send bulk campaigns with open and click tracking.</p>
+            </div>
+
+            <div class="group flex flex-col rounded-[24px] bg-[var(--card-pink)] p-6 transition hover:-translate-y-1 hover:shadow-[0_20px_48px_-16px_rgba(244,114,182,0.35)]">
+                <div class="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#111]/10">
+                    <svg class="h-5 w-5 text-[#111]/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-[15px] font-bold text-[#111]">Contacts</h3>
+                <p class="mt-1.5 text-[13px] leading-5 text-[#111]/55">Import via CSV, tag segments, and manage subscriptions with GDPR support.</p>
+            </div>
+
+            <div class="group flex flex-col rounded-[24px] bg-[var(--card-sage)] p-6 transition hover:-translate-y-1 hover:shadow-[0_20px_48px_-16px_rgba(168,224,99,0.35)]">
+                <div class="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#111]/10">
+                    <svg class="h-5 w-5 text-[#111]/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-[15px] font-bold text-[#111]">Templates</h3>
+                <p class="mt-1.5 text-[13px] leading-5 text-[#111]/55">Build reusable email templates with variable substitution and previews.</p>
+            </div>
+
+            <div class="group flex flex-col rounded-[24px] bg-[var(--card-mauve)] p-6 transition hover:-translate-y-1 hover:shadow-[0_20px_48px_-16px_rgba(147,196,253,0.35)]">
+                <div class="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#111]/10">
+                    <svg class="h-5 w-5 text-[#111]/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-[15px] font-bold text-[#111]">Domains</h3>
+                <p class="mt-1.5 text-[13px] leading-5 text-[#111]/55">Verify sending domains with DKIM signing and DNS record management.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-5 anim-4">
+        <div class="app-panel px-7 py-8 sm:px-10">
+            <div class="mb-8 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--app-text-soft)]/60">Setup</p>
+                    <h2 class="mt-2 text-[1.85rem] font-extrabold tracking-[-0.025em] text-[var(--app-text)]">Up and sending in minutes.</h2>
+                </div>
+                <a th:href="@{/register}" class="app-button-primary mt-4 self-start px-5 py-2.5 text-sm sm:mt-0">Start now →</a>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-3">
+                <div class="relative rounded-[20px] border border-[var(--app-border)] bg-white/60 p-5">
+                    <span class="absolute right-4 top-4 text-[2.5rem] font-extrabold leading-none text-[var(--app-border-strong)]/40">01</span>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--card-lime)]/70">
+                        <svg class="h-5 w-5 text-[#3a4a00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-[15px] font-bold text-[var(--app-text)]">Create your account</h3>
+                    <p class="mt-2 text-[13px] leading-5 text-[var(--app-text-soft)]">Sign up, set your workspace name, and log in to your dashboard.</p>
+                </div>
+
+                <div class="relative rounded-[20px] border border-[var(--app-border)] bg-white/60 p-5">
+                    <span class="absolute right-4 top-4 text-[2.5rem] font-extrabold leading-none text-[var(--app-border-strong)]/40">02</span>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--card-pink)]/70">
+                        <svg class="h-5 w-5 text-[#7a004a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-[15px] font-bold text-[var(--app-text)]">Connect &amp; verify</h3>
+                    <p class="mt-2 text-[13px] leading-5 text-[var(--app-text-soft)]">Add your sending domain, verify DNS records, and wire up your email provider.</p>
+                </div>
+
+                <div class="relative rounded-[20px] border border-[var(--app-border)] bg-white/60 p-5">
+                    <span class="absolute right-4 top-4 text-[2.5rem] font-extrabold leading-none text-[var(--app-border-strong)]/40">03</span>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--card-mauve)]/70">
+                        <svg class="h-5 w-5 text-[#003a7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-[15px] font-bold text-[var(--app-text)]">Import &amp; send</h3>
+                    <p class="mt-2 text-[13px] leading-5 text-[var(--app-text-soft)]">Import your contacts, build a campaign from a template, and hit send.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-5 anim-4">
+        <div class="flex flex-wrap items-center justify-center gap-3 rounded-[20px] border border-[var(--app-border)] bg-[var(--app-panel)] px-6 py-5">
+            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--app-text-soft)]/50 mr-2">Works with</p>
+            <span class="rounded-full border border-[var(--app-border)] bg-white/70 px-4 py-1.5 text-[13px] font-semibold text-slate-700">AWS SES</span>
+            <span class="rounded-full border border-[var(--app-border)] bg-white/70 px-4 py-1.5 text-[13px] font-semibold text-slate-700">SendGrid</span>
+            <span class="rounded-full border border-[var(--app-border)] bg-white/70 px-4 py-1.5 text-[13px] font-semibold text-slate-700">SMTP</span>
+            <span class="rounded-full border border-[var(--app-border)] bg-white/70 px-4 py-1.5 text-[13px] font-semibold text-slate-700">Docker</span>
+            <span class="rounded-full border border-[var(--app-border)] bg-white/70 px-4 py-1.5 text-[13px] font-semibold text-slate-700">Railway</span>
+            <span class="rounded-full border border-[var(--app-border)] bg-white/70 px-4 py-1.5 text-[13px] font-semibold text-slate-700">PostgreSQL</span>
+            <span class="rounded-full border border-[var(--app-border)] bg-white/70 px-4 py-1.5 text-[13px] font-semibold text-slate-700">Redis</span>
+        </div>
+    </section>
+
+    <section class="mt-5 mb-1 anim-5">
+        <div class="relative overflow-hidden rounded-[28px] bg-[#1a1a1a] px-8 py-10 text-center sm:px-12 sm:py-14">
+            <!-- Decorative blobs -->
+            <div class="absolute -left-10 -top-10 h-48 w-48 rounded-full bg-[var(--card-lime)]/12 blur-3xl"></div>
+            <div class="absolute -right-10 -bottom-10 h-48 w-48 rounded-full bg-[var(--card-pink)]/10 blur-3xl"></div>
+
+            <p class="relative text-[11px] font-bold uppercase tracking-[0.22em] text-white/30">Free &amp; open source</p>
+            <h2 class="relative mt-3 text-[2.2rem] font-extrabold leading-tight tracking-[-0.03em] text-white sm:text-[2.8rem]">
+                Ready to own your<br>email delivery?
+            </h2>
+            <p class="relative mt-4 mx-auto max-w-md text-[14px] leading-6 text-white/45">
+                No monthly seat fees. No vendor lock-in. Deploy on your own server or Railway — the data stays yours.
+            </p>
+            <div class="relative mt-8 flex flex-wrap justify-center gap-3">
+                <a th:href="@{/register}"
+                   class="inline-flex items-center gap-2 rounded-full bg-[var(--card-lime)] px-7 py-3.5 text-sm font-bold text-[#1a1a1a] shadow-[0_8px_32px_-8px_rgba(221,240,78,0.5)] transition hover:brightness-110">
+                    Get started — it's free
+                </a>
+                <a th:href="@{/login}"
+                   class="inline-flex items-center rounded-full border border-white/12 px-7 py-3.5 text-sm font-semibold text-white/65 transition hover:border-white/20 hover:text-white">
+                    Already have an account
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
+</main>
 </body>
 </html>

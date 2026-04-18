@@ -4,11 +4,30 @@
       layout:decorate="~{layout/auth}"
       lang="en">
 <head>
-    <title>Register - OpenMailer</title>
-    <th:block th:with="pageTitle='Create Account - OpenMailer',
-                       pageDescription='Create your OpenMailer account to start managing campaigns, templates, and subscribers.',
-                       pageKeywords='register, sign up, email marketing, openmailer'">
-    </th:block>
+    <title>Create Account — OpenMailer</title>
+    <meta name="description" content="Create your free OpenMailer account. Self-host bulk email campaigns, import contacts, set up DKIM domains, and connect your own email provider.">
+    <meta name="keywords" content="openmailer register, create account, self-hosted email, bulk email platform, open source email marketing">
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="/register">
+
+    <meta property="og:title" content="Create Account — OpenMailer">
+    <meta property="og:description" content="Sign up for OpenMailer — the free, open-source self-hosted email platform. Own your delivery infrastructure.">
+    <meta property="og:url" content="/register">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:title" content="Create Account — OpenMailer">
+    <meta name="twitter:description" content="Sign up for OpenMailer — the free, open-source self-hosted email platform. Own your delivery infrastructure.">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Create Account — OpenMailer",
+      "description": "Create your free OpenMailer account to start running self-hosted email campaigns with full delivery control.",
+      "url": "/register",
+      "isPartOf": { "@type": "WebSite", "name": "OpenMailer", "url": "https://openmailer.astrareconslabs.com" }
+    }
+    </script>
 </head>
 <body>
 <div layout:fragment="content" class="flex w-full items-stretch">
