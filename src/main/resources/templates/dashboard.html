@@ -21,7 +21,6 @@
 <main layout:fragment="content">
 <div class="space-y-5">
 
-    <!-- ── Header ────────────────────────────────────────────────────── -->
     <header class="d1 flex flex-wrap items-start justify-between gap-4">
         <div>
             <div class="mb-2.5 flex items-center gap-2">
@@ -44,11 +43,9 @@
         </a>
     </header>
 
-    <!-- ── Stat cards ──────────────────────────────────────────────── -->
     <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
 
         <div class="d2 group relative flex min-h-[170px] flex-col overflow-hidden rounded-[22px] bg-[var(--card-lime)] p-5 transition-transform duration-200 hover:-translate-y-0.5">
-            <!-- decorative corner: people silhouettes -->
             <svg class="pointer-events-none absolute -bottom-5 -right-5 h-36 w-36 opacity-[0.11]" viewBox="0 0 120 120" fill="currentColor">
                 <circle cx="42" cy="34" r="19"/>
                 <path d="M4 104 C4 66 80 66 80 104Z"/>
@@ -77,7 +74,6 @@
         </div>
 
         <div class="d3 group relative flex min-h-[170px] flex-col overflow-hidden rounded-[22px] bg-[var(--card-pink)] p-5 transition-transform duration-200 hover:-translate-y-0.5">
-            <!-- decorative corner: envelope -->
             <svg class="pointer-events-none absolute -bottom-4 -right-4 h-36 w-36 opacity-[0.11]" viewBox="0 0 120 120" fill="currentColor">
                 <path d="M8 28 C8 20 16 14 24 14 H96 C104 14 112 20 112 28 V92 C112 100 104 106 96 106 H24 C16 106 8 100 8 92 Z"/>
                 <path fill="white" opacity="0.35" d="M8 36 L60 70 L112 36 V28 L60 62 L8 28 Z"/>
@@ -104,7 +100,6 @@
         </div>
 
         <div class="d4 group relative flex min-h-[170px] flex-col overflow-hidden rounded-[22px] bg-[var(--card-sage)] p-5 transition-transform duration-200 hover:-translate-y-0.5">
-            <!-- decorative corner: stacked documents -->
             <svg class="pointer-events-none absolute -bottom-4 -right-4 h-36 w-36 opacity-[0.11]" viewBox="0 0 120 120" fill="currentColor">
                 <rect x="22" y="28" width="76" height="88" rx="8"/>
                 <rect fill="white" opacity="0.22" x="14" y="18" width="76" height="88" rx="8"/>
@@ -134,7 +129,6 @@
         </div>
 
         <div class="d5 group relative flex min-h-[170px] flex-col overflow-hidden rounded-[22px] bg-[var(--card-mauve)] p-5 transition-transform duration-200 hover:-translate-y-0.5">
-            <!-- decorative corner: globe -->
             <svg class="pointer-events-none absolute -bottom-5 -right-5 h-36 w-36 opacity-[0.11]" viewBox="0 0 120 120" fill="currentColor">
                 <circle cx="60" cy="60" r="52"/>
                 <ellipse fill="none" stroke="white" stroke-width="4" cx="60" cy="60" rx="21" ry="52"/>
@@ -164,13 +158,10 @@
         </div>
     </div>
 
-    <!-- ── Main content ──────────────────────────────────────────────── -->
     <div class="grid gap-5 xl:grid-cols-[1fr_300px]">
 
-        <!-- Left column -->
         <div class="space-y-4 d6">
 
-            <!-- Dark launch checklist -->
             <section class="relative overflow-hidden rounded-[24px] bg-[#1a1a1a] p-6 shadow-[0_32px_64px_-24px_rgba(0,0,0,0.5)] sm:p-7">
                 <div class="pointer-events-none absolute -right-12 -top-12 h-52 w-52 rounded-full bg-[var(--card-lime)]/8 blur-3xl"></div>
                 <div class="pointer-events-none absolute -left-8 bottom-0 h-36 w-36 rounded-full bg-[var(--card-pink)]/6 blur-2xl"></div>
@@ -227,7 +218,6 @@
                 </div>
             </section>
 
-            <!-- Quick actions + overview -->
             <div class="grid gap-4 sm:grid-cols-[200px_1fr]">
                 <div class="app-panel p-5">
                     <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Quick actions</p>
@@ -258,10 +248,8 @@
             </div>
         </div>
 
-        <!-- ── Right aside ──────────────────────────────────────────── -->
         <aside class="space-y-4 d7">
 
-            <!-- Calendar widget -->
             <section class="overflow-hidden rounded-[22px] border border-[var(--app-border)] shadow-[0_18px_40px_-28px_rgba(33,29,24,0.22)]"
                      x-data="calendarWidget()">
                 <div class="flex items-center justify-between bg-[#1a1a1a] px-5 py-4">
@@ -335,7 +323,6 @@
                 </div>
             </section>
 
-            <!-- ── Readiness + Next steps — isolated dark panel ─────── -->
             <section class="overflow-hidden rounded-[24px] bg-[#1a1a1a] shadow-[0_24px_56px_-20px_rgba(0,0,0,0.48)]">
                 <div class="p-5">
                     <div class="mb-4 flex items-center justify-between">

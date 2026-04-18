@@ -10,17 +10,14 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="/">
 
-    <!-- OG overrides for landing page -->
     <meta property="og:title" content="OpenMailer — Free Self-Hosted Bulk Email Platform">
     <meta property="og:description" content="Send bulk email campaigns with your own infrastructure. DKIM signing, contact management, AWS SES / SendGrid / SMTP support. Free and open-source.">
     <meta property="og:url" content="https://openmailer.astrareconslabs.com">
     <meta property="og:type" content="website">
 
-    <!-- Twitter overrides -->
     <meta name="twitter:title" content="OpenMailer — Free Self-Hosted Bulk Email Platform">
     <meta name="twitter:description" content="Send bulk email campaigns with your own infrastructure. DKIM signing, contact management, AWS SES / SendGrid / SMTP support. Free and open-source.">
 
-    <!-- JSON-LD: SoftwareApplication + WebSite -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -77,7 +74,6 @@
 <main layout:fragment="content">
 <div class="w-full">
 
-    <!-- ── Top Nav ────────────────────────────────────────────────────── -->
     <nav class="mb-6 flex items-center justify-between rounded-[20px] border border-[var(--app-border)] bg-[var(--app-panel)] px-5 py-3.5 shadow-[0_4px_24px_-8px_rgba(33,29,24,0.10)] anim-1">
         <a th:href="@{/}" class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#1a1a1a] text-[11px] font-extrabold text-white">OM</div>
@@ -89,11 +85,9 @@
         </div>
     </nav>
 
-    <!-- ── Hero ──────────────────────────────────────────────────────── -->
     <section class="overflow-hidden rounded-[32px] bg-[#1a1a1a] p-7 shadow-[0_40px_100px_-32px_rgba(26,26,26,0.55)] sm:p-10 lg:p-12 anim-2">
         <div class="grid items-center gap-10 lg:grid-cols-[1fr_420px]">
 
-            <!-- Left: headline + CTAs -->
             <div>
                 <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">
                     <span class="h-1.5 w-1.5 rounded-full bg-[var(--card-lime)]"></span>
@@ -123,7 +117,6 @@
                     </a>
                 </div>
 
-                <!-- Social proof chips -->
                 <div class="mt-8 flex flex-wrap items-center gap-3">
                     <div class="flex items-center gap-2 rounded-full border border-white/8 bg-white/6 px-3.5 py-1.5">
                         <span class="text-[var(--card-sage)]">
@@ -146,13 +139,10 @@
                 </div>
             </div>
 
-            <!-- Right: mini dashboard preview -->
             <div class="relative hidden lg:block">
-                <!-- Glow -->
                 <div class="absolute inset-0 rounded-[28px] bg-[var(--card-lime)]/6 blur-3xl"></div>
 
                 <div class="relative space-y-3">
-                    <!-- Stat row -->
                     <div class="grid grid-cols-2 gap-2.5 float-a">
                         <div class="rounded-[18px] bg-[var(--card-lime)] p-4">
                             <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#111]/50">Contacts</p>
@@ -180,7 +170,6 @@
                         </div>
                     </div>
 
-                    <!-- Campaign list card -->
                     <div class="float-b rounded-[18px] border border-white/[0.07] bg-[#232323] p-4">
                         <div class="mb-3 flex items-center justify-between">
                             <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-white/30">Recent campaigns</p>
@@ -211,7 +200,6 @@
                         </div>
                     </div>
 
-                    <!-- Open rate badge -->
                     <div class="flex items-center gap-3 rounded-[14px] bg-[var(--card-mauve)]/20 p-4 float-a">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--card-mauve)]/30">
                             <svg class="h-5 w-5 text-[var(--card-mauve)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,7 +220,6 @@
         </div>
     </section>
 
-    <!-- ── Feature cards ─────────────────────────────────────────────── -->
     <section class="mt-5 anim-3">
         <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
 
@@ -278,7 +265,6 @@
         </div>
     </section>
 
-    <!-- ── How it works ──────────────────────────────────────────────── -->
     <section class="mt-5 anim-4">
         <div class="app-panel px-7 py-8 sm:px-10">
             <div class="mb-8 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
@@ -326,7 +312,6 @@
         </div>
     </section>
 
-    <!-- ── Provider logos row ─────────────────────────────────────────── -->
     <section class="mt-5 anim-4">
         <div class="flex flex-wrap items-center justify-center gap-3 rounded-[20px] border border-[var(--app-border)] bg-[var(--app-panel)] px-6 py-5">
             <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--app-text-soft)]/50 mr-2">Works with</p>
@@ -340,7 +325,6 @@
         </div>
     </section>
 
-    <!-- ── Final CTA ──────────────────────────────────────────────────── -->
     <section class="mt-5 mb-1 anim-5">
         <div class="relative overflow-hidden rounded-[28px] bg-[#1a1a1a] px-8 py-10 text-center sm:px-12 sm:py-14">
             <!-- Decorative blobs -->
