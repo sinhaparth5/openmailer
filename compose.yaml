@@ -31,66 +31,8 @@ services:
       APP_MAIL_FROM: cory.mills@ethereal.email
       APP_TEST_EMAIL_RECIPIENT: cory.mills@ethereal.email
       APP_ASSETS_MINIFIED: "true"
-    expose:
-      - "8080"
-    networks:
-      - bw-services
-      - default
-    labels:
-      - "bunkerweb.SERVER_NAME=localhost"
-      - "bunkerweb.USE_REVERSE_PROXY=yes"
-      - "bunkerweb.REVERSE_PROXY_URL=/"
-      - "bunkerweb.REVERSE_PROXY_HOST=http://app:8080"
-      - "bunkerweb.REVERSE_PROXY_INTERCEPT_ERRORS=no"
-      - "bunkerweb.ALLOWED_METHODS=GET|POST|PUT|PATCH|DELETE|OPTIONS"
-      - "bunkerweb.USE_LIMIT_REQ=yes"
-      - "bunkerweb.LIMIT_REQ_URL=/"
-      - "bunkerweb.LIMIT_REQ_RATE=20r/s"
-      - "bunkerweb.LIMIT_REQ_URL_2=^/api/auth"
-      - "bunkerweb.LIMIT_REQ_RATE_2=10r/m"
-      - "bunkerweb.USE_BAD_BEHAVIOR=yes"
-      - "bunkerweb.USE_BUNKERNET=no"
-      - "bunkerweb.BAD_BEHAVIOR_STATUS_CODES=400 401 403 404 405 429 444"
-      - "bunkerweb.BAD_BEHAVIOR_THRESHOLD=8"
-      - "bunkerweb.BAD_BEHAVIOR_COUNT_TIME=60"
-      - "bunkerweb.BAD_BEHAVIOR_BAN_TIME=3600"
-      - "bunkerweb.BAD_BEHAVIOR_BAN_SCOPE=service"
-      - "bunkerweb.USE_BLACKLIST=yes"
-      - "bunkerweb.BLACKLIST_URI=^/wp-admin/?$ ^/wp-login\\.php$ ^/xmlrpc\\.php$ ^/\\.env$ ^/server-status$"
-      - "bunkerweb.PERMISSIONS_POLICY=accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), usb=(), web-share=(), xr-spatial-tracking=()"
-      - "bunkerweb.FEATURE_POLICY="
-
-  bunkerweb:
-    image: bunkerity/bunkerweb:1.4.0
-    container_name: openmailer-bunkerweb
-    depends_on:
-      - app
     ports:
       - "8080:8080"
-      - "8443:8443"
-    volumes:
-      - bw-data:/data
-    environment:
-      MULTISITE: "yes"
-      SERVER_NAME: ""
-      USE_BUNKERNET: "no"
-      API_WHITELIST_IP: "127.0.0.0/8 10.20.30.0/24 172.16.0.0/12"
-    labels:
-      - "bunkerweb.AUTOCONF"
-    networks:
-      - bw-autoconf
-      - bw-services
-
-  bunkerweb-autoconf:
-    image: bunkerity/bunkerweb-autoconf:1.4.0
-    container_name: openmailer-bunkerweb-autoconf
-    depends_on:
-      - bunkerweb
-    volumes:
-      - bw-data:/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - bw-autoconf
 
   postgres:
     image: postgres:17-alpine
@@ -123,10 +65,5 @@ services:
       retries: 5
 
 volumes:
-  bw-data:
   postgres_data:
   redis_data:
-
-networks:
-  bw-autoconf:
-  bw-services:

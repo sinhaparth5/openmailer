@@ -2,30 +2,31 @@
 
 @layer base {
   :root {
-    --app-bg: #f3ecdf;
-    --app-bg-soft: #f8f4eb;
-    --app-panel: rgba(255, 251, 245, 0.88);
-    --app-panel-strong: #fffaf2;
-    --app-border: rgba(57, 48, 36, 0.12);
-    --app-border-strong: rgba(32, 27, 21, 0.18);
-    --app-text: #211d18;
-    --app-text-soft: #736657;
-    --app-accent: #171717;
-    --app-accent-soft: #f3d9a2;
-    --app-peach: #f6d9d1;
-    --app-lilac: #dcd4f7;
-    --app-mint: #d8eddc;
-    --app-sun: #f4dfa4;
-    --app-shadow: 0 30px 80px -48px rgba(53, 43, 31, 0.28);
+    --app-bg: #ede5d4;
+    --app-bg-soft: #f4eedd;
+    --app-panel: rgba(255, 252, 244, 0.90);
+    --app-panel-strong: #fffcf4;
+    --app-border: rgba(57, 48, 36, 0.11);
+    --app-border-strong: rgba(32, 27, 21, 0.17);
+    --app-text: #1e1a14;
+    --app-text-soft: #6b5e4e;
+    --app-accent: #1a1a1a;
+    --app-accent-soft: #f0d87e;
+    /* Semantic palette — richer & more vibrant */
+    --app-peach: #fbb8a8;
+    --app-lilac: #c9bcf8;
+    --app-mint: #a8e6ba;
+    --app-sun: #f8d96a;
+    --app-shadow: 0 32px 80px -40px rgba(53, 43, 31, 0.32);
     --app-radius-xl: 28px;
     --app-radius-lg: 22px;
     --app-radius-md: 18px;
     --font-ui: "DM Sans", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-    /* Stat card colors — matched from design reference */
-    --card-lime: #ccd97a;
-    --card-pink: #f4b0bf;
-    --card-sage: #a4c892;
-    --card-mauve: #e8b8ce;
+    /* Stat card colors — vibrant, matched to reference design */
+    --card-lime: #ddf04e;
+    --card-pink: #f472b6;
+    --card-sage: #a8e063;
+    --card-mauve: #93c4fd;
   }
 
   html {
@@ -36,14 +37,16 @@
 
   body {
     background:
-      radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 26%),
-      radial-gradient(circle at top right, rgba(244, 223, 164, 0.42), transparent 23%),
-      linear-gradient(180deg, #efe5d8 0%, #f7f2ea 38%, #f2ede4 100%);
+      radial-gradient(ellipse 70% 50% at top left, rgba(255, 255, 245, 0.85), transparent),
+      radial-gradient(ellipse 60% 45% at top right, rgba(221, 240, 78, 0.28), transparent),
+      radial-gradient(ellipse 50% 40% at bottom left, rgba(244, 114, 182, 0.14), transparent),
+      radial-gradient(ellipse 55% 45% at bottom right, rgba(147, 196, 253, 0.16), transparent),
+      linear-gradient(155deg, #e8ddc8 0%, #f2e9d5 45%, #ede4ce 100%);
     color: var(--app-text);
   }
 
   ::selection {
-    background: rgba(244, 223, 164, 0.75);
+    background: rgba(221, 240, 78, 0.65);
     color: #18130d;
   }
 }
@@ -51,29 +54,37 @@
 @layer components {
   .app-shell {
     border: 1px solid var(--app-border);
-    background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(250, 244, 235, 0.92));
+    background: linear-gradient(160deg, rgba(255, 253, 244, 0.97) 0%, rgba(250, 243, 228, 0.94) 100%);
     border-radius: 34px;
-    box-shadow: var(--app-shadow);
-    backdrop-filter: blur(24px);
+    box-shadow:
+      0 40px 100px -40px rgba(53, 43, 31, 0.30),
+      0 4px 20px -8px rgba(53, 43, 31, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(28px);
   }
 
   .app-panel {
     border: 1px solid var(--app-border);
     background: var(--app-panel);
     border-radius: var(--app-radius-xl);
-    box-shadow: 0 18px 40px -36px rgba(33, 29, 24, 0.38);
+    box-shadow:
+      0 16px 40px -24px rgba(33, 29, 24, 0.24),
+      0 2px 8px -4px rgba(33, 29, 24, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
   }
 
   .app-panel-strong {
     border: 1px solid var(--app-border-strong);
     background: var(--app-panel-strong);
     border-radius: var(--app-radius-xl);
-    box-shadow: 0 24px 50px -40px rgba(33, 29, 24, 0.3);
+    box-shadow:
+      0 20px 52px -32px rgba(33, 29, 24, 0.26),
+      0 2px 10px -4px rgba(33, 29, 24, 0.06);
   }
 
   .app-soft-card {
     border: 1px solid rgba(57, 48, 36, 0.08);
-    background: rgba(255, 255, 255, 0.68);
+    background: rgba(255, 255, 255, 0.72);
     border-radius: var(--app-radius-lg);
   }
 

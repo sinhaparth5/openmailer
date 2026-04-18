@@ -77,6 +77,53 @@ window.showToast = function(type, title, message = '', duration = 5000) {
     window.dispatchEvent(event);
 };
 
+/**
+ * Calendar Widget Component
+ */
+function calendarWidget() {
+    return {
+        today: new Date(),
+        viewDate: new Date(),
+
+        get monthYear() {
+            return this.viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        },
+
+        get todayLabel() {
+            return this.today.toLocaleString('default', { month: 'long', day: 'numeric' });
+        },
+
+        get daysArray() {
+            const year = this.viewDate.getFullYear();
+            const month = this.viewDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            // Monday-first: Sunday=0 → offset 6, Mon=1 → offset 0, etc.
+            const startOffset = (firstDay.getDay() + 6) % 7;
+            const days = [];
+            for (let i = 0; i < startOffset; i++) days.push(null);
+            for (let d = 1; d <= totalDays; d++) {
+                days.push({ d, isToday: this.checkToday(year, month, d) });
+            }
+            return days;
+        },
+
+        checkToday(year, month, day) {
+            return year === this.today.getFullYear() &&
+                   month === this.today.getMonth() &&
+                   day === this.today.getDate();
+        },
+
+        prevMonth() {
+            this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() - 1, 1);
+        },
+
+        nextMonth() {
+            this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() + 1, 1);
+        }
+    };
+}
+
 // Listen for toast events and dispatch to the toast container
 window.addEventListener('show-toast', (event) => {
     const container = document.querySelector('[x-data*="toastManager"]');

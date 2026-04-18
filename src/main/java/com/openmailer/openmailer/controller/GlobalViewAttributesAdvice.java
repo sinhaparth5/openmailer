@@ -2,6 +2,7 @@ package com.openmailer.openmailer.controller;
 
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.security.CustomUserDetails;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,11 @@ public class GlobalViewAttributesAdvice {
     @ModelAttribute("assetMinified")
     public boolean assetMinified() {
         return assetMinified;
+    }
+
+    @ModelAttribute("currentUri")
+    public String currentUri(HttpServletRequest request) {
+        return request.getRequestURI();
     }
 
     @ModelAttribute("currentUserDisplayName")

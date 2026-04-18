@@ -23,19 +23,19 @@
             <span class="flex-shrink-0 rounded-full bg-[var(--card-lime)]/75 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-700">Live account</span>
         </div>
 
-        <!-- ── 4 Stat Cards ──────────────────────────────────────────── -->
-        <div class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <!-- ── 4 Stat Cards (2×2 grid, uniform height per row) ─────── -->
+        <div class="mb-8 grid gap-4 grid-cols-2">
 
             <!-- Contacts — lime -->
-            <div class="rounded-[18px] bg-[var(--card-lime)] p-5">
+            <div class="flex flex-col rounded-[18px] bg-[var(--card-lime)] p-5 min-h-[170px]">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Contacts</p>
                 <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${contactCount}">0</p>
                 <div class="mt-2 flex items-center gap-1.5">
                     <span class="text-[13px] text-[#111]/55">Subscribed</span>
                     <span class="text-[13px] font-semibold text-[#111]/75" th:text="${subscribedContactCount}">0</span>
                 </div>
-                <!-- mini bar chart -->
-                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                <!-- mini bar chart pinned to bottom -->
+                <div class="mt-auto pt-4 flex items-end gap-[3px]" style="height:36px">
                     <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:42%"></div>
                     <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:60%"></div>
                     <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:48%"></div>
@@ -47,14 +47,14 @@
             </div>
 
             <!-- Campaigns — pink -->
-            <div class="rounded-[18px] bg-[var(--card-pink)] p-5">
+            <div class="flex flex-col rounded-[18px] bg-[var(--card-pink)] p-5 min-h-[170px]">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Campaigns</p>
                 <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${campaignCount}">0</p>
                 <div class="mt-2 flex items-center gap-1.5">
                     <span class="text-[13px] text-[#111]/55">Drafts</span>
                     <span class="text-[13px] font-semibold text-[#111]/75" th:text="${draftCampaignCount}">0</span>
                 </div>
-                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                <div class="mt-auto pt-4 flex items-end gap-[3px]" style="height:36px">
                     <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:55%"></div>
                     <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:36%"></div>
                     <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:68%"></div>
@@ -66,13 +66,13 @@
             </div>
 
             <!-- Templates — sage -->
-            <div class="rounded-[18px] bg-[var(--card-sage)] p-5">
+            <div class="flex flex-col rounded-[18px] bg-[var(--card-sage)] p-5 min-h-[170px]">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Templates</p>
                 <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${templateCount}">0</p>
                 <div class="mt-2 flex items-center gap-1.5">
-                    <span class="text-[13px] text-[#111]/55">Ready for new drafts</span>
+                    <span class="text-[13px] text-[#111]/55">Ready to use</span>
                 </div>
-                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                <div class="mt-auto pt-4 flex items-end gap-[3px]" style="height:36px">
                     <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:35%"></div>
                     <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:58%"></div>
                     <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:44%"></div>
@@ -84,7 +84,7 @@
             </div>
 
             <!-- Domains — mauve -->
-            <div class="rounded-[18px] bg-[var(--card-mauve)] p-5">
+            <div class="flex flex-col rounded-[18px] bg-[var(--card-mauve)] p-5 min-h-[170px]">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Domains</p>
                 <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${verifiedDomainCount}">0</p>
                 <div class="mt-2 flex items-center gap-1.5">
@@ -92,7 +92,7 @@
                     <span class="text-[13px] font-semibold text-[#111]/75" th:text="${activeProviderCount}">0</span>
                     <span class="text-[13px] text-[#111]/55">active</span>
                 </div>
-                <div class="mt-5 flex items-end gap-[3px]" style="height:36px">
+                <div class="mt-auto pt-4 flex items-end gap-[3px]" style="height:36px">
                     <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:68%"></div>
                     <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:44%"></div>
                     <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:82%"></div>
@@ -185,44 +185,132 @@
             </div>
 
             <!-- Right aside (fixed 320px) -->
-            <aside class="space-y-5">
+            <aside class="space-y-4">
 
-                <section class="app-panel p-5">
-                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Readiness</p>
-                    <div class="mt-4 space-y-2">
-                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
-                            <span class="text-[13px] text-slate-500">Domains</span>
-                            <span class="text-[15px] font-bold text-slate-900" th:text="${verifiedDomainCount}">0</span>
+                <!-- ── Calendar ─────────────────────────────────────── -->
+                <section class="overflow-hidden rounded-[22px] border border-[var(--app-border)] shadow-[0_18px_40px_-28px_rgba(33,29,24,0.22)]"
+                         x-data="calendarWidget()">
+
+                    <!-- Dark header with month nav -->
+                    <div class="flex items-center justify-between bg-[#1a1a1a] px-5 py-4">
+                        <button type="button"
+                                @click="prevMonth()"
+                                class="flex h-7 w-7 items-center justify-center rounded-full text-white/45 transition hover:bg-white/10 hover:text-white"
+                                aria-label="Previous month">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <span class="text-[13px] font-bold text-white" x-text="monthYear">April 2025</span>
+                        <button type="button"
+                                @click="nextMonth()"
+                                class="flex h-7 w-7 items-center justify-center rounded-full text-white/45 transition hover:bg-white/10 hover:text-white"
+                                aria-label="Next month">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Calendar body -->
+                    <div class="bg-[var(--app-panel-strong)] p-4">
+
+                        <!-- Day-of-week headers -->
+                        <div class="mb-2 grid grid-cols-7 text-center">
+                            <span class="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Mo</span>
+                            <span class="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Tu</span>
+                            <span class="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">We</span>
+                            <span class="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Th</span>
+                            <span class="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Fr</span>
+                            <span class="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Sa</span>
+                            <span class="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Su</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
-                            <span class="text-[13px] text-slate-500">Providers</span>
-                            <span class="text-[15px] font-bold text-slate-900" th:text="${activeProviderCount}">0</span>
+
+                        <!-- Day grid -->
+                        <div class="grid grid-cols-7 gap-y-0.5 text-center">
+                            <template x-for="(item, idx) in daysArray" :key="idx">
+                                <div class="flex items-center justify-center py-0.5">
+                                    <span x-show="item !== null"
+                                          x-text="item ? item.d : ''"
+                                          :class="item && item.isToday
+                                              ? 'flex h-7 w-7 items-center justify-center rounded-full bg-[#1a1a1a] text-xs font-bold text-white'
+                                              : 'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-xs text-slate-600 transition hover:bg-[var(--card-lime)]/50 hover:font-semibold'">
+                                    </span>
+                                </div>
+                            </template>
                         </div>
-                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
-                            <span class="text-[13px] text-slate-500">Drafts</span>
-                            <span class="text-[15px] font-bold text-slate-900" th:text="${draftCampaignCount}">0</span>
+                    </div>
+
+                    <!-- Today's snapshot -->
+                    <div class="border-t border-[var(--app-border)] bg-[var(--app-panel)] px-4 pb-4 pt-3">
+                        <div class="mb-3 flex items-center justify-between">
+                            <p class="text-sm font-bold text-slate-900" x-text="todayLabel">Today</p>
+                            <span class="rounded-full bg-[var(--card-lime)]/70 px-2.5 py-0.5 text-[10px] font-bold text-slate-700 uppercase tracking-[0.14em]">Today</span>
                         </div>
-                        <div class="flex items-center justify-between rounded-[12px] bg-white/75 px-4 py-3">
-                            <span class="text-[13px] text-slate-500">Scheduled</span>
-                            <span class="text-[15px] font-bold text-slate-900" th:text="${scheduledCampaignCount}">0</span>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-3 rounded-[12px] bg-[var(--card-lime)]/40 px-3 py-2.5">
+                                <div class="mt-0.5 h-2 w-2 flex-shrink-0 rounded-full bg-[#6b7c1a]"></div>
+                                <div class="min-w-0">
+                                    <p class="truncate text-[12px] font-semibold text-slate-900">Send campaign drafts</p>
+                                    <p class="text-[11px] text-slate-500">Review before scheduling</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 rounded-[12px] bg-[var(--card-pink)]/35 px-3 py-2.5">
+                                <div class="mt-0.5 h-2 w-2 flex-shrink-0 rounded-full bg-[#9d1e5e]"></div>
+                                <div class="min-w-0">
+                                    <p class="truncate text-[12px] font-semibold text-slate-900">Verify new domain</p>
+                                    <p class="text-[11px] text-slate-500">DNS propagation check</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 rounded-[12px] bg-[var(--card-mauve)]/35 px-3 py-2.5">
+                                <div class="mt-0.5 h-2 w-2 flex-shrink-0 rounded-full bg-[#1a4f9e]"></div>
+                                <div class="min-w-0">
+                                    <p class="truncate text-[12px] font-semibold text-slate-900">Import audience CSV</p>
+                                    <p class="text-[11px] text-slate-500">Contacts batch upload</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
 
+                <!-- ── Readiness ────────────────────────────────────── -->
+                <section class="app-panel p-5">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Readiness</p>
+                    <div class="mt-3 space-y-1.5">
+                        <div class="flex items-center justify-between rounded-[11px] bg-white/75 px-3.5 py-2.5">
+                            <span class="text-[13px] text-slate-500">Domains</span>
+                            <span class="text-[14px] font-bold text-slate-900" th:text="${verifiedDomainCount}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[11px] bg-white/75 px-3.5 py-2.5">
+                            <span class="text-[13px] text-slate-500">Providers</span>
+                            <span class="text-[14px] font-bold text-slate-900" th:text="${activeProviderCount}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[11px] bg-white/75 px-3.5 py-2.5">
+                            <span class="text-[13px] text-slate-500">Drafts</span>
+                            <span class="text-[14px] font-bold text-slate-900" th:text="${draftCampaignCount}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[11px] bg-white/75 px-3.5 py-2.5">
+                            <span class="text-[13px] text-slate-500">Scheduled</span>
+                            <span class="text-[14px] font-bold text-slate-900" th:text="${scheduledCampaignCount}">0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ── Next steps ───────────────────────────────────── -->
                 <section class="app-panel p-5">
                     <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Next steps</p>
-                    <div class="mt-4 space-y-2.5">
-                        <div class="rounded-[14px] bg-[var(--card-lime)]/55 p-4">
+                    <div class="mt-3 space-y-2">
+                        <div class="rounded-[13px] bg-[var(--card-lime)]/55 p-3.5">
                             <p class="text-[13px] font-semibold text-slate-900">Missing domains?</p>
-                            <a href="/api/v1/domains" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Review domain setup →</a>
+                            <a href="/api/v1/domains" class="mt-1 inline-flex text-[11px] font-bold text-slate-700 hover:text-slate-950">Review domain setup →</a>
                         </div>
-                        <div class="rounded-[14px] bg-[var(--card-pink)]/55 p-4">
+                        <div class="rounded-[13px] bg-[var(--card-pink)]/50 p-3.5">
                             <p class="text-[13px] font-semibold text-slate-900">Missing providers?</p>
-                            <a href="/api/v1/providers" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Review providers →</a>
+                            <a href="/api/v1/providers" class="mt-1 inline-flex text-[11px] font-bold text-slate-700 hover:text-slate-950">Review providers →</a>
                         </div>
-                        <div class="rounded-[14px] bg-[var(--card-sage)]/55 p-4">
+                        <div class="rounded-[13px] bg-[var(--card-sage)]/55 p-3.5">
                             <p class="text-[13px] font-semibold text-slate-900">Empty audience?</p>
-                            <a href="/contacts/import" class="mt-1.5 inline-flex text-[12px] font-bold text-slate-700 hover:text-slate-950">Import contacts →</a>
+                            <a href="/contacts/import" class="mt-1 inline-flex text-[11px] font-bold text-slate-700 hover:text-slate-950">Import contacts →</a>
                         </div>
                     </div>
                 </section>
