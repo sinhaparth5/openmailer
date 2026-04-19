@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/auth}"
+      lang="en">
+<head>
+    <title>404 — Page Not Found</title>
+    <meta name="description" content="The page you requested could not be found on OpenMailer.">
+    <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+<section layout:fragment="content"
+         class="relative flex min-h-[calc(100vh-3rem)] w-full items-center justify-center overflow-hidden rounded-[32px] border border-slate-200/70 bg-[radial-gradient(circle_at_top_left,_rgba(221,240,78,0.35),_transparent_32%),linear-gradient(135deg,_#f8fafc_0%,_#eef4ff_45%,_#fff7ed_100%)] px-6 py-10 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.45)] sm:px-10">
+    <div class="pointer-events-none absolute inset-0 overflow-hidden">
+        <div class="absolute -left-12 top-14 h-40 w-40 rounded-full bg-lime-300/35 blur-3xl"></div>
+        <div class="absolute bottom-10 right-0 h-48 w-48 rounded-full bg-sky-300/25 blur-3xl"></div>
+        <div class="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-white/20 blur-2xl"></div>
+    </div>
+
+    <div class="relative grid w-full max-w-5xl gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div class="space-y-6">
+            <div class="inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/75 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+                Missing destination
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-semibold uppercase tracking-[0.35em] text-slate-500">Error 404</p>
+                <h1 class="max-w-2xl text-4xl font-black tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+                    This route fell off the campaign map.
+                </h1>
+                <p class="max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
+                    The page you tried to open does not exist, may have moved, or was linked incorrectly.
+                    Return to the dashboard or head back to the homepage.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+                <a th:href="@{/dashboard}"
+                   class="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+                    Go To Dashboard
+                </a>
+                <a th:href="@{/}"
+                   class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white/80 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-white">
+                    Back To Home
+                </a>
+            </div>
+        </div>
+
+        <div class="relative">
+            <div class="rounded-[28px] border border-slate-200/80 bg-slate-950 p-6 text-white shadow-2xl shadow-slate-900/20">
+                <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-white/45">OpenMailer</p>
+                        <p class="mt-1 text-lg font-semibold">Route inspector</p>
+                    </div>
+                    <div class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/65">
+                        404
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-4">
+                    <div class="rounded-2xl border border-rose-400/20 bg-rose-400/10 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-rose-200/80">Status</p>
+                        <p class="mt-2 text-sm text-white/80">Requested resource not found.</p>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/40">Try next</p>
+                            <p class="mt-2 text-sm text-white/75">Check the URL or use app navigation.</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/40">Common cause</p>
+                            <p class="mt-2 text-sm text-white/75">Old bookmark or stale deploy link.</p>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[24px] border border-dashed border-white/15 bg-black/20 p-5">
+                        <div class="flex items-end gap-2">
+                            <span class="text-7xl font-black tracking-[-0.08em] text-white/95">404</span>
+                            <span class="mb-2 text-sm font-medium uppercase tracking-[0.28em] text-white/35">Not Found</span>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <span class="h-2 w-16 rounded-full bg-lime-300"></span>
+                            <span class="h-2 w-10 rounded-full bg-sky-300"></span>
+                            <span class="h-2 w-6 rounded-full bg-rose-300"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
