@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${pageTitle}">Templates</title>
+    <style>
+        @keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
+        .tp1{animation:fade-up .5s .04s ease both}
+        .tp2{animation:fade-up .5s .10s ease both}
+        .tp3{animation:fade-up .5s .17s ease both}
+        .tp4{animation:fade-up .5s .24s ease both}
+        .live-dot{animation:pulse-dot 2.4s ease-in-out infinite}
+        .tmpl-card{transition:transform 180ms ease,box-shadow 180ms ease,border-color 180ms ease}
+        .tmpl-card:hover{transform:translateY(-3px);box-shadow:0 20px 44px -24px rgba(15,23,42,0.2)}
+    </style>
+</head>
+<body>
+<main layout:fragment="content">
+<div class="space-y-5">
+
+    <!-- ── Header ────────────────────────────────────────────────────── -->
+    <header class="tp1 flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <div class="mb-2.5 flex items-center gap-2">
+                <span class="live-dot inline-block h-2 w-2 rounded-full bg-[var(--card-sage)]"></span>
+                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Campaign content</p>
+            </div>
+            <h1 class="text-[2.2rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-[#111] sm:text-[2.6rem]">
+                Email templates.
+            </h1>
+            <p class="mt-2 max-w-md text-[0.875rem] leading-6 text-slate-500">
+                Build reusable layouts with subject lines, preview text, and merge variables that personalize every send.
+            </p>
+        </div>
+        <a href="/templates/new" class="app-button-primary flex-shrink-0 px-5 py-3 text-sm">+ Create template</a>
+    </header>
+
+    <!-- ── Stat cards ─────────────────────────────────────────────────── -->
+    <div class="tp2 grid grid-cols-3 gap-4">
+
+        <div class="relative flex min-h-[140px] flex-col overflow-hidden rounded-[22px] bg-[var(--card-sage)] p-5 transition-transform duration-200 hover:-translate-y-0.5">
+            <!-- decorative: stacked documents -->
+            <svg class="pointer-events-none absolute -bottom-4 -right-4 h-32 w-32 opacity-[0.11]" viewBox="0 0 120 120" fill="currentColor">
+                <rect x="22" y="28" width="76" height="88" rx="8"/>
+                <rect fill="white" opacity="0.22" x="14" y="18" width="76" height="88" rx="8"/>
+                <rect fill="white" opacity="0.3" x="30" y="42" width="58" height="7" rx="3.5"/>
+                <rect fill="white" opacity="0.3" x="30" y="56" width="58" height="7" rx="3.5"/>
+                <rect fill="white" opacity="0.3" x="30" y="70" width="40" height="7" rx="3.5"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Total templates</p>
+            <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${totalTemplates}">0</p>
+            <p class="mt-1.5 text-[12px] text-[#111]/50">in library</p>
+            <div class="mt-auto flex items-end gap-[3px] pt-4" style="height:32px">
+                <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:45%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:62%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:50%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:78%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:90%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:100%"></div>
+            </div>
+        </div>
+
+        <div class="relative flex min-h-[140px] flex-col overflow-hidden rounded-[22px] bg-[var(--app-mint)]/80 p-5 transition-transform duration-200 hover:-translate-y-0.5">
+            <!-- decorative: checkmark circle -->
+            <svg class="pointer-events-none absolute -bottom-4 -right-4 h-32 w-32 opacity-[0.11]" viewBox="0 0 100 100" fill="currentColor">
+                <circle cx="50" cy="50" r="44"/>
+                <path fill="none" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" d="M28 52 L44 68 L72 34"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Active</p>
+            <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${activeTemplates}">0</p>
+            <p class="mt-1.5 text-[12px] text-[#111]/50">ready to use</p>
+            <div class="mt-auto flex items-end gap-[3px] pt-4" style="height:32px">
+                <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:60%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:80%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:100%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:70%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:85%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:55%"></div>
+            </div>
+        </div>
+
+        <div class="relative flex min-h-[140px] flex-col overflow-hidden rounded-[22px] bg-[var(--app-lilac)]/80 p-5 transition-transform duration-200 hover:-translate-y-0.5">
+            <!-- decorative: merge/variable braces -->
+            <svg class="pointer-events-none absolute -bottom-3 -right-3 h-32 w-32 opacity-[0.11]" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M30 16 C18 16 16 24 16 32 V44 C16 50 10 52 10 52 C10 52 16 54 16 60 V72 C16 80 18 88 30 88"/>
+                <path d="M70 16 C82 16 84 24 84 32 V44 C84 50 90 52 90 52 C90 52 84 54 84 60 V72 C84 80 82 88 70 88"/>
+                <circle fill="currentColor" cx="50" cy="52" r="5"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Using variables</p>
+            <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${templatesWithVariables}">0</p>
+            <p class="mt-1.5 text-[12px] text-[#111]/50">with merge tags</p>
+            <div class="mt-auto flex items-end gap-[3px] pt-4" style="height:32px">
+                <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:100%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:68%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:82%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:50%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:72%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:44%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Template library ──────────────────────────────────────────── -->
+    <section class="tp3 app-panel-strong overflow-hidden rounded-[24px]">
+        <!-- Header strip -->
+        <div class="relative flex flex-wrap items-center justify-between gap-4 overflow-hidden border-b border-[rgba(57,48,36,0.08)] bg-[var(--card-sage)]/22 px-6 py-5 sm:px-8">
+            <!-- decorative corner: layered pages -->
+            <svg class="pointer-events-none absolute -bottom-5 -right-4 h-28 w-28 opacity-[0.13]" viewBox="0 0 120 120" fill="currentColor">
+                <rect x="22" y="28" width="76" height="88" rx="8"/>
+                <rect fill="white" opacity="0.22" x="14" y="18" width="76" height="88" rx="8"/>
+            </svg>
+            <div class="flex items-center gap-3.5">
+                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[12px] bg-[var(--card-sage)]/60">
+                    <svg class="h-5 w-5 text-[#3a5a00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Library</p>
+                    <h2 class="text-base font-extrabold tracking-tight text-slate-950">Reusable campaign content</h2>
+                </div>
+            </div>
+            <form method="get" class="w-full max-w-xs">
+                <input type="text" name="search" th:value="${search}" class="app-input text-sm" placeholder="Search templates…">
+            </form>
+        </div>
+
+        <div class="p-6 sm:p-8">
+            <div th:if="${#lists.isEmpty(templates)}"
+                 class="flex flex-col items-center justify-center rounded-[22px] border border-dashed border-[rgba(57,48,36,0.16)] bg-white/55 py-14 text-center">
+                <div class="flex h-14 w-14 items-center justify-center rounded-[16px] bg-[var(--card-sage)]/22">
+                    <svg class="h-7 w-7 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-base font-bold text-slate-900">No templates yet</h3>
+                <p class="mt-2 max-w-xs text-[13px] leading-6 text-slate-500">Create your first template to reuse consistent branding and copy across campaigns.</p>
+                <a href="/templates/new" class="app-button-primary mt-5 px-5 py-3 text-sm">Create first template</a>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(templates)}" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <article th:each="template : ${templates}"
+                         class="tmpl-card relative overflow-hidden rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-white/80 p-5 shadow-[0_8px_28px_-18px_rgba(33,29,24,0.15)]">
+
+                    <!-- status dot -->
+                    <div class="absolute right-4 top-4 h-2 w-2 rounded-full"
+                         th:classappend="${template.active} ? 'bg-[var(--card-lime)]' : 'bg-slate-300'"></div>
+
+                    <div class="pr-6">
+                        <h3 class="text-[15px] font-extrabold tracking-tight text-[#111]" th:text="${template.name}">Template name</h3>
+                        <p class="mt-1 text-[12px] font-medium text-slate-600" th:text="${template.subject}">Subject line</p>
+                    </div>
+
+                    <p class="mt-3 text-[12px] leading-6 text-slate-500 line-clamp-2"
+                       th:text="${template.description != null ? template.description : template.previewSnippet}">Template preview</p>
+
+                    <div class="mt-4 grid grid-cols-2 gap-2.5">
+                        <div class="rounded-[14px] bg-[var(--card-sage)]/25 px-3 py-2.5">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Variables</p>
+                            <p class="mt-1.5 text-[18px] font-extrabold text-slate-900" th:text="${template.variableCount}">0</p>
+                        </div>
+                        <div class="rounded-[14px] bg-[var(--app-lilac)]/25 px-3 py-2.5">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Updated</p>
+                            <p class="mt-1.5 text-[11px] font-bold text-slate-900" th:text="${template.updatedAt}">—</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-between gap-3 border-t border-[rgba(57,48,36,0.07)] pt-4">
+                        <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]"
+                              th:classappend="${template.active} ? 'bg-[var(--app-mint)]/50 text-emerald-900' : 'bg-slate-100 text-slate-600'"
+                              th:text="${template.active ? 'Active' : 'Inactive'}">Active</span>
+                        <a th:href="@{/templates/{id}(id=${template.id})}"
+                           class="text-[12px] font-bold text-slate-700 transition hover:text-slate-900">Open template →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+</div>
+</main>
+</body>
+</html>

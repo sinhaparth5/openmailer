@@ -19,16 +19,20 @@ import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.auth.AuthenticationService;
 import com.openmailer.openmailer.service.auth.PasswordResetService;
 import com.openmailer.openmailer.service.auth.TwoFactorAuthService;
+import com.openmailer.openmailer.service.auth.UserService;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,10 +47,12 @@ public class AuthController {
 
   private static final String REFRESH_TOKEN_COOKIE = "openmailer_refresh_token";
   private static final long REFRESH_TOKEN_MAX_AGE_SECONDS = TimeUnit.DAYS.toSeconds(7);
+  private static final int MAX_PROFILE_IMAGE_BYTES = 2 * 1024 * 1024;
 
   private final AuthenticationService authenticationService;
   private final PasswordResetService passwordResetService;
   private final TwoFactorAuthService twoFactorAuthService;
+  private final UserService userService;
   private final boolean secureCookies;
   private final String cookieDomain;
 
@@ -55,12 +61,14 @@ public class AuthController {
       AuthenticationService authenticationService,
       PasswordResetService passwordResetService,
       TwoFactorAuthService twoFactorAuthService,
+      UserService userService,
       @Value("${app.security.cookies.secure:false}") boolean secureCookies,
       @Value("${app.security.cookies.domain:}") String cookieDomain
   ) {
     this.authenticationService = authenticationService;
     this.passwordResetService = passwordResetService;
     this.twoFactorAuthService = twoFactorAuthService;
+    this.userService = userService;
     this.secureCookies = secureCookies;
     this.cookieDomain = cookieDomain;
   }
@@ -168,6 +176,44 @@ public class AuthController {
         request.getNewPassword()
     );
     return ResponseEntity.ok(ApiResponse.success(null, "Password changed successfully."));
+  }
+
+  @PostMapping(path = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<ApiResponse<LoginResponse.UserInfo>> uploadAvatar(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestParam("file") MultipartFile file
+  ) throws java.io.IOException {
+    if (file.isEmpty()) {
+      return ResponseEntity.badRequest()
+          .body(ApiResponse.error("INVALID_FILE", "Choose an image to upload.", "file"));
+    }
+
+    String contentType = file.getContentType();
+    if (contentType == null || !isAllowedProfileImageContentType(contentType)) {
+      return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+          .body(ApiResponse.error("INVALID_FILE_TYPE", "Only PNG, JPEG, GIF, or WEBP images are allowed.", "file"));
+    }
+
+    if (file.getSize() > MAX_PROFILE_IMAGE_BYTES) {
+      return ResponseEntity.badRequest()
+          .body(ApiResponse.error("FILE_TOO_LARGE", "Profile images must be 2MB or smaller.", "file"));
+    }
+
+    User savedUser = userService.updateProfileImage(
+        userDetails.getUser().getId(),
+        file.getBytes(),
+        contentType,
+        (int) file.getSize()
+    );
+    return ResponseEntity.ok(ApiResponse.success(authenticationService.buildUserInfo(savedUser), "Profile picture updated successfully."));
+  }
+
+  @DeleteMapping("/me/avatar")
+  public ResponseEntity<ApiResponse<LoginResponse.UserInfo>> deleteAvatar(
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    User savedUser = userService.removeProfileImage(userDetails.getUser().getId());
+    return ResponseEntity.ok(ApiResponse.success(authenticationService.buildUserInfo(savedUser), "Profile picture removed successfully."));
   }
 
   /**
@@ -389,5 +435,12 @@ public class AuthController {
       return null;
     }
     return value.trim();
+  }
+
+  private boolean isAllowedProfileImageContentType(String contentType) {
+    return MediaType.IMAGE_PNG_VALUE.equals(contentType)
+        || MediaType.IMAGE_JPEG_VALUE.equals(contentType)
+        || MediaType.IMAGE_GIF_VALUE.equals(contentType)
+        || "image/webp".equals(contentType);
   }
 }

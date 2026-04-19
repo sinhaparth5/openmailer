@@ -2,6 +2,8 @@ package com.openmailer.openmailer.model;
 
 import com.openmailer.openmailer.util.IdGenerator;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 @Entity
@@ -77,6 +79,17 @@ public class User {
 
     @Column(name = "password_reset_token_expires_at")
     private LocalDateTime passwordResetTokenExpiresAt;
+
+    @Basic(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.VARBINARY)
+    @Column(name = "profile_image_data", columnDefinition = "BYTEA")
+    private byte[] profileImageData;
+
+    @Column(name = "profile_image_content_type", length = 100)
+    private String profileImageContentType;
+
+    @Column(name = "profile_image_size")
+    private Integer profileImageSize;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -315,5 +328,29 @@ public class User {
 
     public void setPasswordResetTokenExpiresAt(LocalDateTime passwordResetTokenExpiresAt) {
         this.passwordResetTokenExpiresAt = passwordResetTokenExpiresAt;
+    }
+
+    public byte[] getProfileImageData() {
+        return profileImageData;
+    }
+
+    public void setProfileImageData(byte[] profileImageData) {
+        this.profileImageData = profileImageData;
+    }
+
+    public String getProfileImageContentType() {
+        return profileImageContentType;
+    }
+
+    public void setProfileImageContentType(String profileImageContentType) {
+        this.profileImageContentType = profileImageContentType;
+    }
+
+    public Integer getProfileImageSize() {
+        return profileImageSize;
+    }
+
+    public void setProfileImageSize(Integer profileImageSize) {
+        this.profileImageSize = profileImageSize;
     }
 }

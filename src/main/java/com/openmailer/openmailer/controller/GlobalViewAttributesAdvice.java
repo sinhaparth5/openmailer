@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import java.time.ZoneOffset;
+
 @ControllerAdvice
 public class GlobalViewAttributesAdvice {
 
@@ -72,6 +74,26 @@ public class GlobalViewAttributesAdvice {
         }
 
         return initials.toString();
+    }
+
+    @ModelAttribute("currentUserHasProfileImage")
+    public boolean currentUserHasProfileImage() {
+        User user = currentUser();
+        return user != null && user.getProfileImageSize() != null && user.getProfileImageSize() > 0;
+    }
+
+    @ModelAttribute("currentUserAvatarUrl")
+    public String currentUserAvatarUrl() {
+        User user = currentUser();
+        if (user == null || user.getProfileImageSize() == null || user.getProfileImageSize() <= 0) {
+            return null;
+        }
+
+        long version = user.getUpdatedAt() != null
+            ? user.getUpdatedAt().toInstant(ZoneOffset.UTC).toEpochMilli()
+            : System.currentTimeMillis();
+
+        return "/users/me/avatar?v=" + version;
     }
 
     private User currentUser() {

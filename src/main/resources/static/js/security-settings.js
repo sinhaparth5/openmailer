@@ -41,6 +41,13 @@ function getCsrfHeaders() {
     return headers;
 }
 
+function getCsrfTokenPair() {
+    return {
+        token: document.querySelector('meta[name="_csrf"]')?.getAttribute('content'),
+        header: document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content')
+    };
+}
+
 async function apiRequest(url, options = {}) {
     const response = await fetch(url, {
         credentials: 'same-origin',
@@ -151,6 +158,103 @@ document.getElementById('profileForm')?.addEventListener('submit', async (event)
             })
         });
         showAlert(result.message || 'Profile updated successfully.', 'success');
+    } catch (error) {
+        showAlert(error.message);
+    }
+});
+
+document.getElementById('avatarForm')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    hideAlert();
+
+    const fileInput = document.getElementById('profileImageInput');
+    const file = fileInput?.files?.[0];
+    if (!file) {
+        showAlert('Choose an image before uploading.');
+        return;
+    }
+
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        showAlert('Only PNG, JPEG, GIF, or WEBP images are allowed.');
+        return;
+    }
+
+    const maxBytes = 2 * 1024 * 1024;
+    if (file.size > maxBytes) {
+        showAlert('Profile images must be 2MB or smaller.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { token, header } = getCsrfTokenPair();
+    const headers = {};
+    if (token && header) {
+        headers[header] = token;
+    }
+
+    try {
+        const response = await fetch('/api/auth/me/avatar', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers,
+            body: formData
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            throw new Error(result?.error?.message || result?.message || 'Upload failed');
+        }
+
+        const avatarUrl = `/users/me/avatar?v=${Date.now()}`;
+        const image = document.getElementById('profileAvatarImage');
+        const fallback = document.getElementById('profileAvatarFallback');
+
+        if (image) {
+            image.src = avatarUrl;
+            image.classList.remove('hidden');
+        } else if (fallback) {
+            const img = document.createElement('img');
+            img.id = 'profileAvatarImage';
+            img.alt = 'Profile picture';
+            img.src = avatarUrl;
+            img.className = 'h-24 w-24 rounded-full object-cover shadow-[0_10px_24px_-12px_rgba(15,23,42,0.45)]';
+            fallback.replaceWith(img);
+        }
+
+        document.getElementById('removeAvatarButton')?.classList.remove('hidden');
+        fileInput.value = '';
+        showAlert(result.message || 'Profile picture updated successfully.', 'success');
+    } catch (error) {
+        showAlert(error.message);
+    }
+});
+
+document.getElementById('removeAvatarButton')?.addEventListener('click', async () => {
+    hideAlert();
+
+    if (!window.confirm('Remove your current profile picture?')) {
+        return;
+    }
+
+    try {
+        const result = await apiRequest('/api/auth/me/avatar', {
+            method: 'DELETE',
+            body: JSON.stringify({})
+        });
+
+        const image = document.getElementById('profileAvatarImage');
+        if (image) {
+            const fallback = document.createElement('div');
+            fallback.id = 'profileAvatarFallback';
+            fallback.className = 'flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[var(--card-lime)]/65 to-[var(--card-mauve)]/65 text-2xl font-extrabold text-white shadow-[0_10px_24px_-12px_rgba(15,23,42,0.45)]';
+            fallback.textContent = document.getElementById('securitySettingsRoot')?.dataset.currentUserInitials || 'U';
+            image.replaceWith(fallback);
+        }
+
+        document.getElementById('removeAvatarButton')?.classList.add('hidden');
+        showAlert(result.message || 'Profile picture removed successfully.', 'success');
     } catch (error) {
         showAlert(error.message);
     }

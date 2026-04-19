@@ -76,6 +76,7 @@ public class SecurityConfiguration {
                         "img-src 'self' data: https:; " +
                         "font-src 'self' data: https://fonts.gstatic.com; " +
                         "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; " +
+                        "manifest-src 'self'; " +
                         "frame-ancestors 'none';")
                 )
                 .xssProtection(xss -> xss
@@ -92,7 +93,8 @@ public class SecurityConfiguration {
                 )
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/images/**").permitAll()
+                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/images/**", "/site.webmanifest", "/apple-touch-icon.png").permitAll()
+                .requestMatchers("/api/auth/me/**", "/api/auth/change-password", "/api/auth/2fa/**").authenticated()
                 .requestMatchers("/api/auth/**", "/track/**").permitAll()
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/webhooks/**", "/api/v1/webhooks/**").permitAll()

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${pageTitle}">Domains</title>
+    <style>
+        @keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
+        .dn1{animation:fade-up .5s .04s ease both}
+        .dn2{animation:fade-up .5s .10s ease both}
+        .dn3{animation:fade-up .5s .17s ease both}
+        .dn4{animation:fade-up .5s .24s ease both}
+        .dn5{animation:fade-up .5s .31s ease both}
+        .live-dot{animation:pulse-dot 2.4s ease-in-out infinite}
+        .domain-card{transition:transform 180ms ease,box-shadow 180ms ease,border-color 180ms ease}
+        .domain-card:hover{transform:translateY(-3px);box-shadow:0 20px 44px -24px rgba(15,23,42,0.2)}
+    </style>
+</head>
+<body>
+<main layout:fragment="content">
+<div class="space-y-5">
+
+    <!-- ── Header ────────────────────────────────────────────────────── -->
+    <header class="dn1 flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <div class="mb-2.5 flex items-center gap-2">
+                <span class="live-dot inline-block h-2 w-2 rounded-full bg-[var(--card-mauve)]"></span>
+                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">DNS &amp; Delivery</p>
+            </div>
+            <h1 class="text-[2.2rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-[#111] sm:text-[2.6rem]">
+                Sending domains.
+            </h1>
+            <p class="mt-2 max-w-md text-[0.875rem] leading-6 text-slate-500">
+                Add branded domains, publish DNS records, and verify SPF, DKIM, and DMARC before sending.
+            </p>
+        </div>
+        <a href="/campaigns/create" class="app-button-primary flex-shrink-0 px-5 py-3 text-sm">+ New campaign</a>
+    </header>
+
+    <!-- ── Stat cards ─────────────────────────────────────────────────── -->
+    <div class="dn2 grid grid-cols-3 gap-4">
+
+        <div class="relative flex min-h-[140px] flex-col overflow-hidden rounded-[22px] bg-[var(--card-mauve)] p-5 transition-transform duration-200 hover:-translate-y-0.5">
+            <!-- decorative: globe -->
+            <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 opacity-[0.11]" viewBox="0 0 120 120" fill="currentColor">
+                <circle cx="60" cy="60" r="52"/>
+                <ellipse fill="none" stroke="white" stroke-width="4" cx="60" cy="60" rx="21" ry="52"/>
+                <line stroke="white" stroke-width="4" x1="8" y1="60" x2="112" y2="60"/>
+                <path fill="none" stroke="white" stroke-width="3.5" d="M14 38 Q60 46 106 38"/>
+                <path fill="none" stroke="white" stroke-width="3.5" d="M14 82 Q60 74 106 82"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Total domains</p>
+            <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${totalDomains}">0</p>
+            <p class="mt-1.5 text-[12px] text-[#111]/50">registered</p>
+            <div class="mt-auto flex items-end gap-[3px] pt-4" style="height:32px">
+                <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:55%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:70%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:48%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:82%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:100%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:65%"></div>
+            </div>
+        </div>
+
+        <div class="relative flex min-h-[140px] flex-col overflow-hidden rounded-[22px] bg-[var(--card-lime)] p-5 transition-transform duration-200 hover:-translate-y-0.5">
+            <!-- decorative: shield check -->
+            <svg class="pointer-events-none absolute -bottom-4 -right-4 h-32 w-32 opacity-[0.11]" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M50 6 L88 22 V52 C88 74 66 92 50 96 C34 92 12 74 12 52 V22 Z"/>
+                <path fill="none" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" d="M32 52 L45 65 L68 38"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Verified</p>
+            <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${verifiedDomains}">0</p>
+            <p class="mt-1.5 text-[12px] text-[#111]/50">ready to send</p>
+            <div class="mt-auto flex items-end gap-[3px] pt-4" style="height:32px">
+                <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:40%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:60%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:80%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:65%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:90%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:100%"></div>
+            </div>
+        </div>
+
+        <div class="relative flex min-h-[140px] flex-col overflow-hidden rounded-[22px] bg-[var(--app-sun)]/80 p-5 transition-transform duration-200 hover:-translate-y-0.5">
+            <!-- decorative: warning triangle -->
+            <svg class="pointer-events-none absolute -bottom-4 -right-4 h-32 w-32 opacity-[0.11]" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M50 8 L94 86 H6 Z"/>
+                <rect fill="white" opacity="0.5" x="46" y="38" width="8" height="26" rx="4"/>
+                <circle fill="white" opacity="0.5" cx="50" cy="72" r="5"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Needs setup</p>
+            <p class="mt-3 text-[2.6rem] font-extrabold leading-none tracking-tight text-[#111]" th:text="${pendingDomains}">0</p>
+            <p class="mt-1.5 text-[12px] text-[#111]/50">DNS pending</p>
+            <div class="mt-auto flex items-end gap-[3px] pt-4" style="height:32px">
+                <div class="flex-1 rounded-[3px] bg-[#111]/12" style="height:100%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/14" style="height:72%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/16" style="height:88%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/18" style="height:55%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/20" style="height:40%"></div>
+                <div class="flex-1 rounded-[3px] bg-[#111]/22" style="height:30%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Main content ──────────────────────────────────────────────── -->
+    <div class="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+
+        <!-- Add domain -->
+        <section class="dn3 app-panel-strong overflow-hidden rounded-[24px]">
+            <div class="relative flex items-center gap-3.5 overflow-hidden border-b border-[rgba(57,48,36,0.08)] bg-[var(--card-mauve)]/22 px-6 py-5 sm:px-8">
+                <!-- decorative corner: orbit rings -->
+                <svg class="pointer-events-none absolute -bottom-5 -right-4 h-28 w-28 opacity-[0.13]" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">
+                    <circle cx="50" cy="50" r="42"/>
+                    <circle cx="50" cy="50" r="26"/>
+                    <circle cx="50" cy="50" r="10"/>
+                </svg>
+                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[12px] bg-[var(--card-mauve)]/55">
+                    <svg class="h-5 w-5 text-[#1a4f9e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">New domain</p>
+                    <h2 class="text-base font-extrabold tracking-tight text-slate-950">Add your sending domain</h2>
+                </div>
+            </div>
+
+            <div class="p-6 sm:p-8">
+                <p class="mb-6 text-[13px] leading-6 text-slate-500">Use the bare domain you want to send from, such as <span class="font-medium text-slate-900">example.com</span>. OpenMailer generates the DNS records you need next.</p>
+
+                <form th:action="@{/domains}" th:object="${domainForm}" method="post" class="space-y-5">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div th:if="${#fields.hasGlobalErrors()}" class="rounded-[20px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Form error</p>
+                    </div>
+                    <div>
+                        <label for="domainName" class="mb-2 block text-sm font-semibold text-slate-700">Domain name</label>
+                        <input id="domainName" th:field="*{domainName}" type="text" class="app-input" placeholder="example.com">
+                        <p th:if="${#fields.hasErrors('domainName')}" th:errors="*{domainName}" class="mt-2 text-sm text-rose-700">Domain error</p>
+                    </div>
+                    <div class="rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-[var(--card-mauve)]/10 px-5 py-4">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">How it works</p>
+                        <p class="mt-2 text-[13px] leading-6 text-slate-600">OpenMailer generates a DKIM keypair immediately. After creation, publish SPF, DKIM, and DMARC records from the detail page, then run verification.</p>
+                    </div>
+                    <button type="submit" class="app-button-primary px-6 py-3 text-sm">Add domain →</button>
+                </form>
+
+                <!-- DNS quick ref -->
+                <div class="mt-6 grid gap-2.5">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Required DNS records</p>
+                    <div class="flex items-center gap-3 rounded-[14px] bg-[var(--card-mauve)]/14 px-4 py-3">
+                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[var(--card-mauve)]/40 text-[10px] font-bold text-slate-700">1</span>
+                        <span class="text-[12px] font-semibold text-slate-700">SPF TXT record on root domain</span>
+                    </div>
+                    <div class="flex items-center gap-3 rounded-[14px] bg-[var(--card-lime)]/14 px-4 py-3">
+                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[var(--card-lime)]/40 text-[10px] font-bold text-slate-700">2</span>
+                        <span class="text-[12px] font-semibold text-slate-700">DKIM CNAME at <code class="font-mono text-[11px]">mailer._domainkey</code></span>
+                    </div>
+                    <div class="flex items-center gap-3 rounded-[14px] bg-[var(--app-sun)]/18 px-4 py-3">
+                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[var(--app-sun)]/50 text-[10px] font-bold text-slate-700">3</span>
+                        <span class="text-[12px] font-semibold text-slate-700">DMARC TXT record at <code class="font-mono text-[11px]">_dmarc</code></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Existing domains -->
+        <section class="dn4 app-panel rounded-[24px] p-6">
+            <div class="mb-5 flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Existing domains</p>
+                    <h2 class="mt-1.5 text-lg font-extrabold tracking-tight text-[#111]">Delivery-ready identities</h2>
+                </div>
+                <span class="rounded-full bg-[var(--card-mauve)]/35 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-700"
+                      th:text="${totalDomains} + ' total'">0 total</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(domains)}"
+                 class="flex flex-col items-center justify-center rounded-[22px] border border-dashed border-[rgba(57,48,36,0.16)] bg-white/55 py-14 text-center">
+                <div class="flex h-14 w-14 items-center justify-center rounded-[16px] bg-[var(--card-mauve)]/22">
+                    <svg class="h-7 w-7 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                    </svg>
+                </div>
+                <h3 class="mt-4 text-base font-bold text-slate-900">No domains added yet</h3>
+                <p class="mt-2 max-w-xs text-[13px] leading-6 text-slate-500">Add your first domain on the left. Once DNS is verified, it becomes available for sending flows.</p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(domains)}" class="grid gap-4 md:grid-cols-2">
+                <article th:each="domain : ${domains}"
+                         class="domain-card relative overflow-hidden rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-white/80 p-5 shadow-[0_8px_28px_-18px_rgba(33,29,24,0.18)]">
+                    <!-- corner accent dot -->
+                    <div class="absolute right-4 top-4 h-2 w-2 rounded-full"
+                         th:classappend="${domain.verified} ? 'bg-[var(--card-lime)]' : 'bg-amber-400'"></div>
+
+                    <div class="pr-6">
+                        <h3 class="text-[15px] font-extrabold tracking-tight text-[#111]" th:text="${domain.domainName}">example.com</h3>
+                        <p class="mt-1 text-[12px] text-slate-500" th:text="${domain.verificationSummary}">0/3 records verified</p>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-3 gap-2">
+                        <div class="rounded-[14px] bg-[var(--card-mauve)]/28 px-3 py-2.5">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">SPF</p>
+                            <p class="mt-1.5 text-[12px] font-bold text-slate-900"
+                               th:text="${domain.verified ? 'Ready' : 'Pending'}">Pending</p>
+                        </div>
+                        <div class="rounded-[14px] bg-[var(--card-lime)]/28 px-3 py-2.5">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">DKIM</p>
+                            <p class="mt-1.5 text-[12px] font-bold text-slate-900"
+                               th:text="${domain.verified ? 'Ready' : 'Check'}">Check</p>
+                        </div>
+                        <div class="rounded-[14px] bg-[var(--app-sun)]/30 px-3 py-2.5">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">DMARC</p>
+                            <p class="mt-1.5 text-[12px] font-bold text-slate-900"
+                               th:text="${domain.verified ? 'Ready' : 'Pending'}">Pending</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-between gap-3 border-t border-[rgba(57,48,36,0.07)] pt-4">
+                        <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]"
+                              th:classappend="${domain.verified} ? 'bg-[var(--card-lime)]/40 text-emerald-900' : 'bg-amber-100 text-amber-800'"
+                              th:text="${domain.status}">PENDING</span>
+                        <a th:href="@{/domains/{id}(id=${domain.id})}"
+                           class="text-[12px] font-bold text-slate-700 transition hover:text-slate-900">Open domain →</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+
+</div>
+</main>
+</body>
+</html>
