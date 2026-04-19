@@ -28,59 +28,90 @@
       "isPartOf": { "@type": "WebSite", "name": "OpenMailer", "url": "https://openmailer.astrareconslabs.com" }
     }
     </script>
+
+    <style>
+        @keyframes fade-up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
+        .li1{animation:fade-up .45s .04s ease both}
+        .li2{animation:fade-up .45s .12s ease both}
+        .li3{animation:fade-up .45s .20s ease both}
+        .li4{animation:fade-up .45s .28s ease both}
+        .live-dot{animation:pulse-dot 2.4s ease-in-out infinite}
+    </style>
 </head>
 <body>
 <div layout:fragment="content" class="flex w-full items-stretch">
-    <div class="app-shell grid w-full overflow-hidden lg:grid-cols-[1.02fr_0.98fr]">
-        <section class="relative hidden overflow-hidden bg-[linear-gradient(180deg,rgba(255,252,247,0.88),rgba(246,236,221,0.95))] p-10 lg:flex lg:flex-col lg:justify-between">
-            <div class="absolute inset-x-10 top-10 h-52 rounded-[32px] bg-[radial-gradient(circle_at_top_right,rgba(244,223,164,0.85),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(220,212,247,0.65),transparent_42%),#f4e9da] blur-[2px]"></div>
-            <div class="relative z-10">
-                <div class="inline-flex items-center gap-3 rounded-full bg-white/75 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-                    <span class="app-status-dot bg-[var(--app-sun)]"></span>
-                    Built for warm, deliberate campaign operations
+    <div class="app-shell grid w-full overflow-hidden lg:grid-cols-[1.05fr_0.95fr]">
+
+        <!-- ── Dark hero panel ─────────────────────────────────────────── -->
+        <section class="relative hidden overflow-hidden bg-[#1a1a1a] p-10 lg:flex lg:flex-col lg:justify-between">
+            <!-- Decorative blobs -->
+            <div class="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-[var(--card-lime)]/8 blur-3xl"></div>
+            <div class="pointer-events-none absolute -left-10 bottom-10 h-56 w-56 rounded-full bg-[var(--card-pink)]/7 blur-2xl"></div>
+            <div class="pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--card-mauve)]/6 blur-2xl"></div>
+
+            <div class="relative z-10 li1">
+                <div class="mb-4 flex items-center gap-2.5">
+                    <span class="live-dot inline-block h-2 w-2 rounded-full bg-[var(--card-lime)]"></span>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-white/38">OpenMailer</p>
                 </div>
-                <h1 class="mt-8 max-w-lg text-5xl font-semibold leading-[1.05] tracking-tight text-slate-950">Step back into a calmer workspace for delivery, lists, and campaign control.</h1>
-                <p class="mt-5 max-w-xl text-base leading-8 text-slate-600">
-                    The interface is designed like an operations desk, not a template showroom. Review send readiness,
-                    monitor audiences, and keep campaign setup intentional.
+                <h1 class="text-[2.2rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-white sm:text-[2.8rem]">
+                    Glad you're<br>back.
+                </h1>
+                <p class="mt-4 max-w-sm text-[0.875rem] leading-7 text-white/45">
+                    Your campaign workspace is ready. Monitor audiences, review delivery, and keep everything intentional.
                 </p>
             </div>
 
-            <div class="relative z-10 grid gap-4">
-                <div class="grid gap-4 md:grid-cols-2">
-                    <div class="app-soft-card bg-[var(--app-sun)]/55 p-5">
-                        <p class="app-kicker">Audience</p>
-                        <p class="mt-3 text-2xl font-semibold text-slate-900">Segment quietly</p>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Import, review, and refine subscriber groups without noisy admin clutter.</p>
+            <div class="relative z-10 grid gap-3 li2">
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <!-- Audience card -->
+                    <div class="relative overflow-hidden rounded-[20px] border border-white/[0.09] bg-[var(--card-lime)]/12 p-5">
+                        <svg class="pointer-events-none absolute -bottom-3 -right-3 h-24 w-24 opacity-[0.11] text-white" viewBox="0 0 100 100" fill="currentColor">
+                            <circle cx="38" cy="30" r="18"/>
+                            <path d="M2 90 C2 58 74 58 74 90Z"/>
+                            <circle cx="70" cy="34" r="13"/>
+                            <path d="M44 90 C44 66 96 66 96 90Z"/>
+                        </svg>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">Audience</p>
+                        <p class="mt-2 text-[15px] font-extrabold tracking-tight text-white/82">Segment quietly</p>
+                        <p class="mt-1 text-[12px] leading-5 text-white/38">Import, review, and refine subscriber groups.</p>
                     </div>
-                    <div class="app-soft-card bg-[var(--app-lilac)]/55 p-5">
-                        <p class="app-kicker">Delivery</p>
-                        <p class="mt-3 text-2xl font-semibold text-slate-900">Ship with intent</p>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Keep provider, domain, and campaign configuration visible in one place.</p>
+                    <!-- Delivery card -->
+                    <div class="relative overflow-hidden rounded-[20px] border border-white/[0.09] bg-[var(--card-mauve)]/12 p-5">
+                        <svg class="pointer-events-none absolute -bottom-4 -right-4 h-24 w-24 opacity-[0.11] text-white" viewBox="0 0 100 100" fill="currentColor">
+                            <path d="M8 28 L50 56 L92 28 V82 C92 87 87 92 82 92 H18 C13 92 8 87 8 82 Z"/>
+                            <path fill="white" opacity="0.3" d="M8 28 L50 56 L92 28 Z"/>
+                        </svg>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">Delivery</p>
+                        <p class="mt-2 text-[15px] font-extrabold tracking-tight text-white/82">Ship with intent</p>
+                        <p class="mt-1 text-[12px] leading-5 text-white/38">Provider, domain, and campaign in one view.</p>
                     </div>
                 </div>
-                <div class="app-soft-card bg-white/75 p-5">
-                    <p class="app-kicker">Workspace Notes</p>
-                    <div class="mt-4 flex items-end justify-between gap-4">
-                        <div>
-                            <p class="text-lg font-semibold text-slate-900">Minimal chrome, sharper hierarchy</p>
-                            <p class="mt-2 max-w-md text-sm leading-6 text-slate-600">This refreshed UI language carries through login, register, dashboard, forms, and detail pages.</p>
-                        </div>
-                        <div class="rounded-full bg-[#171717] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white">OpenMailer</div>
+                <!-- Brand strip -->
+                <div class="flex items-center justify-between rounded-[20px] border border-white/[0.09] bg-white/[0.04] px-5 py-4">
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-white/32">Platform</p>
+                        <p class="mt-0.5 text-[13px] text-white/55">Self-hosted email delivery</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-[var(--card-lime)] opacity-70"></span>
+                        <span class="rounded-full bg-white/[0.08] px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white/52">OpenMailer</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="flex items-center justify-center bg-[rgba(255,250,242,0.9)] p-6 sm:p-10">
+        <!-- ── Sign-in form ────────────────────────────────────────────── -->
+        <section class="flex items-center justify-center bg-[rgba(255,250,242,0.92)] p-6 sm:p-10">
             <div class="w-full max-w-md">
-                <div class="mb-8">
-                    <p class="app-kicker">Sign In</p>
-                    <h2 class="mt-4 text-4xl font-semibold tracking-tight text-slate-950">Welcome back.</h2>
-                    <p class="mt-3 text-sm leading-7 text-slate-600">Access your workspace, continue campaign setup, and review account activity.</p>
+                <div class="mb-8 li1">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Sign In</p>
+                    <h2 class="mt-3 text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] text-slate-950">Welcome back.</h2>
+                    <p class="mt-3 text-[0.875rem] leading-7 text-slate-500">Access your workspace, continue campaign setup, and review account activity.</p>
                 </div>
 
-                <div id="alertContainer" class="mb-4 hidden" role="alert" aria-live="assertive" aria-atomic="true">
+                <div id="alertContainer" class="mb-4 hidden li2" role="alert" aria-live="assertive" aria-atomic="true">
                     <div id="alertBox" class="rounded-[20px] p-4">
                         <div class="flex items-start">
                             <svg id="alertIcon" class="mr-3 mt-0.5 h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"></svg>
@@ -91,65 +122,71 @@
                     </div>
                 </div>
 
-                <form id="loginForm" class="app-panel-strong space-y-5 p-6 sm:p-7" aria-labelledby="login-heading">
-                    <div id="loginStepIndicator" class="hidden rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-[var(--app-lilac)]/45 px-4 py-3">
+                <form id="loginForm" class="li2 app-panel-strong space-y-5 p-6 sm:p-7" aria-labelledby="login-heading">
+                    <div id="loginStepIndicator" class="hidden rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-[var(--card-mauve)]/20 px-4 py-3">
                         <div class="flex items-center justify-between gap-3">
                             <div>
-                                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Step 2</p>
-                                <p class="mt-1 text-sm font-medium text-slate-900">Verification required</p>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Step 2 of 2</p>
+                                <p class="mt-1 text-sm font-semibold text-slate-900">Verification required</p>
                             </div>
-                            <span class="rounded-full bg-white/75 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-700">2FA</span>
+                            <span class="rounded-full bg-[#1a1a1a] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">2FA</span>
                         </div>
                     </div>
 
                     <div id="primaryCredentialSection" class="space-y-5 transition duration-200">
-                    <div>
-                        <label for="email" class="mb-2 block text-sm font-medium text-slate-700">Email address</label>
-                        <input type="email" id="email" name="email" required autocomplete="email" aria-required="true"
-                               class="app-input"
-                               placeholder="you@example.com">
-                    </div>
-
-                    <div>
-                        <label for="password" class="mb-2 block text-sm font-medium text-slate-700">Password</label>
-                        <div class="relative">
-                            <input type="password" id="password" name="password" required autocomplete="current-password" aria-required="true"
-                                   class="app-input pr-12"
-                                   placeholder="Enter your password">
-                            <button type="button" id="togglePasswordButton" onclick="togglePasswordVisibility()"
-                                    class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-slate-700"
-                                    aria-label="Show password" aria-pressed="false">
-                                <svg id="eyeIcon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                                <svg id="eyeSlashIcon" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
-                                </svg>
-                            </button>
+                        <div>
+                            <label for="email" class="mb-2 block text-sm font-semibold text-slate-700">Email address</label>
+                            <input type="email" id="email" name="email" required autocomplete="email" aria-required="true"
+                                   class="app-input"
+                                   placeholder="you@example.com">
                         </div>
-                    </div>
-                    </div>
 
-                    <div id="twoFactorSection" class="hidden rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-white/55 p-4 transition duration-200">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <label for="twoFactorCode" class="mb-2 block text-sm font-medium text-slate-700">Two-factor code or backup code</label>
-                                <p id="twoFactorHelpText" class="text-xs leading-6 text-slate-500">Use a 6-digit authenticator code or an 8-character backup code.</p>
+                        <div>
+                            <label for="password" class="mb-2 block text-sm font-semibold text-slate-700">Password</label>
+                            <div class="relative">
+                                <input type="password" id="password" name="password" required autocomplete="current-password" aria-required="true"
+                                       class="app-input pr-12"
+                                       placeholder="Enter your password">
+                                <button type="button" id="togglePasswordButton" onclick="togglePasswordVisibility()"
+                                        class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-slate-700"
+                                        aria-label="Show password" aria-pressed="false">
+                                    <svg id="eyeIcon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    <svg id="eyeSlashIcon" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <span id="twoFactorStepBadge" class="rounded-full bg-[var(--app-lilac)]/62 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-700">Step 2</span>
                         </div>
-                        <input type="text" id="twoFactorCode" name="twoFactorCode" maxlength="8" pattern="([0-9]{6}|[A-Z0-9]{8})" inputmode="text" autocomplete="one-time-code"
-                               class="app-input mt-4"
-                               placeholder="000000 or ABCD1234">
+                    </div>
+
+                    <!-- 2FA section -->
+                    <div id="twoFactorSection" class="hidden overflow-hidden rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-white/60 transition duration-200">
+                        <div class="flex items-center justify-between gap-3 border-b border-[rgba(57,48,36,0.07)] bg-[var(--card-mauve)]/15 px-4 py-3">
+                            <div class="flex items-center gap-2.5">
+                                <svg class="h-4 w-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                <label for="twoFactorCode" class="text-sm font-semibold text-slate-700">Two-factor code</label>
+                            </div>
+                            <span id="twoFactorStepBadge" class="rounded-full bg-[#1a1a1a]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">Step 2</span>
+                        </div>
+                        <div class="p-4">
+                            <p id="twoFactorHelpText" class="text-[12px] leading-5 text-slate-500">Enter the 6-digit code from your authenticator app, or use an 8-character backup code.</p>
+                            <input type="text" id="twoFactorCode" name="twoFactorCode" maxlength="8" pattern="([0-9]{6}|[A-Z0-9]{8})" inputmode="text" autocomplete="one-time-code"
+                                   class="app-input mt-3"
+                                   placeholder="000000 or ABCD1234">
+                        </div>
                     </div>
 
                     <div id="loginFormActions" class="flex items-center justify-between gap-4 transition duration-200">
-                        <label for="rememberMe" class="flex items-center gap-2 text-sm text-slate-700">
+                        <label for="rememberMe" class="flex items-center gap-2 text-sm text-slate-600">
                             <input type="checkbox" id="rememberMe" name="rememberMe" class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-[var(--app-sun)]">
                             <span>Remember me</span>
                         </label>
-                        <button type="button" id="twoFactorToggle" onclick="toggleTwoFactor()" class="text-sm font-medium text-slate-600 transition hover:text-slate-900" aria-label="Show two-factor authentication field" aria-expanded="false" aria-controls="twoFactorSection">
+                        <button type="button" id="twoFactorToggle" onclick="toggleTwoFactor()" class="text-[12px] font-semibold text-slate-500 transition hover:text-slate-800" aria-label="Show two-factor authentication field" aria-expanded="false" aria-controls="twoFactorSection">
                             Need 2FA or backup code?
                         </button>
                     </div>
@@ -164,10 +201,11 @@
                     </button>
                 </form>
 
-                <div class="mt-5 flex items-center justify-between gap-3 rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-white/70 px-5 py-4 text-sm text-slate-600">
-                    <a href="/forgot-password" class="font-semibold text-slate-900 transition hover:text-slate-700">Forgot password?</a>
+                <div class="li3 mt-4 flex items-center justify-between gap-3 rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-white/70 px-5 py-4 text-sm text-slate-600">
+                    <a href="/forgot-password" class="font-semibold text-slate-800 transition hover:text-slate-600">Forgot password?</a>
+                    <span class="text-slate-400">·</span>
                     <span>New to OpenMailer?</span>
-                    <a href="/register" class="font-semibold text-slate-900 transition hover:text-slate-700">Create an account</a>
+                    <a href="/register" class="font-semibold text-slate-800 transition hover:text-slate-600">Create account</a>
                 </div>
             </div>
         </section>

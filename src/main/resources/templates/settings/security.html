@@ -7,16 +7,18 @@
     <title>Account Settings - OpenMailer</title>
     <style>
         @keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
         .s1{animation:fade-up .5s .04s ease both}
-        .s2{animation:fade-up .5s .11s ease both}
-        .s3{animation:fade-up .5s .18s ease both}
-        .s4{animation:fade-up .5s .25s ease both}
+        .s2{animation:fade-up .5s .12s ease both}
+        .s3{animation:fade-up .5s .20s ease both}
+        .s4{animation:fade-up .5s .28s ease both}
+        .live-dot{animation:pulse-dot 2.4s ease-in-out infinite}
     </style>
 </head>
 <body>
 <main layout:fragment="content">
 <div id="securitySettingsRoot"
-     th:attr="data-two-factor-enabled=${twoFactorEnabled},data-backup-code-count=${backupCodeCount}"
+     th:attr="data-two-factor-enabled=${twoFactorEnabled},data-backup-code-count=${backupCodeCount},data-current-user-initials=${currentUserInitials}"
      class="space-y-6">
 
     <!-- ── Hero header ───────────────────────────────────────────────── -->
@@ -27,39 +29,44 @@
 
         <div class="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div>
-                <div class="mb-3 flex items-center gap-2">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--card-lime)]/20">
-                        <svg class="h-4 w-4 text-[var(--card-lime)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
+                <div class="mb-3 flex items-center gap-2.5">
+                    <span class="live-dot inline-block h-2 w-2 rounded-full bg-[var(--card-lime)]"></span>
                     <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-white/38">Account Settings</p>
                 </div>
-                <h1 class="text-[1.9rem] font-extrabold leading-tight tracking-[-0.025em] text-white sm:text-[2.4rem]">
+                <h1 class="text-[2.2rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-white sm:text-[2.6rem]">
                     Security &amp; identity.
                 </h1>
                 <p class="mt-3 max-w-md text-[0.875rem] leading-6 text-white/42">
                     Manage your profile, password, and two-factor authentication all from one place.
                 </p>
+
+                <!-- Dark stat strip -->
+                <div class="mt-6 grid grid-cols-3 gap-2.5">
+                    <div class="rounded-[16px] border border-white/[0.09] bg-white/[0.05] px-4 py-3">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/32">Profile</p>
+                        <p class="mt-2 text-[13px] font-bold text-white/75" th:text="${currentUser.username}">username</p>
+                    </div>
+                    <div class="rounded-[16px] border border-white/[0.09] bg-white/[0.05] px-4 py-3">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/32">2FA</p>
+                        <p id="twoFactorSummary"
+                           class="mt-2 text-[13px] font-bold"
+                           th:classappend="${twoFactorEnabled} ? 'text-[var(--card-lime)]' : 'text-white/55'"
+                           th:text="${twoFactorEnabled} ? 'Enabled' : 'Not enabled'">Not enabled</p>
+                    </div>
+                    <div class="rounded-[16px] border border-white/[0.09] bg-white/[0.05] px-4 py-3">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/32">Backup codes</p>
+                        <p class="mt-2 text-[13px] font-bold text-white/75" th:text="${backupCodeCount} + ' left'">0 left</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Status cards -->
-            <div class="flex flex-wrap gap-3 lg:flex-col lg:items-end lg:gap-3">
-                <div class="min-w-[155px] rounded-[18px] border border-white/[0.09] bg-white/[0.06] p-4 backdrop-blur-sm">
-                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">2FA Status</p>
-                    <p id="twoFactorSummary"
-                       class="mt-2 text-lg font-extrabold"
-                       th:classappend="${twoFactorEnabled} ? 'text-[var(--card-lime)]' : 'text-white/60'"
-                       th:text="${twoFactorEnabled} ? 'Enabled' : 'Not enabled'">Not enabled</p>
-                    <p class="mt-0.5 text-[11px] text-white/30">Auth app + backup codes</p>
-                </div>
-                <div class="min-w-[155px] rounded-[18px] border border-white/[0.09] bg-white/[0.06] p-4 backdrop-blur-sm">
-                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">Last Login</p>
-                    <p class="mt-2 text-sm font-bold text-white/75"
-                       th:text="${lastLoginAt != null ? #temporals.format(lastLoginAt, 'dd MMM yyyy') : '—'}">—</p>
-                    <p class="mt-0.5 text-[11px] text-white/30" th:text="${lastLoginAt != null ? #temporals.format(lastLoginAt, 'HH:mm') : 'No record yet'}">No record yet</p>
-                </div>
+            <!-- Last login card -->
+            <div class="flex-shrink-0 rounded-[20px] border border-white/[0.09] bg-white/[0.05] p-5 backdrop-blur-sm">
+                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">Last login</p>
+                <p class="mt-2 text-base font-extrabold text-white/80"
+                   th:text="${lastLoginAt != null ? #temporals.format(lastLoginAt, 'dd MMM yyyy') : '—'}">—</p>
+                <p class="mt-0.5 text-[11px] text-white/35"
+                   th:text="${lastLoginAt != null ? #temporals.format(lastLoginAt, 'HH:mm z') : 'No record yet'}">No record yet</p>
             </div>
         </div>
     </header>
@@ -98,7 +105,33 @@
             </div>
 
             <div class="p-6 sm:p-8">
-                <p class="mb-6 text-[13px] leading-6 text-slate-500">Update the name, email address, and username shown across your account.</p>
+                <p class="mb-6 text-[13px] leading-6 text-slate-500">Update the name, email address, username, and profile picture shown across your account.</p>
+                <div class="mb-6 grid gap-5 rounded-[20px] border border-[rgba(57,48,36,0.08)] bg-white/72 p-5 sm:grid-cols-[120px_1fr] sm:items-center">
+                    <div class="flex justify-center sm:justify-start">
+                        <img th:if="${currentUserHasProfileImage}"
+                             id="profileAvatarImage"
+                             th:src="${currentUserAvatarUrl}"
+                             alt="Profile picture"
+                             class="h-24 w-24 rounded-full object-cover shadow-[0_10px_24px_-12px_rgba(15,23,42,0.45)]">
+                        <div th:unless="${currentUserHasProfileImage}"
+                             id="profileAvatarFallback"
+                             class="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[var(--card-lime)]/65 to-[var(--card-mauve)]/65 text-2xl font-extrabold text-white shadow-[0_10px_24px_-12px_rgba(15,23,42,0.45)]"
+                             th:text="${currentUserInitials} ?: 'U'">U</div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-900">Profile picture</p>
+                            <p class="mt-1 text-[13px] leading-6 text-slate-500">Upload PNG, JPEG, GIF, or WEBP. Maximum size: 2MB.</p>
+                        </div>
+                        <form id="avatarForm" class="flex flex-wrap items-center gap-3" enctype="multipart/form-data">
+                            <input id="profileImageInput" name="file" type="file" accept="image/png,image/jpeg,image/gif,image/webp"
+                                   class="block max-w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-[var(--card-lime)]/55 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-slate-900 hover:file:bg-[var(--card-lime)]/72">
+                            <button id="uploadAvatarButton" type="submit" class="app-button-secondary px-5 py-3 text-sm">Upload picture</button>
+                            <button id="removeAvatarButton" type="button" class="app-button-secondary px-5 py-3 text-sm" th:classappend="${!currentUserHasProfileImage} ? ' hidden' : ''">Remove picture</button>
+                        </form>
+                        <p id="avatarFileHint" class="text-[12px] text-slate-400">Choose a square image for the cleanest result.</p>
+                    </div>
+                </div>
                 <form id="profileForm" class="space-y-5">
                     <div class="grid gap-5 sm:grid-cols-2">
                         <div>
@@ -229,20 +262,54 @@
                             th:classappend="${!twoFactorEnabled} ? ' hidden' : ''">Disable 2FA</button>
                 </div>
 
-                <div id="setupPanel" class="mt-6 hidden overflow-hidden rounded-[20px] border border-[rgba(57,48,36,0.1)] bg-white/75">
-                    <div class="grid gap-0 lg:grid-cols-[200px_1fr]">
-                        <div class="border-b border-[rgba(57,48,36,0.08)] bg-[var(--app-sun)]/18 p-5 lg:border-b-0 lg:border-r">
-                            <p class="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">QR Code</p>
-                            <div class="rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white p-3">
-                                <img id="qrCodeImage" alt="Two-factor QR code" class="mx-auto h-auto w-full max-w-[160px] rounded-[10px]">
+                <div id="setupPanel" class="mt-6 hidden overflow-hidden rounded-[22px] border border-[rgba(57,48,36,0.1)] bg-white/80 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)]">
+                    <!-- Setup header -->
+                    <div class="relative overflow-hidden border-b border-[rgba(57,48,36,0.08)] bg-[#1a1a1a] px-5 py-4">
+                        <div class="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-[var(--app-sun)]/10 blur-2xl"></div>
+                        <div class="relative flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/38">2FA Setup</p>
+                                <p class="mt-0.5 text-sm font-extrabold text-white/85">Scan &amp; confirm to activate</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white/55">1</span>
+                                <div class="h-px w-4 bg-white/15"></div>
+                                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white/55">2</span>
+                                <div class="h-px w-4 bg-white/15"></div>
+                                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--app-sun)]/30 text-[10px] font-bold text-white/75">3</span>
                             </div>
                         </div>
-                        <div class="p-5">
-                            <p class="text-sm font-bold text-slate-900">Manual entry secret</p>
-                            <p id="secretText" class="mt-2 break-all rounded-[12px] bg-[#171717] px-4 py-3 font-mono text-[11px] tracking-[0.16em] text-white"></p>
-                            <label for="enableCode" class="mt-5 block text-sm font-semibold text-slate-700">6-digit code from app</label>
-                            <input id="enableCode" name="enableCode" type="text" maxlength="6" inputmode="numeric"
-                                   class="app-input mt-2" placeholder="000000">
+                    </div>
+
+                    <div class="grid gap-0 lg:grid-cols-[210px_1fr]">
+                        <!-- QR code column -->
+                        <div class="border-b border-[rgba(57,48,36,0.08)] bg-[var(--app-sun)]/14 p-5 lg:border-b-0 lg:border-r">
+                            <p class="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Step 1 — Scan</p>
+                            <p class="mb-3 text-[12px] text-slate-500">Open your authenticator app and scan this QR code.</p>
+                            <div class="rounded-[16px] border border-[rgba(57,48,36,0.1)] bg-white p-3 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.15)]">
+                                <img id="qrCodeImage" alt="Two-factor QR code" class="mx-auto h-auto w-full max-w-[170px] rounded-[10px]">
+                            </div>
+                            <p class="mt-3 text-center text-[11px] text-slate-400">Google Authenticator, Authy, 1Password</p>
+                        </div>
+
+                        <!-- Code entry column -->
+                        <div class="p-5 sm:p-6">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Step 2 — Manual secret</p>
+                            <p class="mt-1 mb-2 text-[12px] text-slate-500">Can't scan? Enter this key manually in your app.</p>
+                            <div class="flex items-center gap-2 overflow-hidden rounded-[12px] bg-[#111] px-4 py-3">
+                                <svg class="h-3.5 w-3.5 flex-shrink-0 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                </svg>
+                                <p id="secretText" class="break-all font-mono text-[11px] tracking-[0.14em] text-white/80"></p>
+                            </div>
+
+                            <div class="mt-5 border-t border-[rgba(57,48,36,0.08)] pt-5">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Step 3 — Confirm</p>
+                                <label for="enableCode" class="mt-2 block text-sm font-semibold text-slate-700">6-digit code from your app</label>
+                                <input id="enableCode" name="enableCode" type="text" maxlength="6" inputmode="numeric"
+                                       class="app-input mt-2" placeholder="000000">
+                            </div>
+
                             <div class="mt-4 flex flex-wrap gap-3">
                                 <button id="confirmEnableButton" type="button" class="app-button-primary px-5 py-3 text-sm">Enable 2FA</button>
                                 <button id="cancelSetupButton" type="button" class="app-button-secondary px-5 py-3 text-sm">Cancel</button>

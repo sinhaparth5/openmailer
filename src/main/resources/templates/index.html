@@ -79,7 +79,17 @@
             <div class="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#1a1a1a] text-[11px] font-extrabold text-white">OM</div>
             <span class="text-[15px] font-bold tracking-tight text-[var(--app-text)]">OpenMailer</span>
         </a>
-        <div class="flex items-center gap-2">
+        <!-- Logged-in state -->
+        <div th:if="${currentUserDisplayName != null}" class="flex items-center gap-3">
+            <div class="flex items-center gap-2.5 rounded-full border border-[var(--app-border)] bg-white/70 px-3.5 py-1.5">
+                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-[#1a1a1a] text-[10px] font-extrabold text-white"
+                     th:text="${currentUserInitials} ?: 'U'">U</div>
+                <span class="text-[13px] font-semibold text-[var(--app-text)]" th:text="${currentUserDisplayName}">User</span>
+            </div>
+            <a th:href="@{/dashboard}" class="app-button-primary px-4 py-2 text-sm">Go to Dashboard</a>
+        </div>
+        <!-- Logged-out state -->
+        <div th:unless="${currentUserDisplayName != null}" class="flex items-center gap-2">
             <a th:href="@{/login}" class="app-button-secondary px-4 py-2 text-sm">Sign in</a>
             <a th:href="@{/register}" class="app-button-primary px-4 py-2 text-sm">Get started</a>
         </div>
@@ -104,14 +114,23 @@
                 </p>
 
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a th:href="@{/register}"
+                    <!-- Logged-in -->
+                    <a th:if="${currentUserDisplayName != null}" th:href="@{/dashboard}"
+                       class="inline-flex items-center gap-2 rounded-full bg-[var(--card-lime)] px-6 py-3.5 text-sm font-bold text-[#1a1a1a] shadow-[0_8px_24px_-8px_rgba(221,240,78,0.55)] transition hover:brightness-110 hover:-translate-y-0.5">
+                        Go to Dashboard
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </a>
+                    <!-- Logged-out -->
+                    <a th:unless="${currentUserDisplayName != null}" th:href="@{/register}"
                        class="inline-flex items-center gap-2 rounded-full bg-[var(--card-lime)] px-6 py-3.5 text-sm font-bold text-[#1a1a1a] shadow-[0_8px_24px_-8px_rgba(221,240,78,0.55)] transition hover:brightness-110 hover:-translate-y-0.5">
                         Create free account
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                         </svg>
                     </a>
-                    <a th:href="@{/login}"
+                    <a th:unless="${currentUserDisplayName != null}" th:href="@{/login}"
                        class="inline-flex items-center rounded-full border border-white/12 bg-white/8 px-6 py-3.5 text-sm font-semibold text-white/75 transition hover:bg-white/14 hover:text-white">
                         Sign in
                     </a>
@@ -272,7 +291,8 @@
                     <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--app-text-soft)]/60">Setup</p>
                     <h2 class="mt-2 text-[1.85rem] font-extrabold tracking-[-0.025em] text-[var(--app-text)]">Up and sending in minutes.</h2>
                 </div>
-                <a th:href="@{/register}" class="app-button-primary mt-4 self-start px-5 py-2.5 text-sm sm:mt-0">Start now →</a>
+                <a th:if="${currentUserDisplayName != null}" th:href="@{/dashboard}" class="app-button-primary mt-4 self-start px-5 py-2.5 text-sm sm:mt-0">Go to Dashboard →</a>
+                <a th:unless="${currentUserDisplayName != null}" th:href="@{/register}" class="app-button-primary mt-4 self-start px-5 py-2.5 text-sm sm:mt-0">Start now →</a>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-3">
@@ -339,11 +359,17 @@
                 No monthly seat fees. No vendor lock-in. Deploy on your own server or Railway — the data stays yours.
             </p>
             <div class="relative mt-8 flex flex-wrap justify-center gap-3">
-                <a th:href="@{/register}"
+                <!-- Logged-in -->
+                <a th:if="${currentUserDisplayName != null}" th:href="@{/dashboard}"
+                   class="inline-flex items-center gap-2 rounded-full bg-[var(--card-lime)] px-7 py-3.5 text-sm font-bold text-[#1a1a1a] shadow-[0_8px_32px_-8px_rgba(221,240,78,0.5)] transition hover:brightness-110">
+                    Go to Dashboard →
+                </a>
+                <!-- Logged-out -->
+                <a th:unless="${currentUserDisplayName != null}" th:href="@{/register}"
                    class="inline-flex items-center gap-2 rounded-full bg-[var(--card-lime)] px-7 py-3.5 text-sm font-bold text-[#1a1a1a] shadow-[0_8px_32px_-8px_rgba(221,240,78,0.5)] transition hover:brightness-110">
                     Get started — it's free
                 </a>
-                <a th:href="@{/login}"
+                <a th:unless="${currentUserDisplayName != null}" th:href="@{/login}"
                    class="inline-flex items-center rounded-full border border-white/12 px-7 py-3.5 text-sm font-semibold text-white/65 transition hover:border-white/20 hover:text-white">
                     Already have an account
                 </a>

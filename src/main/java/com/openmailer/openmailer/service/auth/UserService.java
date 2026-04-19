@@ -190,6 +190,35 @@ public class UserService {
     return userRepository.save(user);
   }
 
+  @CacheEvict(value = "users", allEntries = true)
+  public User updateProfileImage(String id, byte[] imageData, String contentType, int imageSize) {
+    User user = findById(id);
+    user.setProfileImageData(imageData);
+    user.setProfileImageContentType(contentType);
+    user.setProfileImageSize(imageSize);
+    user.setUpdatedAt(LocalDateTime.now());
+    return userRepository.save(user);
+  }
+
+  @CacheEvict(value = "users", allEntries = true)
+  public User removeProfileImage(String id) {
+    User user = findById(id);
+    user.setProfileImageData(null);
+    user.setProfileImageContentType(null);
+    user.setProfileImageSize(null);
+    user.setUpdatedAt(LocalDateTime.now());
+    return userRepository.save(user);
+  }
+
+  @Transactional(readOnly = true)
+  public ProfileImage loadProfileImage(String id) {
+    User user = findById(id);
+    if (user.getProfileImageData() == null || user.getProfileImageData().length == 0) {
+      return null;
+    }
+    return new ProfileImage(user.getProfileImageData(), user.getProfileImageContentType());
+  }
+
   /**
    * Delete user (GDPR compliance).
    *
@@ -222,5 +251,8 @@ public class UserService {
   @Transactional(readOnly = true)
   public boolean usernameExists(String username) {
     return userRepository.existsByUsername(username);
+  }
+
+  public record ProfileImage(byte[] data, String contentType) {
   }
 }

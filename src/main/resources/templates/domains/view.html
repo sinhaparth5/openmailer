@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${pageTitle}">Domain</title>
+    <style>
+        @keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
+        .dv1{animation:fade-up .5s .04s ease both}
+        .dv2{animation:fade-up .5s .10s ease both}
+        .dv3{animation:fade-up .5s .17s ease both}
+        .dv4{animation:fade-up .5s .24s ease both}
+        .live-dot{animation:pulse-dot 2.4s ease-in-out infinite}
+        .dns-record{transition:transform 180ms ease,box-shadow 180ms ease}
+        .dns-record:hover{transform:translateY(-3px);box-shadow:0 20px 44px -24px rgba(15,23,42,0.2)}
+    </style>
+</head>
+<body>
+<main layout:fragment="content">
+<div class="space-y-5">
+
+    <!-- ── Header ────────────────────────────────────────────────────── -->
+    <header class="dv1 flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <div class="mb-2.5 flex items-center gap-2">
+                <span class="live-dot inline-block h-2 w-2 rounded-full bg-[var(--card-mauve)]"></span>
+                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Domain detail</p>
+            </div>
+            <h1 class="text-[2.2rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-[#111] sm:text-[2.6rem]"
+                th:text="${domain.domainName}">example.com</h1>
+            <p class="mt-2 max-w-md text-[0.875rem] leading-6 text-slate-500">
+                Publish the DNS records below, then run verification. Tracks SPF, DKIM, and DMARC readiness.
+            </p>
+        </div>
+        <div class="flex flex-wrap gap-2.5">
+            <a href="/domains" class="app-button-secondary flex-shrink-0 px-5 py-3 text-sm">← Domains</a>
+            <form th:action="@{/domains/{id}/verify(id=${domain.id})}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="app-button-primary px-5 py-3 text-sm">Verify now</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- ── Stat cards ─────────────────────────────────────────────────── -->
+    <div class="dv2 grid grid-cols-2 gap-4 sm:grid-cols-4">
+
+        <div class="relative flex min-h-[110px] flex-col overflow-hidden rounded-[22px] bg-[var(--card-mauve)] p-5 transition-transform duration-200 hover:-translate-y-0.5">
+            <!-- decorative: globe -->
+            <svg class="pointer-events-none absolute -bottom-5 -right-5 h-28 w-28 opacity-[0.11]" viewBox="0 0 120 120" fill="currentColor">
+                <circle cx="60" cy="60" r="52"/>
+                <ellipse fill="none" stroke="white" stroke-width="4" cx="60" cy="60" rx="21" ry="52"/>
+                <line stroke="white" stroke-width="4" x1="8" y1="60" x2="112" y2="60"/>
+                <path fill="none" stroke="white" stroke-width="3.5" d="M14 38 Q60 46 106 38"/>
+                <path fill="none" stroke="white" stroke-width="3.5" d="M14 82 Q60 74 106 82"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">Status</p>
+            <p class="mt-auto text-[1.4rem] font-extrabold leading-none tracking-tight text-[#111]"
+               th:text="${domain.status}">PENDING</p>
+        </div>
+
+        <div class="relative flex min-h-[110px] flex-col overflow-hidden rounded-[22px] p-5 transition-transform duration-200 hover:-translate-y-0.5"
+             th:classappend="${domain.spfVerified} ? 'bg-[var(--card-lime)]' : 'bg-[var(--app-sun)]/80'">
+            <!-- decorative: shield -->
+            <svg class="pointer-events-none absolute -bottom-4 -right-4 h-28 w-28 opacity-[0.11]" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M50 6 L88 22 V52 C88 74 66 92 50 96 C34 92 12 74 12 52 V22 Z"/>
+                <path fill="none" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"
+                      th:if="${domain.spfVerified}" d="M32 52 L45 65 L68 38"/>
+                <rect fill="white" opacity="0.5" th:unless="${domain.spfVerified}" x="46" y="35" width="8" height="22" rx="4"/>
+                <circle fill="white" opacity="0.5" th:unless="${domain.spfVerified}" cx="50" cy="66" r="4"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">SPF</p>
+            <p class="mt-auto text-[1.4rem] font-extrabold leading-none tracking-tight text-[#111]"
+               th:text="${domain.spfVerified ? 'Verified' : 'Missing'}">Missing</p>
+        </div>
+
+        <div class="relative flex min-h-[110px] flex-col overflow-hidden rounded-[22px] p-5 transition-transform duration-200 hover:-translate-y-0.5"
+             th:classappend="${domain.dkimVerified} ? 'bg-[var(--card-lime)]' : 'bg-[var(--app-lilac)]/70'">
+            <!-- decorative: key -->
+            <svg class="pointer-events-none absolute -bottom-3 -right-3 h-28 w-28 opacity-[0.11]" viewBox="0 0 100 100" fill="currentColor">
+                <circle cx="34" cy="38" r="24"/>
+                <circle fill="white" opacity="0.4" cx="34" cy="38" r="14"/>
+                <rect x="54" y="34" width="38" height="9" rx="4.5"/>
+                <rect x="76" y="43" width="9" height="14" rx="4"/>
+                <rect x="60" y="43" width="9" height="10" rx="4"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">DKIM</p>
+            <p class="mt-auto text-[1.4rem] font-extrabold leading-none tracking-tight text-[#111]"
+               th:text="${domain.dkimVerified ? 'Verified' : 'Missing'}">Missing</p>
+        </div>
+
+        <div class="relative flex min-h-[110px] flex-col overflow-hidden rounded-[22px] p-5 transition-transform duration-200 hover:-translate-y-0.5"
+             th:classappend="${domain.dmarcVerified} ? 'bg-[var(--card-lime)]' : 'bg-[var(--app-peach)]/70'">
+            <!-- decorative: warning/policy -->
+            <svg class="pointer-events-none absolute -bottom-3 -right-3 h-28 w-28 opacity-[0.11]" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M50 8 L94 86 H6 Z"/>
+                <rect fill="white" opacity="0.5" x="46" y="38" width="8" height="24" rx="4"/>
+                <circle fill="white" opacity="0.5" cx="50" cy="72" r="5"/>
+            </svg>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#111]/50">DMARC</p>
+            <p class="mt-auto text-[1.4rem] font-extrabold leading-none tracking-tight text-[#111]"
+               th:text="${domain.dmarcVerified ? 'Verified' : 'Missing'}">Missing</p>
+        </div>
+    </div>
+
+    <!-- ── Content grid ──────────────────────────────────────────────── -->
+    <div class="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
+
+        <!-- DNS records -->
+        <section class="dv3 app-panel-strong overflow-hidden rounded-[24px]">
+            <div class="relative flex flex-wrap items-center justify-between gap-4 overflow-hidden border-b border-[rgba(57,48,36,0.08)] bg-[#1a1a1a] px-6 py-5 sm:px-8">
+                <!-- decorative blobs -->
+                <div class="pointer-events-none absolute -right-12 -top-10 h-40 w-40 rounded-full bg-[var(--card-mauve)]/10 blur-3xl"></div>
+                <div class="pointer-events-none absolute -left-6 bottom-0 h-28 w-28 rounded-full bg-[var(--card-lime)]/8 blur-2xl"></div>
+                <div class="relative flex items-center gap-3.5">
+                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[12px] bg-white/10">
+                        <svg class="h-5 w-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-white/35">DNS records</p>
+                        <h2 class="text-base font-extrabold tracking-tight text-white">Publish these exact values</h2>
+                    </div>
+                </div>
+                <span class="relative rounded-full border border-white/10 bg-white/7 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-white/50"
+                      th:text="${domain.verificationSummary}">0/3 verified</span>
+            </div>
+
+            <div class="p-6 sm:p-8">
+                <p class="mb-5 text-[13px] leading-6 text-slate-500">Add each record at your DNS provider. Wait for propagation (up to 48 h), then click <strong class="text-slate-700">Verify now</strong>.</p>
+                <div class="space-y-4">
+                    <article th:each="record : ${dnsRecords}"
+                             class="dns-record relative rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-white/80 p-5 shadow-[0_8px_28px_-18px_rgba(33,29,24,0.15)]">
+                        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="rounded-full bg-[#111] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-white"
+                                      th:text="${record.type}">TXT</span>
+                                <h3 class="text-[15px] font-extrabold tracking-tight text-[#111]" th:text="${record.name}">@</h3>
+                            </div>
+                            <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]"
+                                  th:classappend="${record.verified} ? 'bg-[var(--card-lime)]/40 text-emerald-900' : 'bg-amber-100 text-amber-800'"
+                                  th:text="${record.verified} ? 'Verified' : 'Pending'">Pending</span>
+                        </div>
+                        <p class="break-all rounded-[14px] bg-[#111] px-4 py-4 font-mono text-[12px] leading-6 text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                           th:text="${record.value}">value</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right sidebar -->
+        <div class="space-y-4">
+
+            <!-- Readiness -->
+            <article class="dv4 app-panel-strong overflow-hidden rounded-[24px]">
+                <div class="relative flex items-center gap-3.5 overflow-hidden border-b border-[rgba(57,48,36,0.08)] bg-[var(--card-mauve)]/22 px-6 py-5">
+                    <svg class="pointer-events-none absolute -bottom-5 -right-4 h-24 w-24 opacity-[0.13]" viewBox="0 0 120 120" fill="currentColor">
+                        <circle cx="60" cy="60" r="52"/>
+                        <ellipse fill="none" stroke="white" stroke-width="4" cx="60" cy="60" rx="21" ry="52"/>
+                        <line stroke="white" stroke-width="4" x1="8" y1="60" x2="112" y2="60"/>
+                    </svg>
+                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[12px] bg-[var(--card-mauve)]/55">
+                        <svg class="h-5 w-5 text-[#1a4f9e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Readiness</p>
+                        <h2 class="text-base font-extrabold tracking-tight text-slate-950">Verification progress</h2>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between rounded-[14px] px-4 py-3"
+                             th:classappend="${domain.spfVerified} ? 'bg-[var(--card-lime)]/22' : 'bg-[rgba(57,48,36,0.05)]'">
+                            <span class="text-[13px] font-bold text-slate-700">SPF</span>
+                            <span class="text-[12px] font-bold"
+                                  th:classappend="${domain.spfVerified} ? 'text-emerald-700' : 'text-amber-600'"
+                                  th:text="${domain.spfVerified} ? 'Verified' : 'Pending'">Pending</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[14px] px-4 py-3"
+                             th:classappend="${domain.dkimVerified} ? 'bg-[var(--card-lime)]/22' : 'bg-[rgba(57,48,36,0.05)]'">
+                            <span class="text-[13px] font-bold text-slate-700">DKIM</span>
+                            <span class="text-[12px] font-bold"
+                                  th:classappend="${domain.dkimVerified} ? 'text-emerald-700' : 'text-amber-600'"
+                                  th:text="${domain.dkimVerified} ? 'Verified' : 'Pending'">Pending</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[14px] px-4 py-3"
+                             th:classappend="${domain.dmarcVerified} ? 'bg-[var(--card-lime)]/22' : 'bg-[rgba(57,48,36,0.05)]'">
+                            <span class="text-[13px] font-bold text-slate-700">DMARC</span>
+                            <span class="text-[12px] font-bold"
+                                  th:classappend="${domain.dmarcVerified} ? 'text-emerald-700' : 'text-amber-600'"
+                                  th:text="${domain.dmarcVerified} ? 'Verified' : 'Pending'">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Metadata -->
+            <article class="dv4 app-panel-strong overflow-hidden rounded-[24px]">
+                <div class="relative flex items-center gap-3.5 overflow-hidden border-b border-[rgba(57,48,36,0.08)] bg-[var(--app-sun)]/30 px-6 py-5">
+                    <svg class="pointer-events-none absolute -bottom-4 -right-4 h-24 w-24 opacity-[0.13]" viewBox="0 0 100 100" fill="currentColor">
+                        <rect x="8" y="18" width="84" height="74" rx="10"/>
+                        <rect fill="white" opacity="0.3" x="8" y="18" width="84" height="22" rx="10"/>
+                        <rect fill="white" opacity="0.2" x="20" y="52" width="18" height="14" rx="4"/>
+                        <rect fill="white" opacity="0.2" x="46" y="52" width="18" height="14" rx="4"/>
+                        <rect fill="white" opacity="0.2" x="20" y="72" width="18" height="14" rx="4"/>
+                    </svg>
+                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[12px] bg-[var(--app-sun)]/65">
+                        <svg class="h-5 w-5 text-[#7a5a00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Metadata</p>
+                        <h2 class="text-base font-extrabold tracking-tight text-slate-950">Domain details</h2>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <dl class="space-y-2">
+                        <div class="flex items-center justify-between rounded-[14px] bg-[rgba(57,48,36,0.04)] px-4 py-2.5">
+                            <dt class="text-[12px] text-slate-500">Created</dt>
+                            <dd class="text-[12px] font-bold text-slate-900" th:text="${domain.createdAt}">—</dd>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[14px] bg-[rgba(57,48,36,0.04)] px-4 py-2.5">
+                            <dt class="text-[12px] text-slate-500">Updated</dt>
+                            <dd class="text-[12px] font-bold text-slate-900" th:text="${domain.updatedAt}">—</dd>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[14px] bg-[rgba(57,48,36,0.04)] px-4 py-2.5">
+                            <dt class="text-[12px] text-slate-500">Verified at</dt>
+                            <dd class="text-[12px] font-bold text-slate-900" th:text="${domain.verifiedAt}">Never</dd>
+                        </div>
+                    </dl>
+                </div>
+            </article>
+
+            <!-- Danger zone -->
+            <article class="dv4 app-panel-strong overflow-hidden rounded-[24px]">
+                <div class="flex items-center gap-3.5 border-b border-rose-200/50 bg-rose-50/60 px-6 py-5">
+                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[12px] bg-rose-100">
+                        <svg class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-rose-500">Danger zone</p>
+                        <h2 class="text-base font-extrabold tracking-tight text-slate-950">Delete domain</h2>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <p class="mb-4 text-[13px] leading-6 text-slate-500">Remove this domain if it is no longer used in any campaign. This cannot be undone.</p>
+                    <form th:action="@{/domains/{id}/delete(id=${domain.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit"
+                                class="rounded-full border border-rose-200 bg-white px-5 py-2.5 text-sm font-bold text-rose-700 transition hover:bg-rose-50">
+                            Delete domain
+                        </button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </div>
+
+</div>
+</main>
+</body>
+</html>

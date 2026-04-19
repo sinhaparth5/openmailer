@@ -28,19 +28,30 @@
       "isPartOf": { "@type": "WebSite", "name": "OpenMailer", "url": "https://openmailer.astrareconslabs.com" }
     }
     </script>
+
+    <style>
+        @keyframes fade-up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
+        .rg1{animation:fade-up .45s .04s ease both}
+        .rg2{animation:fade-up .45s .12s ease both}
+        .rg3{animation:fade-up .45s .20s ease both}
+        .live-dot{animation:pulse-dot 2.4s ease-in-out infinite}
+    </style>
 </head>
 <body>
 <div layout:fragment="content" class="flex w-full items-stretch">
-    <div class="app-shell grid w-full overflow-hidden lg:grid-cols-[0.94fr_1.06fr]">
+    <div class="app-shell grid w-full overflow-hidden lg:grid-cols-[1fr_0.82fr]">
+
+        <!-- ── Registration form ───────────────────────────────────────── -->
         <section class="flex items-center justify-center bg-[rgba(255,250,242,0.92)] p-6 sm:p-10">
             <div class="w-full max-w-xl">
-                <div class="mb-8">
-                    <p class="app-kicker">Create Workspace</p>
-                    <h1 class="mt-4 text-4xl font-semibold tracking-tight text-slate-950">Set up your account.</h1>
-                    <p class="mt-3 max-w-lg text-sm leading-7 text-slate-600">Create a calm, modern workspace for sender setup, audience management, and campaign execution.</p>
+                <div class="mb-8 rg1">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Create Workspace</p>
+                    <h1 class="mt-3 text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] text-slate-950">Set up your account.</h1>
+                    <p class="mt-3 max-w-lg text-[0.875rem] leading-7 text-slate-500">A modern workspace for sender setup, audience management, and campaign execution — all on your own infrastructure.</p>
                 </div>
 
-                <div id="alertContainer" class="mb-4 hidden" role="alert" aria-live="assertive" aria-atomic="true">
+                <div id="alertContainer" class="mb-4 hidden rg1" role="alert" aria-live="assertive" aria-atomic="true">
                     <div id="alertBox" class="rounded-[20px] p-4">
                         <div class="flex items-start">
                             <svg id="alertIcon" class="mr-3 mt-0.5 h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"></svg>
@@ -49,35 +60,35 @@
                     </div>
                 </div>
 
-                <form id="registerForm" class="app-panel-strong space-y-5 p-6 sm:p-7">
+                <form id="registerForm" class="rg2 app-panel-strong space-y-5 p-6 sm:p-7">
                     <div class="grid gap-5 md:grid-cols-2">
                         <div>
-                            <label for="firstName" class="mb-2 block text-sm font-medium text-slate-700">First name</label>
+                            <label for="firstName" class="mb-2 block text-sm font-semibold text-slate-700">First name</label>
                             <input id="firstName" name="firstName" type="text" maxlength="100" class="app-input" placeholder="Ava">
                         </div>
                         <div>
-                            <label for="lastName" class="mb-2 block text-sm font-medium text-slate-700">Last name</label>
+                            <label for="lastName" class="mb-2 block text-sm font-semibold text-slate-700">Last name</label>
                             <input id="lastName" name="lastName" type="text" maxlength="100" class="app-input" placeholder="Stone">
                         </div>
                     </div>
 
                     <div>
-                        <label for="username" class="mb-2 block text-sm font-medium text-slate-700">Username</label>
+                        <label for="username" class="mb-2 block text-sm font-semibold text-slate-700">Username</label>
                         <input id="username" name="username" type="text" required minlength="3" maxlength="50" pattern="^[a-zA-Z0-9_]+$"
                                class="app-input"
                                placeholder="openmailer_admin">
-                        <p class="mt-2 text-xs text-slate-500">Letters, numbers, and underscores only.</p>
+                        <p class="mt-2 text-xs text-slate-400">Letters, numbers, and underscores only.</p>
                     </div>
 
                     <div>
-                        <label for="email" class="mb-2 block text-sm font-medium text-slate-700">Email address</label>
+                        <label for="email" class="mb-2 block text-sm font-semibold text-slate-700">Email address</label>
                         <input id="email" name="email" type="email" required autocomplete="email" class="app-input" placeholder="you@example.com">
                     </div>
 
                     <div>
                         <div class="mb-2 flex items-center justify-between gap-3">
-                            <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
-                            <span class="text-xs text-slate-500">Min 8 chars, mixed-case, number, symbol</span>
+                            <label for="password" class="block text-sm font-semibold text-slate-700">Password</label>
+                            <span class="text-[11px] text-slate-400">Min 8 chars, mixed-case, number, symbol</span>
                         </div>
                         <div class="relative">
                             <input id="password" name="password" type="password" required minlength="8" maxlength="100"
@@ -95,31 +106,34 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="mt-3 rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-white/70 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live password check</p>
-                            <ul class="mt-3 space-y-2 text-xs text-slate-600">
-                                <li id="passwordRuleLength" class="flex items-center gap-2">
-                                    <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                        <!-- Live password checker -->
+                        <div class="mt-3 overflow-hidden rounded-[18px] border border-[rgba(57,48,36,0.08)] bg-white/70">
+                            <div class="border-b border-[rgba(57,48,36,0.07)] bg-[var(--card-lime)]/10 px-4 py-2.5">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Live password check</p>
+                            </div>
+                            <ul class="grid gap-2 p-4 sm:grid-cols-2">
+                                <li id="passwordRuleLength" class="flex items-center gap-2.5 text-[12px] text-slate-600">
+                                    <span class="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-slate-300 transition-colors duration-200"></span>
                                     At least 8 characters
                                 </li>
-                                <li id="passwordRuleUpper" class="flex items-center gap-2">
-                                    <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                                <li id="passwordRuleUpper" class="flex items-center gap-2.5 text-[12px] text-slate-600">
+                                    <span class="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-slate-300 transition-colors duration-200"></span>
                                     One uppercase letter
                                 </li>
-                                <li id="passwordRuleLower" class="flex items-center gap-2">
-                                    <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                                <li id="passwordRuleLower" class="flex items-center gap-2.5 text-[12px] text-slate-600">
+                                    <span class="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-slate-300 transition-colors duration-200"></span>
                                     One lowercase letter
                                 </li>
-                                <li id="passwordRuleNumber" class="flex items-center gap-2">
-                                    <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                                <li id="passwordRuleNumber" class="flex items-center gap-2.5 text-[12px] text-slate-600">
+                                    <span class="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-slate-300 transition-colors duration-200"></span>
                                     One number
                                 </li>
-                                <li id="passwordRuleSpecial" class="flex items-center gap-2">
-                                    <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                                <li id="passwordRuleSpecial" class="flex items-center gap-2.5 text-[12px] text-slate-600">
+                                    <span class="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-slate-300 transition-colors duration-200"></span>
                                     One symbol
                                 </li>
-                                <li id="passwordRuleMatch" class="flex items-center gap-2">
-                                    <span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+                                <li id="passwordRuleMatch" class="flex items-center gap-2.5 text-[12px] text-slate-600">
+                                    <span class="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-slate-300 transition-colors duration-200"></span>
                                     Passwords match
                                 </li>
                             </ul>
@@ -127,7 +141,7 @@
                     </div>
 
                     <div>
-                        <label for="confirmPassword" class="mb-2 block text-sm font-medium text-slate-700">Confirm password</label>
+                        <label for="confirmPassword" class="mb-2 block text-sm font-semibold text-slate-700">Confirm password</label>
                         <input id="confirmPassword" name="confirmPassword" type="password" required minlength="8" maxlength="100" class="app-input" placeholder="Repeat your password">
                     </div>
 
@@ -140,60 +154,69 @@
                     </button>
                 </form>
 
-                <div class="mt-5 flex items-center justify-between gap-3 rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-white/70 px-5 py-4 text-sm text-slate-600">
+                <div class="rg3 mt-4 flex items-center justify-between gap-3 rounded-[22px] border border-[rgba(57,48,36,0.08)] bg-white/70 px-5 py-4 text-sm text-slate-600">
                     <span>Already have an account?</span>
-                    <a href="/login" class="font-semibold text-slate-900 transition hover:text-slate-700">Sign in</a>
+                    <a href="/login" class="font-semibold text-slate-800 transition hover:text-slate-600">Sign in</a>
                 </div>
             </div>
         </section>
 
-        <section class="relative hidden overflow-hidden bg-[linear-gradient(180deg,rgba(255,252,247,0.88),rgba(246,236,221,0.95))] p-10 lg:flex lg:flex-col lg:justify-between">
-            <div class="absolute right-10 top-10 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(244,223,164,0.95),rgba(244,223,164,0)_72%)] blur-[6px]"></div>
-            <div class="relative z-10">
-                <div class="inline-flex items-center gap-3 rounded-full bg-white/75 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-                    <span class="app-status-dot bg-[var(--app-mint)]"></span>
-                    Start with a quieter design system
+        <!-- ── Dark info panel ─────────────────────────────────────────── -->
+        <section class="relative hidden overflow-hidden bg-[#1a1a1a] p-10 lg:flex lg:flex-col lg:justify-between">
+            <!-- Decorative blobs -->
+            <div class="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-[var(--card-sage)]/8 blur-3xl"></div>
+            <div class="pointer-events-none absolute -left-12 bottom-12 h-52 w-52 rounded-full bg-[var(--card-mauve)]/7 blur-2xl"></div>
+
+            <div class="relative z-10 rg1">
+                <div class="mb-4 flex items-center gap-2.5">
+                    <span class="live-dot inline-block h-2 w-2 rounded-full bg-[var(--card-lime)]"></span>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-white/38">Get started</p>
                 </div>
-                <h2 class="mt-8 max-w-lg text-5xl font-semibold leading-[1.05] tracking-tight text-slate-950">A workspace that feels more editorial, less generic SaaS.</h2>
-                <p class="mt-5 max-w-xl text-base leading-8 text-slate-600">
-                    The updated application style takes cues from your reference boards: pale surfaces, softer contrast,
-                    large typography, and information blocks that feel composed rather than crowded.
+                <h2 class="text-[2rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-white sm:text-[2.4rem]">
+                    A workspace that<br>feels deliberate.
+                </h2>
+                <p class="mt-4 max-w-xs text-[0.875rem] leading-7 text-white/45">
+                    Editorial surfaces, restrained color, and clear hierarchy — designed for operators, not template shops.
                 </p>
             </div>
 
-            <div class="relative z-10 grid gap-4">
-                <div class="grid gap-4 md:grid-cols-3">
-                    <div class="app-soft-card bg-[var(--app-peach)]/58 p-5">
-                        <p class="app-kicker">1</p>
-                        <p class="mt-3 text-lg font-semibold text-slate-900">Create account</p>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Establish your workspace identity.</p>
+            <div class="relative z-10 grid gap-3 rg2">
+                <!-- Step cards -->
+                <div class="grid gap-3 sm:grid-cols-3">
+                    <div class="relative overflow-hidden rounded-[18px] border border-white/[0.09] bg-[var(--card-mauve)]/12 p-4">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">Step 1</p>
+                        <p class="mt-2 text-[13px] font-extrabold text-white/80">Create account</p>
+                        <p class="mt-1 text-[11px] leading-4 text-white/35">Establish your workspace identity.</p>
                     </div>
-                    <div class="app-soft-card bg-[var(--app-mint)]/58 p-5">
-                        <p class="app-kicker">2</p>
-                        <p class="mt-3 text-lg font-semibold text-slate-900">Configure sender</p>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Connect provider and domain setup.</p>
+                    <div class="relative overflow-hidden rounded-[18px] border border-white/[0.09] bg-[var(--card-sage)]/12 p-4">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">Step 2</p>
+                        <p class="mt-2 text-[13px] font-extrabold text-white/80">Configure sender</p>
+                        <p class="mt-1 text-[11px] leading-4 text-white/35">Connect provider and domain.</p>
                     </div>
-                    <div class="app-soft-card bg-[var(--app-lilac)]/58 p-5">
-                        <p class="app-kicker">3</p>
-                        <p class="mt-3 text-lg font-semibold text-slate-900">Launch audience</p>
-                        <p class="mt-2 text-sm leading-6 text-slate-600">Import contacts and build your first draft.</p>
+                    <div class="relative overflow-hidden rounded-[18px] border border-white/[0.09] bg-[var(--card-lime)]/10 p-4">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">Step 3</p>
+                        <p class="mt-2 text-[13px] font-extrabold text-white/80">Launch audience</p>
+                        <p class="mt-1 text-[11px] leading-4 text-white/35">Import contacts, draft campaign.</p>
                     </div>
                 </div>
 
-                <div class="app-soft-card bg-white/75 p-6">
-                    <p class="app-kicker">Visual Direction</p>
-                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <p class="text-2xl font-semibold text-slate-900">Pastel signal blocks</p>
-                            <p class="mt-2 text-sm leading-6 text-slate-600">Each page uses a restrained color family to separate navigation, status, and content without overloading the user.</p>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="rounded-[20px] bg-[var(--app-sun)]/65 p-4 text-sm font-medium text-slate-700">Warm neutral</div>
-                            <div class="rounded-[20px] bg-[var(--app-peach)]/65 p-4 text-sm font-medium text-slate-700">Muted peach</div>
-                            <div class="rounded-[20px] bg-[var(--app-lilac)]/65 p-4 text-sm font-medium text-slate-700">Soft lilac</div>
-                            <div class="rounded-[20px] bg-[var(--app-mint)]/65 p-4 text-sm font-medium text-slate-700">Dusty mint</div>
-                        </div>
+                <!-- Color palette card -->
+                <div class="overflow-hidden rounded-[20px] border border-white/[0.09] bg-white/[0.04]">
+                    <div class="border-b border-white/[0.07] px-5 py-3">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">Design system</p>
                     </div>
+                    <div class="grid grid-cols-4 gap-3 p-4">
+                        <div class="rounded-[14px] bg-[var(--app-sun)]/50 py-4 text-center text-[10px] font-semibold text-white/50">Warm</div>
+                        <div class="rounded-[14px] bg-[var(--app-peach)]/50 py-4 text-center text-[10px] font-semibold text-white/50">Peach</div>
+                        <div class="rounded-[14px] bg-[var(--app-lilac)]/50 py-4 text-center text-[10px] font-semibold text-white/50">Lilac</div>
+                        <div class="rounded-[14px] bg-[var(--app-mint)]/50 py-4 text-center text-[10px] font-semibold text-white/50">Mint</div>
+                    </div>
+                </div>
+
+                <!-- Brand footer -->
+                <div class="flex items-center justify-between rounded-[20px] border border-white/[0.09] bg-white/[0.04] px-5 py-4">
+                    <p class="text-[12px] text-white/38">Free &amp; open-source</p>
+                    <span class="rounded-full bg-white/[0.08] px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white/52">OpenMailer</span>
                 </div>
             </div>
         </section>

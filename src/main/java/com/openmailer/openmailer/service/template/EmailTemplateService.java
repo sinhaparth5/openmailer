@@ -122,11 +122,21 @@ public class EmailTemplateService {
     if (updatedTemplate.getSubject() != null) {
       template.setSubject(updatedTemplate.getSubject());
     }
+    if (updatedTemplate.getDescription() != null) {
+      template.setDescription(updatedTemplate.getDescription());
+    }
     if (updatedTemplate.getHtmlContent() != null) {
       template.setHtmlContent(updatedTemplate.getHtmlContent());
+      template.setBody(updatedTemplate.getHtmlContent());
     }
     if (updatedTemplate.getPlainTextContent() != null) {
       template.setPlainTextContent(updatedTemplate.getPlainTextContent());
+    }
+    if (updatedTemplate.getPreviewText() != null) {
+      template.setPreviewText(updatedTemplate.getPreviewText());
+    }
+    if (updatedTemplate.getIsActive() != null) {
+      template.setIsActive(updatedTemplate.getIsActive());
     }
 
     template.setUpdatedAt(LocalDateTime.now());
