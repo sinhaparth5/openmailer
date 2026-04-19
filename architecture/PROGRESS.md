@@ -1,6 +1,6 @@
 # OpenMailer - Implementation Progress
 
-Last Updated: 2026-04-16
+Last Updated: 2026-04-19
 
 ---
 
@@ -51,6 +51,9 @@ Last Updated: 2026-04-16
 - Kept the main `compose.yaml` on the simpler working BunkerWeb `1.4.0` setup
 - Prepared the experimental `1.6.9` stack with scheduler, autoconf, UI, and socket proxy for later testing
 - Configured that experimental stack to reuse the same PostgreSQL and Redis services instead of adding extra database containers
+
+### 🚧 Testing And Documentation Started (2026-04-19)
+- Added controller test coverage for public tracking endpoints to lock down pixel responses, redirects, and failure fallbacks
 
 ### ✅ Earlier Configuration, Runtime, and Security Cleanup
 - Removed hardcoded development secrets from application properties and shifted to env-backed configuration
@@ -912,9 +915,9 @@ ghi._domainkey.yourdomain.com    CNAME    ghi.dkim.amazonses.com
 
 ---
 
-## ⏳ Phase 11: Testing & Documentation (0% Complete)
+## 🚧 Phase 11: Testing & Documentation (5% Complete)
 
-**Status:** ⏳ NOT STARTED
+**Status:** 🚧 IN PROGRESS
 
 **Priority:** HIGH - Before production
 
