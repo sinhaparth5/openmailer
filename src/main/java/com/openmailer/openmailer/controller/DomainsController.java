@@ -84,10 +84,15 @@ public class DomainsController {
             domain.setDomainName(domainForm.getDomainName().trim().toLowerCase());
             domain.setStatus("PENDING");
             domain.setUser(userDetails.getUser());
+            domain.setDkimSelector("openmailer");
 
             DkimKeyGenerationService.DkimKeyPair keys = dkimKeyGenerationService.generateDkimKeys();
-            domain.setDkimPublicKey(dkimKeyGenerationService.formatPublicKeyForDns(keys.getPublicKey()));
+            String formattedPublicKey = dkimKeyGenerationService.formatPublicKeyForDns(keys.getPublicKey());
+            domain.setDkimPublicKey(formattedPublicKey);
             domain.setDkimPrivateKey(encryptionService.encrypt(keys.getPrivateKey()));
+            domain.setSpfRecord(expectedSpfRecord(domain.getDomainName()));
+            domain.setDkimRecord(expectedDkimRecord(domain.getDkimSelector(), formattedPublicKey));
+            domain.setDmarcRecord(expectedDmarcRecord(domain.getDomainName()));
 
             Domain saved = domainService.createDomain(domain);
             redirectAttributes.addFlashAttribute("successMessage", "Domain added. Configure the DNS records, then run verification.");
@@ -131,7 +136,9 @@ public class DomainsController {
             DnsVerificationService.DnsVerificationResult verificationResult = dnsVerificationService.verifyDomain(
                 domain.getDomainName(),
                 selector,
-                domain.getDkimPublicKey()
+                domain.getSpfRecord() != null ? domain.getSpfRecord() : expectedSpfRecord(domain.getDomainName()),
+                domain.getDkimRecord() != null ? domain.getDkimRecord() : expectedDkimRecord(selector, domain.getDkimPublicKey()),
+                domain.getDmarcRecord() != null ? domain.getDmarcRecord() : expectedDmarcRecord(domain.getDomainName())
             );
 
             String status = verificationResult.isAllVerified() ? "VERIFIED" : "FAILED";
@@ -190,20 +197,39 @@ public class DomainsController {
     private List<DnsRecordView> dnsRecords(Domain domain) {
         String selector = domain.getDkimSelector() != null ? domain.getDkimSelector() : "openmailer";
         return List.of(
-            new DnsRecordView("TXT", "@", "v=spf1 include:openmailer.com ~all", Boolean.TRUE.equals(domain.getSpfVerified())),
+            new DnsRecordView(
+                "TXT",
+                "@",
+                domain.getSpfRecord() != null ? domain.getSpfRecord() : expectedSpfRecord(domain.getDomainName()),
+                Boolean.TRUE.equals(domain.getSpfVerified())
+            ),
             new DnsRecordView(
                 "TXT",
                 selector + "._domainkey",
-                "v=DKIM1; k=rsa; p=" + (domain.getDkimPublicKey() != null ? domain.getDkimPublicKey() : "Generating..."),
+                domain.getDkimRecord() != null ? domain.getDkimRecord() : expectedDkimRecord(selector, domain.getDkimPublicKey()),
                 Boolean.TRUE.equals(domain.getDkimVerified())
             ),
             new DnsRecordView(
                 "TXT",
                 "_dmarc",
-                "v=DMARC1; p=quarantine; rua=mailto:dmarc@" + domain.getDomainName(),
+                domain.getDmarcRecord() != null ? domain.getDmarcRecord() : expectedDmarcRecord(domain.getDomainName()),
                 Boolean.TRUE.equals(domain.getDmarcVerified())
             )
         );
+    }
+
+    private String expectedSpfRecord(String domainName) {
+        return "v=spf1 include:openmailer.com ~all";
+    }
+
+    private String expectedDkimRecord(String selector, String publicKey) {
+        return publicKey != null && !publicKey.isBlank()
+            ? "v=DKIM1; k=rsa; p=" + publicKey
+            : "Generating...";
+    }
+
+    private String expectedDmarcRecord(String domainName) {
+        return "v=DMARC1; p=quarantine; rua=mailto:dmarc@" + domainName;
     }
 
     private DomainListItemView toListItemView(Domain domain) {

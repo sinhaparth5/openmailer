@@ -10,7 +10,9 @@ import com.openmailer.openmailer.model.Segment;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.contact.ContactListService;
+import com.openmailer.openmailer.service.contact.ContactListMembershipService;
 import com.openmailer.openmailer.service.contact.ContactService;
+import com.openmailer.openmailer.service.contact.SegmentEvaluationService;
 import com.openmailer.openmailer.service.contact.SegmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,15 +40,21 @@ public class SegmentController {
 
     private final SegmentService segmentService;
     private final ContactListService contactListService;
+    private final ContactListMembershipService membershipService;
     private final ContactService contactService;
+    private final SegmentEvaluationService segmentEvaluationService;
 
     @Autowired
     public SegmentController(SegmentService segmentService,
                             ContactListService contactListService,
-                            ContactService contactService) {
+                            ContactListMembershipService membershipService,
+                            ContactService contactService,
+                            SegmentEvaluationService segmentEvaluationService) {
         this.segmentService = segmentService;
         this.contactListService = contactListService;
+        this.membershipService = membershipService;
         this.contactService = contactService;
+        this.segmentEvaluationService = segmentEvaluationService;
     }
 
     /**
@@ -206,8 +215,6 @@ public class SegmentController {
 
     /**
      * Get contacts matching a segment.
-     * Note: This is a simplified implementation. A full implementation would
-     * require a dynamic query builder to evaluate segment conditions.
      *
      * @param userDetails the authenticated user
      * @param id the segment ID
@@ -225,27 +232,21 @@ public class SegmentController {
         User user = userDetails.getUser();
         Segment segment = segmentService.findByIdAndUserId(id, user.getId());
 
-        // For now, return contacts from the associated list if available
-        // A full implementation would evaluate the segment conditions
         Map<String, Object> result = new HashMap<>();
         result.put("segmentId", segment.getId());
         result.put("segmentName", segment.getName());
         result.put("isDynamic", segment.getIsDynamic());
         result.put("conditions", segment.getConditions());
+        List<Contact> matchingContacts = resolveSegmentContacts(user.getId(), segment);
+        int fromIndex = Math.min(page * size, matchingContacts.size());
+        int toIndex = Math.min(fromIndex + size, matchingContacts.size());
+        List<Contact> pagedContacts = matchingContacts.subList(fromIndex, toIndex);
 
-        // For now, return all user's contacts as this is a simplified implementation
-        // A full implementation would evaluate the segment conditions dynamically
-        result.put("message", "Segment condition evaluation not yet implemented. " +
-                "Showing all user contacts. Full implementation requires dynamic query builder.");
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Contact> contacts = contactService.findByUserId(user.getId(), pageable);
-
-        result.put("contacts", contacts.getContent());
-        result.put("totalContacts", contacts.getTotalElements());
+        result.put("contacts", pagedContacts);
+        result.put("totalContacts", matchingContacts.size());
         result.put("page", page);
         result.put("size", size);
-        result.put("totalPages", contacts.getTotalPages());
+        result.put("totalPages", size > 0 ? (int) Math.ceil((double) matchingContacts.size() / size) : 1);
 
         return ResponseEntity.ok(ApiResponse.success(result));
     }
@@ -272,25 +273,28 @@ public class SegmentController {
         result.put("conditions", segment.getConditions());
         result.put("isDynamic", segment.getIsDynamic());
 
-        // For now, return cached count or list size
-        // Full implementation would evaluate conditions against database
-        if (segment.getCachedCount() != null && segment.getCachedCount() > 0) {
-            result.put("matchingContacts", segment.getCachedCount());
-            result.put("lastCalculatedAt", segment.getLastCalculatedAt());
-            result.put("source", "cached");
-        } else if (segment.getContactList() != null) {
-            int count = segment.getContactList().getTotalContacts();
-            result.put("matchingContacts", count);
-            result.put("source", "list_total");
-        } else {
-            // Count all user contacts as estimate
-            long totalContacts = contactService.countByUserId(user.getId());
-            result.put("matchingContacts", totalContacts);
-            result.put("source", "user_total_estimate");
-            result.put("message", "Full condition evaluation not yet implemented. " +
-                    "Showing total user contacts. Full implementation requires dynamic query builder.");
-        }
+        List<Contact> matchingContacts = resolveSegmentContacts(user.getId(), segment);
+        segmentService.updateCachedCount(segment.getId(), user.getId(), matchingContacts.size());
+        result.put("matchingContacts", matchingContacts.size());
+        result.put("lastCalculatedAt", LocalDateTime.now());
+        result.put("source", "evaluated");
 
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    private List<Contact> resolveSegmentContacts(String userId, Segment segment) {
+        List<Contact> baseContacts;
+        if (segment.getContactList() != null) {
+            List<String> contactIds = membershipService.getActiveContactIdsByList(segment.getContactList().getId());
+            baseContacts = contactService.findByUserId(userId).stream()
+                .filter(contact -> contactIds.contains(contact.getId()))
+                .filter(contact -> "SUBSCRIBED".equals(contact.getStatus()))
+                .toList();
+        } else {
+            baseContacts = contactService.findByUserId(userId).stream()
+                .filter(contact -> "SUBSCRIBED".equals(contact.getStatus()))
+                .toList();
+        }
+        return segmentEvaluationService.filterContacts(baseContacts, segment);
     }
 }

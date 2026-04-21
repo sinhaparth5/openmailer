@@ -30,20 +30,26 @@ public class DnsVerificationService {
      * @param expectedDkimPublicKey the expected DKIM public key
      * @return DnsVerificationResult with verification status for each record type
      */
-    public DnsVerificationResult verifyDomain(String domainName, String dkimSelector, String expectedDkimPublicKey) {
+    public DnsVerificationResult verifyDomain(
+        String domainName,
+        String dkimSelector,
+        String expectedSpfRecord,
+        String expectedDkimRecord,
+        String expectedDmarcRecord
+    ) {
         log.info("Starting DNS verification for domain: {}", domainName);
 
         DnsVerificationResult result = new DnsVerificationResult();
         result.setDomainName(domainName);
 
         // Verify SPF record
-        result.setSpfVerified(verifySpfRecord(domainName));
+        result.setSpfVerified(verifySpfRecord(domainName, expectedSpfRecord));
 
         // Verify DKIM record
-        result.setDkimVerified(verifyDkimRecord(domainName, dkimSelector, expectedDkimPublicKey));
+        result.setDkimVerified(verifyDkimRecord(domainName, dkimSelector, expectedDkimRecord));
 
         // Verify DMARC record
-        result.setDmarcVerified(verifyDmarcRecord(domainName));
+        result.setDmarcVerified(verifyDmarcRecord(domainName, expectedDmarcRecord));
 
         boolean allVerified = result.isSpfVerified() && result.isDkimVerified() && result.isDmarcVerified();
         result.setAllVerified(allVerified);
@@ -61,17 +67,19 @@ public class DnsVerificationService {
      * @param domainName the domain name
      * @return true if SPF record is found and valid
      */
-    public boolean verifySpfRecord(String domainName) {
+    public boolean verifySpfRecord(String domainName, String expectedSpfRecord) {
         try {
             List<String> txtRecords = getTxtRecords(domainName);
+            String normalizedExpected = normalizeTxtRecord(expectedSpfRecord);
 
-            // Check if any TXT record contains SPF information
             for (String record : txtRecords) {
-                if (record.startsWith("v=spf1")) {
+                String normalizedRecord = normalizeTxtRecord(record);
+                if (normalizedRecord.startsWith("v=spf1")) {
                     log.debug("Found SPF record for {}: {}", domainName, record);
-                    // Additional validation could check if record includes openmailer.com
-                    return record.contains("include:openmailer.com") ||
-                           record.contains("include:_spf.openmailer.com");
+                    if (normalizedExpected != null && !normalizedExpected.isBlank()) {
+                        return normalizedRecord.equalsIgnoreCase(normalizedExpected);
+                    }
+                    return true;
                 }
             }
 
@@ -93,25 +101,28 @@ public class DnsVerificationService {
      * @param expectedPublicKey the expected DKIM public key
      * @return true if DKIM record matches
      */
-    public boolean verifyDkimRecord(String domainName, String selector, String expectedPublicKey) {
+    public boolean verifyDkimRecord(String domainName, String selector, String expectedDkimRecord) {
         try {
             String dkimDomain = selector + "._domainkey." + domainName;
             List<String> txtRecords = getTxtRecords(dkimDomain);
+            String normalizedExpected = normalizeTxtRecord(expectedDkimRecord);
 
             for (String record : txtRecords) {
-                if (record.startsWith("v=DKIM1")) {
+                String normalizedRecord = normalizeTxtRecord(record);
+                if (normalizedRecord.startsWith("v=DKIM1")) {
                     log.debug("Found DKIM record for {}: {}", dkimDomain, record);
 
-                    // Extract public key from DKIM record
-                    String publicKeyFromDns = extractDkimPublicKey(record);
-
-                    if (publicKeyFromDns != null && publicKeyFromDns.equals(expectedPublicKey)) {
+                    if (normalizedExpected != null && !normalizedExpected.isBlank()) {
+                        if (normalizedRecord.equalsIgnoreCase(normalizedExpected)) {
+                            log.info("DKIM record verified successfully for {}", domainName);
+                            return true;
+                        }
+                    } else {
                         log.info("DKIM record verified successfully for {}", domainName);
                         return true;
-                    } else {
-                        log.warn("DKIM public key mismatch for {}", domainName);
-                        return false;
                     }
+                    log.warn("DKIM record mismatch for {}", domainName);
+                    return false;
                 }
             }
 
@@ -131,19 +142,23 @@ public class DnsVerificationService {
      * @param domainName the domain name
      * @return true if DMARC record is found and valid
      */
-    public boolean verifyDmarcRecord(String domainName) {
+    public boolean verifyDmarcRecord(String domainName, String expectedDmarcRecord) {
         try {
             String dmarcDomain = "_dmarc." + domainName;
             List<String> txtRecords = getTxtRecords(dmarcDomain);
+            String normalizedExpected = normalizeTxtRecord(expectedDmarcRecord);
 
             for (String record : txtRecords) {
-                if (record.startsWith("v=DMARC1")) {
+                String normalizedRecord = normalizeTxtRecord(record);
+                if (normalizedRecord.startsWith("v=DMARC1")) {
                     log.debug("Found DMARC record for {}: {}", dmarcDomain, record);
-                    // Basic validation - could add more checks for policy values
-                    return record.contains("p=") && (
-                           record.contains("p=none") ||
-                           record.contains("p=quarantine") ||
-                           record.contains("p=reject")
+                    if (normalizedExpected != null && !normalizedExpected.isBlank()) {
+                        return normalizedRecord.equalsIgnoreCase(normalizedExpected);
+                    }
+                    return normalizedRecord.contains("p=") && (
+                           normalizedRecord.contains("p=none") ||
+                           normalizedRecord.contains("p=quarantine") ||
+                           normalizedRecord.contains("p=reject")
                     );
                 }
             }
@@ -177,8 +192,7 @@ public class DnsVerificationService {
         if (txtAttr != null) {
             for (int i = 0; i < txtAttr.size(); i++) {
                 String record = txtAttr.get(i).toString();
-                // Remove quotes if present
-                record = record.replaceAll("^\"|\"$", "");
+                record = normalizeTxtRecord(record);
                 txtRecords.add(record);
             }
         }
@@ -194,6 +208,9 @@ public class DnsVerificationService {
      * @return the public key, or null if not found
      */
     private String extractDkimPublicKey(String dkimRecord) {
+        if (dkimRecord == null || dkimRecord.isBlank()) {
+            return null;
+        }
         // DKIM records have format: v=DKIM1; k=rsa; p=<public_key>
         String[] parts = dkimRecord.split(";");
         for (String part : parts) {
@@ -203,6 +220,17 @@ public class DnsVerificationService {
             }
         }
         return null;
+    }
+
+    private String normalizeTxtRecord(String record) {
+        if (record == null) {
+            return null;
+        }
+        return record
+            .replace("\" \"", "")
+            .replace("\"", "")
+            .replaceAll("\\s+", " ")
+            .trim();
     }
 
     /**

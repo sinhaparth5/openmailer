@@ -88,13 +88,25 @@ public class DomainVerificationScheduler {
         log.info("Verifying domain: {}", domain.getDomainName());
 
         try {
-            // Get expected DKIM public key from domain record
-            String dkimPublicKey = domain.getDkimPublicKey();
             String dkimSelector = domain.getDkimSelector() != null ? domain.getDkimSelector() : "openmailer";
+            String expectedSpfRecord = domain.getSpfRecord() != null
+                ? domain.getSpfRecord()
+                : expectedSpfRecord(domain.getDomainName());
+            String expectedDkimRecord = domain.getDkimRecord() != null
+                ? domain.getDkimRecord()
+                : expectedDkimRecord(domain.getDkimPublicKey());
+            String expectedDmarcRecord = domain.getDmarcRecord() != null
+                ? domain.getDmarcRecord()
+                : expectedDmarcRecord(domain.getDomainName());
 
             // Perform DNS verification
-            DnsVerificationService.DnsVerificationResult result =
-                    dnsVerificationService.verifyDomain(domain.getDomainName(), dkimSelector, dkimPublicKey);
+            DnsVerificationService.DnsVerificationResult result = dnsVerificationService.verifyDomain(
+                domain.getDomainName(),
+                dkimSelector,
+                expectedSpfRecord,
+                expectedDkimRecord,
+                expectedDmarcRecord
+            );
 
             // Update domain status based on results
             domain.setSpfVerified(result.isSpfVerified());
@@ -185,8 +197,13 @@ public class DomainVerificationScheduler {
                 .orElseThrow(() -> new RuntimeException("Domain not found: " + domainId));
 
         String dkimSelector = domain.getDkimSelector() != null ? domain.getDkimSelector() : "openmailer";
-        DnsVerificationService.DnsVerificationResult result =
-                dnsVerificationService.verifyDomain(domain.getDomainName(), dkimSelector, domain.getDkimPublicKey());
+        DnsVerificationService.DnsVerificationResult result = dnsVerificationService.verifyDomain(
+            domain.getDomainName(),
+            dkimSelector,
+            domain.getSpfRecord() != null ? domain.getSpfRecord() : expectedSpfRecord(domain.getDomainName()),
+            domain.getDkimRecord() != null ? domain.getDkimRecord() : expectedDkimRecord(domain.getDkimPublicKey()),
+            domain.getDmarcRecord() != null ? domain.getDmarcRecord() : expectedDmarcRecord(domain.getDomainName())
+        );
 
         // Update domain
         domain.setSpfVerified(result.isSpfVerified());
@@ -215,5 +232,19 @@ public class DomainVerificationScheduler {
     public void triggerManualVerification() {
         log.info("Manually triggering domain verification");
         verifyPendingDomains();
+    }
+
+    private String expectedSpfRecord(String domainName) {
+        return "v=spf1 include:openmailer.com ~all";
+    }
+
+    private String expectedDkimRecord(String publicKey) {
+        return publicKey != null && !publicKey.isBlank()
+            ? "v=DKIM1; k=rsa; p=" + publicKey
+            : "Generating...";
+    }
+
+    private String expectedDmarcRecord(String domainName) {
+        return "v=DMARC1; p=quarantine; rua=mailto:dmarc@" + domainName;
     }
 }

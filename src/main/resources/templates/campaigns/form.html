@@ -259,6 +259,55 @@
         <!-- Right column -->
         <div class="cpf4 space-y-4">
 
+            <section class="app-panel-strong overflow-hidden rounded-[24px]">
+                <div class="relative flex items-center gap-3.5 overflow-hidden border-b border-[rgba(57,48,36,0.08)] bg-[var(--card-lime)]/22 px-6 py-5">
+                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[12px] bg-[var(--card-lime)]/55">
+                        <svg class="h-5 w-5 text-[#365200]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H11a4 4 0 00-4 4v2m10 0H7m10-10a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Audience preflight</p>
+                        <h2 class="text-base font-extrabold tracking-tight text-slate-950">Reachability before send</h2>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 px-4 py-3">
+                            <span class="text-[13px] text-slate-600">Selected list</span>
+                            <span class="text-[13px] font-semibold text-slate-900" th:text="${audiencePreflight.listName != null ? audiencePreflight.listName : 'Choose a list'}">Choose a list</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 px-4 py-3">
+                            <span class="text-[13px] text-slate-600">Total list contacts</span>
+                            <span class="text-[13px] font-semibold text-slate-900" th:text="${audiencePreflight.totalListContacts}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-white/70 px-4 py-3">
+                            <span class="text-[13px] text-slate-600">Active memberships</span>
+                            <span class="text-[13px] font-semibold text-slate-900" th:text="${audiencePreflight.activeMemberships}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-[var(--card-lime)]/18 px-4 py-3">
+                            <span class="text-[13px] text-slate-700">Reachable subscribed recipients</span>
+                            <span class="text-[13px] font-bold text-slate-950" th:text="${audiencePreflight.reachableRecipients}">0</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-[var(--card-pink)]/10 px-4 py-3">
+                            <span class="text-[13px] text-slate-600">Excluded before send</span>
+                            <span class="text-[13px] font-semibold text-slate-900" th:text="${audiencePreflight.suppressedRecipients}">0</span>
+                        </div>
+                        <div th:if="${audiencePreflight.segmentSelected}" class="flex items-center justify-between rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-[var(--card-mauve)]/16 px-4 py-3">
+                            <span class="text-[13px] text-slate-600">Segment-matched recipients</span>
+                            <span class="text-[13px] font-semibold text-slate-900" th:text="${audiencePreflight.estimatedSegmentRecipients != null ? audiencePreflight.estimatedSegmentRecipients : 0}">0</span>
+                        </div>
+                    </div>
+                    <p th:if="${audiencePreflight.warning != null}" class="mt-4 rounded-[14px] border border-amber-200/70 bg-amber-50 px-4 py-3 text-[12px] leading-5 text-amber-900" th:text="${audiencePreflight.warning}">Warning</p>
+                    <p th:if="${audiencePreflight.suppressedRecipients > 0}" class="mt-4 rounded-[14px] border border-[rgba(57,48,36,0.08)] bg-slate-50 px-4 py-3 text-[12px] leading-5 text-slate-600">
+                        Some contacts will be skipped because they are not currently subscribed or are not in an active membership state.
+                    </p>
+                    <p th:if="${audiencePreflight.zeroAudience}" class="mt-4 rounded-[14px] border border-rose-200 bg-rose-50 px-4 py-3 text-[12px] leading-5 text-rose-800">
+                        No reachable subscribed recipients are available yet. You can still save the draft, but send and schedule will stay blocked until the list has deliverable contacts.
+                    </p>
+                </div>
+            </section>
+
             <!-- Tracking -->
             <section class="app-panel-strong overflow-hidden rounded-[24px]">
                 <div class="relative flex items-center gap-3.5 overflow-hidden border-b border-[rgba(57,48,36,0.08)] bg-[var(--card-sage)]/22 px-6 py-5">

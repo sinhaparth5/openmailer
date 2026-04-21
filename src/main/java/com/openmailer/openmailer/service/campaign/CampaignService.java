@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -46,6 +47,51 @@ public class CampaignService {
     campaign.setCreatedAt(LocalDateTime.now());
     campaign.setUpdatedAt(LocalDateTime.now());
     return campaignRepository.save(campaign);
+  }
+
+  /**
+   * Duplicate an existing campaign into a fresh draft for the same user.
+   *
+   * @param id the source campaign ID
+   * @param userId the owner ID
+   * @return the duplicated draft campaign
+   */
+  @CacheEvict(value = "campaignStats", allEntries = true)
+  public EmailCampaign duplicateCampaign(String id, String userId) {
+    EmailCampaign source = findByIdAndUserId(id, userId);
+
+    EmailCampaign duplicate = new EmailCampaign();
+    duplicate.setName(buildDuplicateName(source.getName(), userId));
+    duplicate.setTemplate(source.getTemplate());
+    duplicate.setContactList(source.getContactList());
+    duplicate.setSegment(source.getSegment());
+    duplicate.setSubjectLine(source.getSubject());
+    duplicate.setPreviewText(source.getPreviewText());
+    duplicate.setFromName(source.getFromName());
+    duplicate.setFromEmail(source.getFromEmail());
+    duplicate.setReplyToEmail(source.getReplyToEmail());
+    duplicate.setDomain(source.getDomain());
+    duplicate.setProvider(source.getProvider());
+    duplicate.setTrackOpens(source.getTrackOpens());
+    duplicate.setTrackClicks(source.getTrackClicks());
+    duplicate.setStatus("DRAFT");
+    duplicate.setScheduledAt(null);
+    duplicate.setSentAt(null);
+    duplicate.setTotalRecipients(source.getTotalRecipients());
+    duplicate.setSentCount(0);
+    duplicate.setFailedCount(0);
+    duplicate.setOpenRate(BigDecimal.ZERO);
+    duplicate.setClickRate(BigDecimal.ZERO);
+    duplicate.setBounceRate(BigDecimal.ZERO);
+    duplicate.setUnsubscribeCount(0);
+    duplicate.setComplaintCount(0);
+    duplicate.setSendSpeed(source.getSendSpeed());
+    duplicate.setRetryFailed(source.getRetryFailed());
+    duplicate.setMaxRetries(source.getMaxRetries());
+    duplicate.setCreatedBy(source.getCreatedBy());
+    duplicate.setUserId(source.getUserId());
+
+    return createCampaign(duplicate);
   }
 
   /**
@@ -309,5 +355,30 @@ public class CampaignService {
   @Transactional(readOnly = true)
   public long countByStatus(String userId, String status) {
     return campaignRepository.countByUserIdAndStatus(userId, status);
+  }
+
+  private String buildDuplicateName(String originalName, String userId) {
+    String baseName = (originalName == null || originalName.isBlank() ? "Campaign" : originalName.trim()) + " Copy";
+    String candidate = baseName;
+    int suffix = 2;
+    List<String> existingNames = campaignRepository.findByUserId(userId).stream()
+        .map(EmailCampaign::getName)
+        .toList();
+
+    while (containsNameIgnoreCase(existingNames, candidate)) {
+      candidate = baseName + " " + suffix;
+      suffix++;
+    }
+
+    return candidate;
+  }
+
+  private boolean containsNameIgnoreCase(List<String> existingNames, String candidate) {
+    for (String existingName : existingNames) {
+      if (existingName != null && existingName.equalsIgnoreCase(candidate)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
