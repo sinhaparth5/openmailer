@@ -1,6 +1,6 @@
 # OpenMailer
 
-OpenMailer is a self-hosted email platform built with Spring Boot, PostgreSQL, Redis, Thymeleaf, and Tailwind CSS. Test
+OpenMailer is a self-hosted email platform built with Spring Boot, PostgreSQL, Redis, Thymeleaf, and Tailwind CSS.
 
 ## Overview
 
