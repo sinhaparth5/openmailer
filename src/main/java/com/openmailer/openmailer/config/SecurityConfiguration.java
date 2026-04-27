@@ -71,11 +71,12 @@ public class SecurityConfiguration {
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp
                     .policyDirectives("default-src 'self'; " +
-                        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; " +
+                        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com; " +
                         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                         "img-src 'self' data: https:; " +
                         "font-src 'self' data: https://fonts.gstatic.com; " +
-                        "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; " +
+                        "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://analytics.google.com; " +
+                        "frame-src https://www.googletagmanager.com; " +
                         "manifest-src 'self'; " +
                         "frame-ancestors 'none';")
                 )

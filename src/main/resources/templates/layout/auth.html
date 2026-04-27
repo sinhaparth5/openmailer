@@ -50,6 +50,9 @@
 
     <link rel="stylesheet" th:href="@{/css/output.css}">
 
+    <script th:src="${assetMinified} ? @{/js/min/alpine-components.min.js} : @{/js/alpine-components.js}"></script>
+    <script defer th:src="@{/js/vendor/alpinejs.min.js}"></script>
+
     <!-- JSON-LD structured data (base — pages can add their own via extra-head) -->
     <script type="application/ld+json" th:if="${pageJsonLd == null}" th:inline="javascript">
     {
