@@ -124,6 +124,23 @@ function calendarWidget() {
     };
 }
 
+function cookieConsent() {
+    return {
+        show: !localStorage.getItem('cookie_consent'),
+        accept() {
+            localStorage.setItem('cookie_consent', 'accepted');
+            if (typeof gtag === 'function') {
+                gtag('consent', 'update', { analytics_storage: 'granted', ad_storage: 'granted' });
+            }
+            this.show = false;
+        },
+        decline() {
+            localStorage.setItem('cookie_consent', 'declined');
+            this.show = false;
+        }
+    };
+}
+
 // Listen for toast events and dispatch to the toast container
 window.addEventListener('show-toast', (event) => {
     const container = document.querySelector('[x-data*="toastManager"]');

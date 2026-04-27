@@ -75,7 +75,7 @@ public class SecurityConfiguration {
                         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                         "img-src 'self' data: https:; " +
                         "font-src 'self' data: https://fonts.gstatic.com; " +
-                        "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://analytics.google.com; " +
+                        "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; " +
                         "frame-src https://www.googletagmanager.com; " +
                         "manifest-src 'self'; " +
                         "frame-ancestors 'none';")
