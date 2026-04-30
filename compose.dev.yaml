@@ -1,0 +1,71 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: openmailer-app-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: 8080
+      APP_BASE_URL: http://localhost:8080
+      DATABASE_URL: jdbc:postgresql://postgres:5432/openmailer
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      CACHE_TYPE: redis
+      ENCRYPTION_KEY: cd18b33b46ab2d5ccced4f4ea20da280
+      JWT_SECRET: hbJkYjW4i9KxlUb9LU7+QjP5UIphJqzWH6IqAP5gYuo=
+      JWT_ACCESS_TOKEN_EXPIRATION: 3600000
+      JWT_REFRESH_TOKEN_EXPIRATION: 604800000
+      MAIL_HOST: smtp.ethereal.email
+      MAIL_PORT: 587
+      MAIL_USERNAME: cory.mills@ethereal.email
+      MAIL_PASSWORD: 1k1zdXapjsuyV8TCD2
+      APP_MAIL_FROM: cory.mills@ethereal.email
+      APP_TEST_EMAIL_RECIPIENT: cory.mills@ethereal.email
+      APP_ASSETS_MINIFIED: "false"
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: openmailer-postgres-dev
+    environment:
+      POSTGRES_DB: openmailer
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d openmailer"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8-alpine
+    container_name: openmailer-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:

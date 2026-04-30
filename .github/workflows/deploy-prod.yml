@@ -49,11 +49,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Prepare deploy bundle
-        run: |
-          mkdir -p deploy-bundle
-          cp deploy/compose.prod.yml deploy-bundle/compose.yml
-
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1.0.3
         env:
