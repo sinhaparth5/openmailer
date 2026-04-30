@@ -33,12 +33,41 @@ RUN npm run build:prod
 # Build Spring Boot application (skip tests for faster builds)
 RUN ./mvnw clean package -DskipTests
 
+# Create a trimmed Java runtime for the application
+RUN mkdir -p /app/target/dependency && \
+    cd /app/target/dependency && \
+    jar -xf ../openmailer-0.0.1-SNAPSHOT.jar && \
+    CLASSPATH="$(echo BOOT-INF/lib/*.jar | tr ' ' ':')" && \
+    jdeps \
+      --ignore-missing-deps \
+      --multi-release 25 \
+      --recursive \
+      --print-module-deps \
+      --class-path "${CLASSPATH}" \
+      BOOT-INF/classes > /tmp/java-modules.txt && \
+    jlink \
+      --add-modules "$(cat /tmp/java-modules.txt),jdk.crypto.ec,jdk.unsupported" \
+      --strip-debug \
+      --no-man-pages \
+      --no-header-files \
+      --compress=2 \
+      --output /opt/java-minimal
+
 # Stage 2: Runtime image
-FROM eclipse-temurin:25-jre
+FROM debian:bookworm-slim
 
 WORKDIR /app
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends bash vim-tiny ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/opt/java-minimal
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
 # Copy the built JAR from builder stage
+COPY --from=builder /opt/java-minimal /opt/java-minimal
 COPY --from=builder /app/target/openmailer-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the application port
