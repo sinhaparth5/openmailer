@@ -14,6 +14,7 @@ import com.openmailer.openmailer.repository.EmailProviderRepository;
 import com.openmailer.openmailer.repository.EmailTemplateRepository;
 import com.openmailer.openmailer.repository.SegmentRepository;
 import com.openmailer.openmailer.security.CustomUserDetails;
+import com.openmailer.openmailer.service.campaign.CampaignAudienceService;
 import com.openmailer.openmailer.service.campaign.CampaignSendingService;
 import com.openmailer.openmailer.service.campaign.CampaignService;
 import jakarta.validation.Valid;
@@ -48,6 +49,7 @@ public class CampaignsController {
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
     private static final DateTimeFormatter DATE_TIME_INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
     private final CampaignService campaignService;
+    private final CampaignAudienceService audienceService;
     private final CampaignSendingService campaignSendingService;
     private final EmailTemplateRepository templateRepository;
     private final ContactListRepository listRepository;
@@ -57,6 +59,7 @@ public class CampaignsController {
 
     public CampaignsController(
         CampaignService campaignService,
+        CampaignAudienceService audienceService,
         CampaignSendingService campaignSendingService,
         EmailTemplateRepository templateRepository,
         ContactListRepository listRepository,
@@ -65,6 +68,7 @@ public class CampaignsController {
         EmailProviderRepository providerRepository
     ) {
         this.campaignService = campaignService;
+        this.audienceService = audienceService;
         this.campaignSendingService = campaignSendingService;
         this.templateRepository = templateRepository;
         this.listRepository = listRepository;
@@ -114,7 +118,9 @@ public class CampaignsController {
     @GetMapping("/create")
     public String create(Model model) {
         populateFormMetadata(model, "Create Campaign - OpenMailer", "create");
-        model.addAttribute("campaignForm", new CampaignForm());
+        CampaignForm form = new CampaignForm();
+        model.addAttribute("campaignForm", form);
+        populateAudiencePreview(model, null, form);
         return "campaigns/form";
     }
 
@@ -128,6 +134,7 @@ public class CampaignsController {
     ) {
         if (bindingResult.hasErrors()) {
             populateFormMetadata(model, "Create Campaign - OpenMailer", "create");
+            populateAudiencePreview(model, userDetails.getUser().getId(), campaignForm);
             return "campaigns/form";
         }
 
@@ -138,6 +145,7 @@ public class CampaignsController {
         } catch (ValidationException ex) {
             bindValidationError(bindingResult, ex);
             populateFormMetadata(model, "Create Campaign - OpenMailer", "create");
+            populateAudiencePreview(model, userId, campaignForm);
             return "campaigns/form";
         }
         redirectAttributes.addFlashAttribute("successMessage", "Campaign created successfully.");
@@ -174,6 +182,7 @@ public class CampaignsController {
         model.addAttribute("minimumScheduledAt", minimumScheduleTime.format(DATE_TIME_INPUT_FORMAT));
         model.addAttribute("suggestedScheduledAt", suggestedScheduleTime.format(DATE_TIME_INPUT_FORMAT));
         model.addAttribute("actionStateMessage", actionStateMessage(view.status()));
+        model.addAttribute("audiencePreflight", audienceService.evaluate(campaign));
 
         return "campaigns/view";
     }
@@ -185,7 +194,9 @@ public class CampaignsController {
         Model model
     ) {
         populateFormMetadata(model, "Edit Campaign - OpenMailer", "edit");
-        model.addAttribute("campaignForm", toForm(campaignService.findByIdAndUserId(id, userDetails.getUser().getId())));
+        CampaignForm form = toForm(campaignService.findByIdAndUserId(id, userDetails.getUser().getId()));
+        model.addAttribute("campaignForm", form);
+        populateAudiencePreview(model, userDetails.getUser().getId(), form);
         return "campaigns/form";
     }
 
@@ -200,6 +211,7 @@ public class CampaignsController {
     ) {
         if (bindingResult.hasErrors()) {
             populateFormMetadata(model, "Edit Campaign - OpenMailer", "edit");
+            populateAudiencePreview(model, userDetails.getUser().getId(), campaignForm);
             return "campaigns/form";
         }
 
@@ -208,6 +220,7 @@ public class CampaignsController {
         } catch (ValidationException ex) {
             bindValidationError(bindingResult, ex);
             populateFormMetadata(model, "Edit Campaign - OpenMailer", "edit");
+            populateAudiencePreview(model, userDetails.getUser().getId(), campaignForm);
             return "campaigns/form";
         }
         redirectAttributes.addFlashAttribute("successMessage", "Campaign updated successfully.");
@@ -221,6 +234,7 @@ public class CampaignsController {
         RedirectAttributes redirectAttributes
     ) {
         try {
+            validateAudienceBeforeDelivery(campaignService.findByIdAndUserId(id, userDetails.getUser().getId()));
             campaignService.startSendingCampaign(id, userDetails.getUser().getId());
             campaignSendingService.sendCampaignAsync(id);
             redirectAttributes.addFlashAttribute("successMessage", "Campaign send started successfully.");
@@ -241,6 +255,7 @@ public class CampaignsController {
             if (scheduledAt == null || scheduledAt.isBlank()) {
                 throw new ValidationException("Choose a future date and time for scheduling.", "scheduledAt");
             }
+            validateAudienceBeforeDelivery(campaignService.findByIdAndUserId(id, userDetails.getUser().getId()));
             campaignService.scheduleCampaign(id, userDetails.getUser().getId(), LocalDateTime.parse(scheduledAt));
             redirectAttributes.addFlashAttribute("successMessage", "Campaign scheduled successfully.");
         } catch (RuntimeException ex) {
@@ -262,6 +277,22 @@ public class CampaignsController {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
         return "redirect:/campaigns/" + id;
+    }
+
+    @PostMapping("/{id}/duplicate")
+    public String duplicateCampaign(
+        @PathVariable String id,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        RedirectAttributes redirectAttributes
+    ) {
+        try {
+            EmailCampaign duplicate = campaignService.duplicateCampaign(id, userDetails.getUser().getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Campaign duplicated as a new draft.");
+            return "redirect:/campaigns/" + duplicate.getId() + "/edit";
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/campaigns/" + id;
+        }
     }
 
     @ModelAttribute
@@ -398,10 +429,34 @@ public class CampaignsController {
         campaign.setTrackOpens(form.trackOpens);
         campaign.setTrackClicks(form.trackClicks);
         campaign.setStatus("DRAFT");
-        campaign.setTotalRecipients(list.getTotalContacts());
+        campaign.setTotalRecipients(audienceService.evaluate(userId, list.getId(), form.segmentId).getReachableRecipients());
         campaign.setCreatedBy(user);
         campaign.setUserId(userId);
         return campaign;
+    }
+
+    private void populateAudiencePreview(Model model, String userId, CampaignForm form) {
+        CampaignAudienceService.AudiencePreflight preflight;
+        if (userId == null) {
+            preflight = CampaignAudienceService.AudiencePreflight.empty(false, null);
+        } else {
+            try {
+                preflight = audienceService.evaluate(userId, form.listId, form.segmentId);
+            } catch (RuntimeException ex) {
+                preflight = CampaignAudienceService.AudiencePreflight.empty(
+                    form.segmentId != null && !form.segmentId.isBlank(),
+                    null
+                );
+            }
+        }
+        model.addAttribute("audiencePreflight", preflight);
+    }
+
+    private void validateAudienceBeforeDelivery(EmailCampaign campaign) {
+        CampaignAudienceService.AudiencePreflight preflight = audienceService.evaluate(campaign);
+        if (preflight.isZeroAudience()) {
+            throw new ValidationException("This campaign has no reachable subscribed recipients. Review the selected list before sending.");
+        }
     }
 
     private void populateFormMetadata(Model model, String pageTitle, String mode) {

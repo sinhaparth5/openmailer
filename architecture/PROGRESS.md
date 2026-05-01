@@ -1,6 +1,6 @@
 # OpenMailer - Implementation Progress
 
-Last Updated: 2026-04-19
+Last Updated: 2026-04-21
 
 ---
 
@@ -12,7 +12,18 @@ Last Updated: 2026-04-19
 
 ---
 
-## 🔄 Recent Progress Update (2026-04-16)
+## 🔄 Recent Progress Update (2026-04-21)
+
+### ✅ Campaign Draft Reuse
+- Added campaign duplication so any existing campaign can be copied into a fresh draft
+- Reset delivery metrics and scheduling state on duplicated campaigns so reused drafts start clean
+- Added duplicate actions on both the campaign list and campaign detail pages
+- Redirect duplicated campaigns straight into edit mode for faster iteration
+- Added audience preflight visibility on campaign create/edit and detail screens
+- Blocked send and schedule actions when a campaign has zero reachable subscribed recipients
+- Implemented real segment condition enforcement so preflight and delivery now use the same filtered audience
+
+## 🔄 Earlier Progress Update (2026-04-16)
 
 ### ✅ Authentication, Recovery, and Account Settings
 - Fixed auth state persistence so successful logins now correctly update `lastLoginAt`
@@ -39,6 +50,7 @@ Last Updated: 2026-04-19
 - Improved campaign create/edit readiness messaging for templates, lists, verified domains, and providers
 - Added clearer delivery-state messaging and next-step guidance on campaign list and detail screens
 - Improved scheduling UX with safer defaults and minimum scheduling constraints
+- Added draft reuse tooling so successful campaign setups can be duplicated instead of rebuilt manually
 
 ### ✅ Runtime and Security Hardening
 - Fixed CSP mismatches for Google Fonts in the server security headers

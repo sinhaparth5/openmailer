@@ -3,7 +3,6 @@ package com.openmailer.openmailer.service.campaign;
 import com.openmailer.openmailer.model.*;
 import com.openmailer.openmailer.repository.ContactRepository;
 import com.openmailer.openmailer.service.contact.ContactListMembershipService;
-import com.openmailer.openmailer.service.contact.SegmentService;
 import com.openmailer.openmailer.service.email.EmailSender;
 import com.openmailer.openmailer.service.email.EmailSender.EmailSendRequest;
 import com.openmailer.openmailer.service.email.EmailSender.EmailSendResponse;
@@ -41,7 +40,7 @@ public class CampaignSendingService {
     private final TrackingService trackingService;
     private final ContactRepository contactRepository;
     private final ContactListMembershipService membershipService;
-    private final SegmentService segmentService;
+    private final CampaignAudienceService audienceService;
     private final TemplateRendererService templateRenderer;
     private final ProviderFactory providerFactory;
 
@@ -53,7 +52,7 @@ public class CampaignSendingService {
             TrackingService trackingService,
             ContactRepository contactRepository,
             ContactListMembershipService membershipService,
-            SegmentService segmentService,
+            CampaignAudienceService audienceService,
             TemplateRendererService templateRenderer,
             ProviderFactory providerFactory) {
         this.campaignService = campaignService;
@@ -62,7 +61,7 @@ public class CampaignSendingService {
         this.trackingService = trackingService;
         this.contactRepository = contactRepository;
         this.membershipService = membershipService;
-        this.segmentService = segmentService;
+        this.audienceService = audienceService;
         this.templateRenderer = templateRenderer;
         this.providerFactory = providerFactory;
     }
@@ -151,24 +150,11 @@ public class CampaignSendingService {
      * @return list of contacts
      */
     private List<Contact> getContactsForCampaign(EmailCampaign campaign) {
-        if (campaign.getSegment() != null) {
-            // TODO: Implement segment contact retrieval when SegmentController is implemented
-            log.warn("Segment-based campaigns not fully implemented yet");
-            return new ArrayList<>();
-        } else if (campaign.getContactList() != null) {
-            // Get contacts from the list
-            List<String> contactIds = membershipService.getContactIdsByList(campaign.getContactList().getId());
-            if (contactIds.isEmpty()) {
-                return new ArrayList<>();
-            }
-            // Get all contacts and filter for SUBSCRIBED status
-            return contactRepository.findAllById(contactIds).stream()
-                    .filter(contact -> "SUBSCRIBED".equals(contact.getStatus()))
-                    .toList();
-        } else {
+        if (campaign.getContactList() == null) {
             log.warn("Campaign has no contact list or segment configured");
             return new ArrayList<>();
         }
+        return new ArrayList<>(audienceService.resolveReachableContacts(campaign));
     }
 
     /**

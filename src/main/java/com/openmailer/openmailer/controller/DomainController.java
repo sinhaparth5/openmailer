@@ -111,6 +111,7 @@ public class DomainController {
         domain.setDomainName(domainName);
         domain.setStatus("PENDING");
         domain.setUser(user);
+        domain.setDkimSelector("openmailer");
 
         // Generate DKIM keys
         try {
@@ -120,6 +121,9 @@ public class DomainController {
             // Format and set public key for DNS record
             String formattedPublicKey = dkimKeyGenerationService.formatPublicKeyForDns(keys.getPublicKey());
             domain.setDkimPublicKey(formattedPublicKey);
+            domain.setSpfRecord(expectedSpfRecord(domainName));
+            domain.setDkimRecord(expectedDkimRecord(domain.getDkimSelector(), formattedPublicKey));
+            domain.setDmarcRecord(expectedDmarcRecord(domainName));
 
             // Encrypt and store private key
             String encryptedPrivateKey = encryptionService.encrypt(keys.getPrivateKey());
@@ -215,7 +219,9 @@ public class DomainController {
             verificationResult = dnsVerificationService.verifyDomain(
                     domain.getDomainName(),
                     dkimSelector,
-                    expectedPublicKey
+                    domain.getSpfRecord(),
+                    domain.getDkimRecord() != null ? domain.getDkimRecord() : expectedDkimRecord(dkimSelector, expectedPublicKey),
+                    domain.getDmarcRecord() != null ? domain.getDmarcRecord() : expectedDmarcRecord(domain.getDomainName())
             );
 
             boolean spfVerified = verificationResult.isSpfVerified();
@@ -284,15 +290,16 @@ public class DomainController {
         Map<String, Object> spf = new HashMap<>();
         spf.put("type", "TXT");
         spf.put("name", "@");
-        spf.put("value", "v=spf1 include:openmailer.com ~all");
+        spf.put("value", domain.getSpfRecord() != null ? domain.getSpfRecord() : expectedSpfRecord(domain.getDomainName()));
         spf.put("verified", domain.getSpfVerified());
         records.add(spf);
 
         // DKIM Record
         Map<String, Object> dkim = new HashMap<>();
         dkim.put("type", "TXT");
-        dkim.put("name", "openmailer._domainkey");
-        dkim.put("value", domain.getDkimPublicKey() != null ? "v=DKIM1; k=rsa; p=" + domain.getDkimPublicKey() : "Generating...");
+        String dkimSelector = domain.getDkimSelector() != null ? domain.getDkimSelector() : "openmailer";
+        dkim.put("name", dkimSelector + "._domainkey");
+        dkim.put("value", domain.getDkimRecord() != null ? domain.getDkimRecord() : expectedDkimRecord(dkimSelector, domain.getDkimPublicKey()));
         dkim.put("verified", domain.getDkimVerified());
         records.add(dkim);
 
@@ -300,10 +307,24 @@ public class DomainController {
         Map<String, Object> dmarc = new HashMap<>();
         dmarc.put("type", "TXT");
         dmarc.put("name", "_dmarc");
-        dmarc.put("value", "v=DMARC1; p=quarantine; rua=mailto:dmarc@openmailer.com");
+        dmarc.put("value", domain.getDmarcRecord() != null ? domain.getDmarcRecord() : expectedDmarcRecord(domain.getDomainName()));
         dmarc.put("verified", domain.getDmarcVerified());
         records.add(dmarc);
 
         return records;
+    }
+
+    private String expectedSpfRecord(String domainName) {
+        return "v=spf1 include:openmailer.com ~all";
+    }
+
+    private String expectedDkimRecord(String selector, String publicKey) {
+        return publicKey != null && !publicKey.isBlank()
+            ? "v=DKIM1; k=rsa; p=" + publicKey
+            : "Generating...";
+    }
+
+    private String expectedDmarcRecord(String domainName) {
+        return "v=DMARC1; p=quarantine; rua=mailto:dmarc@" + domainName;
     }
 }

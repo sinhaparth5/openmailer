@@ -1,6 +1,7 @@
 package com.openmailer.openmailer.controller;
 
 import com.openmailer.openmailer.exception.ValidationException;
+import com.openmailer.openmailer.model.EmailCampaign;
 import com.openmailer.openmailer.model.User;
 import com.openmailer.openmailer.repository.ContactListRepository;
 import com.openmailer.openmailer.repository.DomainRepository;
@@ -8,6 +9,7 @@ import com.openmailer.openmailer.repository.EmailProviderRepository;
 import com.openmailer.openmailer.repository.EmailTemplateRepository;
 import com.openmailer.openmailer.repository.SegmentRepository;
 import com.openmailer.openmailer.security.CustomUserDetails;
+import com.openmailer.openmailer.service.campaign.CampaignAudienceService;
 import com.openmailer.openmailer.service.campaign.CampaignSendingService;
 import com.openmailer.openmailer.service.campaign.CampaignService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +24,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +32,9 @@ class CampaignsControllerTest {
 
     @Mock
     private CampaignService campaignService;
+
+    @Mock
+    private CampaignAudienceService audienceService;
 
     @Mock
     private CampaignSendingService campaignSendingService;
@@ -54,6 +60,7 @@ class CampaignsControllerTest {
     void setUp() {
         controller = new CampaignsController(
             campaignService,
+            audienceService,
             campaignSendingService,
             templateRepository,
             listRepository,
@@ -61,6 +68,27 @@ class CampaignsControllerTest {
             domainRepository,
             providerRepository
         );
+
+        EmailCampaign campaign = new EmailCampaign();
+        campaign.setId("campaign-1");
+        campaign.setUserId("user-1");
+
+        CampaignAudienceService.AudiencePreflight audiencePreflight =
+            new CampaignAudienceService.AudiencePreflight(
+                "list-1",
+                "Main List",
+                10,
+                10,
+                5,
+                5,
+                null,
+                false,
+                false,
+                null
+            );
+
+        lenient().when(campaignService.findByIdAndUserId("campaign-1", "user-1")).thenReturn(campaign);
+        lenient().when(audienceService.evaluate(campaign)).thenReturn(audiencePreflight);
     }
 
     @Test

@@ -136,6 +136,13 @@
                                 <a th:if="${campaign.status == 'DRAFT'}"
                                    th:href="@{/campaigns/{id}/edit(id=${campaign.id})}"
                                    class="text-[13px] font-medium text-slate-400 transition hover:text-slate-700">Edit</a>
+                                <form th:action="@{/campaigns/{id}/duplicate(id=${campaign.id})}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button type="submit"
+                                            class="text-[13px] font-medium text-slate-400 transition hover:text-slate-700">
+                                        Duplicate
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
