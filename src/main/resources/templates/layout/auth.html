@@ -1,151 +1,255 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  lang="en"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
-    <title th:text="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'">OpenMailer — Self-Hosted Email Campaigns</title>
-    <meta name="description" th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'">
-    <meta name="keywords" th:content="${pageKeywords} ?: 'self-hosted email, open source email marketing, bulk email campaigns, DKIM, email delivery, openmailer'">
-    <meta name="author" content="OpenMailer">
-    <meta name="robots" th:content="${pageRobots} ?: 'index, follow'">
-    <link rel="canonical" th:href="${pageCanonical} ?: '#'" th:if="${pageCanonical != null}">
+    <title th:text="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'">
+      OpenMailer — Self-Hosted Email Campaigns
+    </title>
+    <meta
+      name="description"
+      th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'"
+    />
+    <meta
+      name="keywords"
+      th:content="${pageKeywords} ?: 'self-hosted email, open source email marketing, bulk email campaigns, DKIM, email delivery, openmailer'"
+    />
+    <meta name="author" content="OpenMailer" />
+    <meta name="robots" th:content="${pageRobots} ?: 'index, follow'" />
+    <link
+      rel="canonical"
+      th:href="${pageCanonical} ?: '#'"
+      th:if="${pageCanonical != null}"
+    />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="OpenMailer">
-    <meta property="og:url" th:content="${pageCanonical} ?: 'https://openmailer.astrareconslabs.com'">
-    <meta property="og:title" th:content="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'">
-    <meta property="og:description" th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'">
-    <meta property="og:image" content="https://openmailer.astrareconslabs.com/images/openmailer_seo_image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="OpenMailer — Self-Hosted Email Campaigns">
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="OpenMailer" />
+    <meta
+      property="og:url"
+      th:content="${pageCanonical} ?: 'https://openmailer.astrareconslabs.com'"
+    />
+    <meta
+      property="og:title"
+      th:content="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'"
+    />
+    <meta
+      property="og:description"
+      th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'"
+    />
+    <meta
+      property="og:image"
+      content="https://openmailer.astrareconslabs.com/images/openmailer_seo_image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="OpenMailer — Self-Hosted Email Campaigns"
+    />
 
-    <!-- Twitter / X -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@openmailer">
-    <meta name="twitter:title" th:content="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'">
-    <meta name="twitter:description" th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'">
-    <meta name="twitter:image" content="https://openmailer.astrareconslabs.com/images/openmailer_seo_image.png">
-    <meta name="twitter:image:alt" content="OpenMailer — Self-Hosted Email Campaigns">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@openmailer" />
+    <meta
+      name="twitter:title"
+      th:content="${pageTitle} ?: 'OpenMailer — Self-Hosted Email Campaigns'"
+    />
+    <meta
+      name="twitter:description"
+      th:content="${pageDescription} ?: 'OpenMailer is a free, open-source self-hosted email platform. Run bulk campaigns, manage contacts, and control delivery — on your own infrastructure.'"
+    />
+    <meta
+      name="twitter:image"
+      content="https://openmailer.astrareconslabs.com/images/openmailer_seo_image.png"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="OpenMailer — Self-Hosted Email Campaigns"
+    />
 
-    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
-    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
-    <link rel="manifest" th:href="@{/site.webmanifest}">
-    <meta name="theme-color" content="#ddf04e">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="OpenMailer">
+    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      th:href="@{/apple-touch-icon.png}"
+    />
+    <link rel="manifest" th:href="@{/site.webmanifest}" />
+    <meta name="theme-color" content="#ddf04e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="OpenMailer" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
+      rel="stylesheet"
+    />
 
-    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
 
-    <script th:src="${assetMinified} ? @{/js/min/alpine-components.min.js} : @{/js/alpine-components.js}"></script>
+    <script
+      th:src="${assetMinified} ? @{/js/min/alpine-components.min.js} : @{/js/alpine-components.js}"
+    ></script>
     <script defer th:src="@{/js/vendor/alpinejs.min.js}"></script>
 
-    <!-- JSON-LD structured data (base — pages can add their own via extra-head) -->
-    <script type="application/ld+json" th:if="${pageJsonLd == null}" th:inline="javascript">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "OpenMailer",
-      "applicationCategory": "BusinessApplication",
-      "operatingSystem": "Any",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "description": "Free, open-source self-hosted email campaign platform with DKIM support, contact management, and multi-provider delivery.",
-      "url": "https://openmailer.astrareconslabs.com",
-      "image": "https://openmailer.astrareconslabs.com/images/openmailer_seo_image.png",
-      "author": { "@type": "Organization", "name": "OpenMailer" },
-      "license": "https://opensource.org/licenses/MIT"
-    }
+    <script
+      type="application/ld+json"
+      th:if="${pageJsonLd == null}"
+      th:inline="javascript"
+    >
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "OpenMailer",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Free, open-source self-hosted email campaign platform with DKIM support, contact management, and multi-provider delivery.",
+        "url": "https://openmailer.astrareconslabs.com",
+        "image": "https://openmailer.astrareconslabs.com/images/openmailer_seo_image.png",
+        "author": { "@type": "Organization", "name": "OpenMailer" },
+        "license": "https://opensource.org/licenses/MIT"
+      }
     </script>
-    <script type="application/ld+json" th:if="${pageJsonLd != null}" th:utext="${pageJsonLd}"></script>
+    <script
+      type="application/ld+json"
+      th:if="${pageJsonLd != null}"
+      th:utext="${pageJsonLd}"
+    ></script>
 
     <th:block layout:fragment="extra-head"></th:block>
 
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('consent', 'default', {
-            'ad_storage': 'denied',
-            'analytics_storage': 'denied',
-            'wait_for_update': 500
-        });
-        (function() {
-            if (localStorage.getItem('cookie_consent') === 'accepted') {
-                gtag('consent', 'update', {'analytics_storage': 'granted', 'ad_storage': 'granted'});
-            }
-        })();
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        analytics_storage: "denied",
+        wait_for_update: 500,
+      });
+      (function () {
+        if (localStorage.getItem("cookie_consent") === "accepted") {
+          gtag("consent", "update", {
+            analytics_storage: "granted",
+            ad_storage: "granted",
+          });
+        }
+      })();
     </script>
 
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TXL68GQG');</script>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VXSD75V1ZC"></script>
     <script>
-        gtag('js', new Date());
-        gtag('config', 'G-VXSD75V1ZC');
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-TXL68GQG");
     </script>
-</head>
-<body class="min-h-screen antialiased">
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXL68GQG"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:m-2 focus:rounded">
-        Skip to main content
+
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-VXSD75V1ZC"
+    ></script>
+    <script>
+      gtag("js", new Date());
+      gtag("config", "G-VXSD75V1ZC");
+    </script>
+  </head>
+  <body class="min-h-screen antialiased">
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-TXL68GQG"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:m-2 focus:rounded"
+    >
+      Skip to main content
     </a>
 
-    <div class="mx-auto flex min-h-screen w-full max-w-[1440px] items-stretch px-4 py-3 sm:px-6 sm:py-5">
-        <div class="flex w-full flex-col gap-4">
-            <div th:replace="~{layout/fragments :: flash-messages}"></div>
-            <main id="main-content" layout:fragment="content" role="main" class="flex w-full">
-                <!-- Page content will be inserted here -->
-            </main>
-        </div>
+    <div
+      class="mx-auto flex min-h-screen w-full max-w-[1440px] items-stretch px-4 py-3 sm:px-6 sm:py-5"
+    >
+      <div class="flex w-full flex-col gap-4">
+        <div th:replace="~{layout/fragments :: flash-messages}"></div>
+        <main
+          id="main-content"
+          layout:fragment="content"
+          role="main"
+          class="flex w-full"
+        >
+          <!-- Page content will be inserted here -->
+        </main>
+      </div>
     </div>
 
     <th:block layout:fragment="extra-scripts"></th:block>
-    <script th:src="${assetMinified} ? @{/js/min/flash-messages.min.js} : @{/js/flash-messages.js}"></script>
+    <script
+      th:src="${assetMinified} ? @{/js/min/flash-messages.min.js} : @{/js/flash-messages.js}"
+    ></script>
 
-    <div x-data="cookieConsent()"
-         x-show="show"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 translate-y-4"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 translate-y-4"
-         class="fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-200 bg-white px-4 py-4 shadow-lg sm:px-6"
-         role="region"
-         aria-label="Cookie consent">
-        <div class="mx-auto flex max-w-[1440px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p class="text-sm text-neutral-600">
-                We use cookies and analytics to understand how you use OpenMailer and improve your experience.
-                See our <a href="#" class="font-medium text-neutral-900 underline underline-offset-2 hover:text-neutral-700">Privacy Policy</a>.
-            </p>
-            <div class="flex shrink-0 gap-2">
-                <button @click="decline()"
-                        class="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50">
-                    Decline
-                </button>
-                <button @click="accept()"
-                        class="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-700">
-                    Accept All
-                </button>
-            </div>
+    <div
+      x-data="cookieConsent()"
+      x-show="show"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0 translate-y-4"
+      x-transition:enter-end="opacity-100 translate-y-0"
+      x-transition:leave="transition ease-in duration-200"
+      x-transition:leave-start="opacity-100 translate-y-0"
+      x-transition:leave-end="opacity-0 translate-y-4"
+      class="fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-200 bg-white px-4 py-4 shadow-lg sm:px-6"
+      role="region"
+      aria-label="Cookie consent"
+    >
+      <div
+        class="mx-auto flex max-w-[1440px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <p class="text-sm text-neutral-600">
+          We use cookies and analytics to understand how you use OpenMailer and
+          improve your experience. See our
+          <a
+            href="#"
+            class="font-medium text-neutral-900 underline underline-offset-2 hover:text-neutral-700"
+            >Privacy Policy</a
+          >.
+        </p>
+        <div class="flex shrink-0 gap-2">
+          <button
+            @click="decline()"
+            class="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50"
+          >
+            Decline
+          </button>
+          <button
+            @click="accept()"
+            class="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-700"
+          >
+            Accept All
+          </button>
         </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>
