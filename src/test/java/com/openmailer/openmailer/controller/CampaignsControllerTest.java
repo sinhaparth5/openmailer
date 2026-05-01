@@ -10,6 +10,7 @@ import com.openmailer.openmailer.repository.EmailTemplateRepository;
 import com.openmailer.openmailer.repository.SegmentRepository;
 import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.campaign.CampaignAudienceService;
+import com.openmailer.openmailer.service.campaign.CampaignDeliveryPolicyService;
 import com.openmailer.openmailer.service.campaign.CampaignSendingService;
 import com.openmailer.openmailer.service.campaign.CampaignService;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,9 @@ class CampaignsControllerTest {
     private CampaignAudienceService audienceService;
 
     @Mock
+    private CampaignDeliveryPolicyService deliveryPolicyService;
+
+    @Mock
     private CampaignSendingService campaignSendingService;
 
     @Mock
@@ -61,6 +65,7 @@ class CampaignsControllerTest {
         controller = new CampaignsController(
             campaignService,
             audienceService,
+            deliveryPolicyService,
             campaignSendingService,
             templateRepository,
             listRepository,
@@ -89,6 +94,7 @@ class CampaignsControllerTest {
 
         lenient().when(campaignService.findByIdAndUserId("campaign-1", "user-1")).thenReturn(campaign);
         lenient().when(audienceService.evaluate(campaign)).thenReturn(audiencePreflight);
+        lenient().when(deliveryPolicyService.usesSharedSender(campaign)).thenReturn(false);
     }
 
     @Test

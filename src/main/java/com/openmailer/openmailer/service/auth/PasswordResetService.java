@@ -138,7 +138,8 @@ public class PasswordResetService {
                                   <td align="left" style="vertical-align:middle;">
                                     <table role="presentation" cellspacing="0" cellpadding="0">
                                       <tr>
-                                        <td style="width:36px; height:36px; border-radius:10px; background:#ddf04e; color:#111111; font-size:12px; font-weight:800; text-align:center; vertical-align:middle;">
+                                        <td style="width:36px; height:36px; border-radius:10px; background:#ddf04e; color:#111111; "
+                                            + "font-size:12px; font-weight:800; text-align:center; vertical-align:middle;">
                                           OM
                                         </td>
                                         <td style="padding-left:12px; color:#ffffff; font-size:18px; font-weight:700; letter-spacing:-0.02em;">
@@ -156,7 +157,9 @@ public class PasswordResetService {
                           </tr>
                           <tr>
                             <td style="padding:34px 28px 30px 28px;">
-                              <div style="display:inline-block; padding:7px 12px; border-radius:999px; background:rgba(221,240,78,0.12); color:#ddf04e; font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase;">
+                              <div style="display:inline-block; padding:7px 12px; border-radius:999px; "
+                                  + "background:rgba(221,240,78,0.12); color:#ddf04e; font-size:11px; "
+                                  + "font-weight:700; letter-spacing:0.12em; text-transform:uppercase;">
                                 Password reset
                               </div>
                               <h1 style="margin:18px 0 12px 0; color:#ffffff; font-size:32px; line-height:1.1; font-weight:800; letter-spacing:-0.03em;">
