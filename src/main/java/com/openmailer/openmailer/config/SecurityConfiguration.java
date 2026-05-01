@@ -94,7 +94,17 @@ public class SecurityConfiguration {
                 )
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/images/**", "/site.webmanifest", "/apple-touch-icon.png").permitAll()
+                .requestMatchers(
+                    "/",
+                    "/css/**",
+                    "/js/**",
+                    "/favicon.ico",
+                    "/images/**",
+                    "/site.webmanifest",
+                    "/apple-touch-icon.png",
+                    "/robots.txt",
+                    "/sitemap.xml"
+                ).permitAll()
                 .requestMatchers("/api/auth/me/**", "/api/auth/change-password", "/api/auth/2fa/**").authenticated()
                 .requestMatchers("/api/auth/**", "/track/**").permitAll()
                 .requestMatchers("/api/v1/public/**").permitAll()
