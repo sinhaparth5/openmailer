@@ -53,6 +53,9 @@ public class DomainController {
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Domain> domains = domainService.findByUserId(user.getId(), pageable);
@@ -75,6 +78,10 @@ public class DomainController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDomain(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         Domain domain = domainService.findById(id);
 
@@ -94,6 +101,10 @@ public class DomainController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> createDomain(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody Map<String, String> request) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         String domainName = request.get("domainName");
         if (domainName == null || domainName.isEmpty()) {
@@ -155,6 +166,10 @@ public class DomainController {
     public ResponseEntity<ApiResponse<Void>> deleteDomain(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         Domain domain = domainService.findById(id);
 
@@ -178,6 +193,10 @@ public class DomainController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDnsRecords(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         Domain domain = domainService.findById(id);
 
@@ -201,6 +220,10 @@ public class DomainController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> verifyDomain(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         Domain domain = domainService.findById(id);
 

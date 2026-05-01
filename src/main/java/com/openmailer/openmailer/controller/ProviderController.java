@@ -51,6 +51,9 @@ public class ProviderController {
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         Pageable pageable = PageRequest.of(page, size);
         Page<EmailProvider> providers = providerService.findByUserId(user.getId(), pageable);
@@ -73,6 +76,10 @@ public class ProviderController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getProvider(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         EmailProvider provider = providerService.findById(id);
 
@@ -92,6 +99,10 @@ public class ProviderController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> createProvider(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody Map<String, Object> request) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         String name = (String) request.get("name");
         String providerTypeStr = (String) request.get("providerType");
@@ -147,6 +158,10 @@ public class ProviderController {
             @AuthenticationPrincipal User user,
             @PathVariable String id,
             @Valid @RequestBody Map<String, Object> request) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         EmailProvider provider = providerService.findById(id);
 
@@ -196,6 +211,10 @@ public class ProviderController {
     public ResponseEntity<ApiResponse<Void>> deleteProvider(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         EmailProvider provider = providerService.findById(id);
 
@@ -219,6 +238,10 @@ public class ProviderController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> testProvider(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         EmailProvider provider = providerService.findById(id);
 
@@ -266,6 +289,10 @@ public class ProviderController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> toggleProvider(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         EmailProvider provider = providerService.findById(id);
 
@@ -292,6 +319,10 @@ public class ProviderController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getProviderStats(
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "Authentication is required", null));
+        }
 
         EmailProvider provider = providerService.findById(id);
 
