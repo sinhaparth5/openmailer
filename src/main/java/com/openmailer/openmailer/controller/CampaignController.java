@@ -4,8 +4,11 @@ import com.openmailer.openmailer.dto.ApiResponse;
 import com.openmailer.openmailer.dto.PaginatedResponse;
 import com.openmailer.openmailer.dto.campaign.CampaignRequest;
 import com.openmailer.openmailer.dto.campaign.CampaignResponse;
+import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.*;
 import com.openmailer.openmailer.service.campaign.CampaignService;
+import com.openmailer.openmailer.service.campaign.CampaignAudienceService;
+import com.openmailer.openmailer.service.campaign.CampaignDeliveryPolicyService;
 import com.openmailer.openmailer.service.contact.ContactListService;
 import com.openmailer.openmailer.service.domain.DomainService;
 import com.openmailer.openmailer.service.provider.EmailProviderService;
@@ -37,17 +40,24 @@ public class CampaignController {
     private static final Logger log = LoggerFactory.getLogger(CampaignController.class);
 
     private final CampaignService campaignService;
+    private final CampaignAudienceService audienceService;
+    private final CampaignDeliveryPolicyService deliveryPolicyService;
     private final EmailTemplateService templateService;
     private final ContactListService listService;
     private final DomainService domainService;
     private final EmailProviderService providerService;
     private final com.openmailer.openmailer.service.campaign.CampaignSendingService campaignSendingService;
 
-    public CampaignController(CampaignService campaignService, EmailTemplateService templateService,
+    public CampaignController(CampaignService campaignService,
+                              CampaignAudienceService audienceService,
+                              CampaignDeliveryPolicyService deliveryPolicyService,
+                              EmailTemplateService templateService,
                               ContactListService listService, DomainService domainService,
                               EmailProviderService providerService,
                               com.openmailer.openmailer.service.campaign.CampaignSendingService campaignSendingService) {
         this.campaignService = campaignService;
+        this.audienceService = audienceService;
+        this.deliveryPolicyService = deliveryPolicyService;
         this.templateService = templateService;
         this.listService = listService;
         this.domainService = domainService;
@@ -126,24 +136,33 @@ public class CampaignController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", "listId"));
         }
 
-        // Validate domain
-        Domain domain = domainService.findById(request.getDomainId());
-        if (!domain.getUser().getId().equals(user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this domain", "domainId"));
-        }
-
-        // Check if domain is verified
-        if (!"VERIFIED".equals(domain.getStatus())) {
+        Domain domain = null;
+        EmailProvider provider = null;
+        boolean sharedSenderMode;
+        try {
+            deliveryPolicyService.validateDraftConfiguration(user, request.getDomainId(), request.getProviderId());
+            sharedSenderMode = deliveryPolicyService.usesSharedSender(request.getDomainId(), request.getProviderId());
+        } catch (ValidationException ex) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("DOMAIN_NOT_VERIFIED", "Domain must be verified before sending", "domainId"));
+                .body(ApiResponse.error("INVALID_CONFIGURATION", ex.getMessage(), null));
         }
 
-        // Validate provider
-        EmailProvider provider = providerService.findById(request.getProviderId());
-        if (!provider.getUser().getId().equals(user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this provider", "providerId"));
+        if (!sharedSenderMode) {
+            domain = domainService.findById(request.getDomainId());
+            if (!domain.getUser().getId().equals(user.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this domain", "domainId"));
+            }
+            if (!"VERIFIED".equals(domain.getStatus())) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("DOMAIN_NOT_VERIFIED", "Domain must be verified before sending", "domainId"));
+            }
+
+            provider = providerService.findById(request.getProviderId());
+            if (!provider.getUser().getId().equals(user.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this provider", "providerId"));
+            }
         }
 
         // Create campaign
@@ -154,8 +173,8 @@ public class CampaignController {
         campaign.setSubjectLine(request.getSubjectLine());
         campaign.setPreviewText(request.getPreviewText());
         campaign.setFromName(request.getFromName());
-        campaign.setFromEmail(request.getFromEmail());
-        campaign.setReplyToEmail(request.getReplyToEmail());
+        campaign.setFromEmail(sharedSenderMode ? deliveryPolicyService.getSharedSenderEmail() : request.getFromEmail());
+        campaign.setReplyToEmail(resolveReplyTo(request, user, sharedSenderMode));
         campaign.setDomain(domain);
         campaign.setProvider(provider);
         campaign.setTrackOpens(request.getTrackOpens());
@@ -211,14 +230,45 @@ public class CampaignController {
                     .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this list", "listId"));
         }
 
+        Domain domain = null;
+        EmailProvider provider = null;
+        boolean sharedSenderMode;
+        try {
+            deliveryPolicyService.validateDraftConfiguration(user, request.getDomainId(), request.getProviderId());
+            sharedSenderMode = deliveryPolicyService.usesSharedSender(request.getDomainId(), request.getProviderId());
+        } catch (ValidationException ex) {
+            return ResponseEntity.badRequest()
+                .body(ApiResponse.error("INVALID_CONFIGURATION", ex.getMessage(), null));
+        }
+
+        if (!sharedSenderMode) {
+            domain = domainService.findById(request.getDomainId());
+            if (!domain.getUser().getId().equals(user.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this domain", "domainId"));
+            }
+            if (!"VERIFIED".equals(domain.getStatus())) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("DOMAIN_NOT_VERIFIED", "Domain must be verified before sending", "domainId"));
+            }
+
+            provider = providerService.findById(request.getProviderId());
+            if (!provider.getUser().getId().equals(user.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(ApiResponse.error("ACCESS_DENIED", "You don't have access to this provider", "providerId"));
+            }
+        }
+
         campaign.setName(request.getName());
         campaign.setTemplate(template);
         campaign.setContactList(list);
         campaign.setSubjectLine(request.getSubjectLine());
         campaign.setPreviewText(request.getPreviewText());
         campaign.setFromName(request.getFromName());
-        campaign.setFromEmail(request.getFromEmail());
-        campaign.setReplyToEmail(request.getReplyToEmail());
+        campaign.setFromEmail(sharedSenderMode ? deliveryPolicyService.getSharedSenderEmail() : request.getFromEmail());
+        campaign.setReplyToEmail(resolveReplyTo(request, user, sharedSenderMode));
+        campaign.setDomain(domain);
+        campaign.setProvider(provider);
         campaign.setTrackOpens(request.getTrackOpens());
         campaign.setTrackClicks(request.getTrackClicks());
         campaign.setSendSpeed(request.getSendSpeed());
@@ -276,6 +326,12 @@ public class CampaignController {
         }
 
         LocalDateTime scheduledAt = LocalDateTime.parse(scheduledAtStr);
+        try {
+            validateAudienceBeforeDelivery(campaignService.findByIdAndUserId(id, user.getId()));
+        } catch (ValidationException ex) {
+            return ResponseEntity.badRequest()
+                .body(ApiResponse.error("INVALID_AUDIENCE", ex.getMessage(), null));
+        }
         EmailCampaign updated = campaignService.scheduleCampaign(id, user.getId(), scheduledAt);
 
         log.info("Campaign scheduled: {} for {} by user: {}", id, scheduledAt, user.getEmail());
@@ -291,6 +347,12 @@ public class CampaignController {
             @AuthenticationPrincipal User user,
             @PathVariable String id) {
 
+        try {
+            validateAudienceBeforeDelivery(campaignService.findByIdAndUserId(id, user.getId()));
+        } catch (ValidationException ex) {
+            return ResponseEntity.badRequest()
+                .body(ApiResponse.error("INVALID_AUDIENCE", ex.getMessage(), null));
+        }
         EmailCampaign campaign = campaignService.startSendingCampaign(id, user.getId());
 
         // Trigger async campaign sending service
@@ -301,6 +363,26 @@ public class CampaignController {
         return ResponseEntity.ok(ApiResponse.success(
                 CampaignResponse.fromEntity(campaign),
                 "Campaign is being sent. Check analytics for progress."));
+    }
+
+    private void validateAudienceBeforeDelivery(EmailCampaign campaign) {
+        CampaignAudienceService.AudiencePreflight preflight = audienceService.evaluate(campaign);
+        if (preflight.isZeroAudience()) {
+            throw new ValidationException("This campaign has no reachable subscribed recipients. Review the selected list before sending.");
+        }
+        if (deliveryPolicyService.usesSharedSender(campaign)) {
+            deliveryPolicyService.validateSharedSenderQuota(campaign.getCreatedBy(), preflight.getReachableRecipients());
+        }
+    }
+
+    private String resolveReplyTo(CampaignRequest request, User user, boolean sharedSenderMode) {
+        if (request.getReplyToEmail() != null && !request.getReplyToEmail().isBlank()) {
+            return request.getReplyToEmail().trim();
+        }
+        if (sharedSenderMode && request.getFromEmail() != null && !request.getFromEmail().isBlank()) {
+            return request.getFromEmail().trim();
+        }
+        return null;
     }
 
     /**

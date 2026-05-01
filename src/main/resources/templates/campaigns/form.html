@@ -30,7 +30,7 @@
             <h1 class="text-[2.2rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-[#111] sm:text-[2.6rem]"
                 th:text="${mode == 'edit'} ? 'Edit campaign.' : 'Create a campaign.'">Create a campaign.</h1>
             <p class="mt-2 max-w-md text-[0.875rem] leading-6 text-slate-500">
-                Build a draft using templates, lists, providers, and verified domains already in your account.
+                Build a draft using templates, lists, and your own delivery stack, or use the OpenMailer shared sender for a small free-plan send.
             </p>
         </div>
         <a href="/campaigns" class="app-button-secondary flex-shrink-0 px-5 py-3 text-sm">← Back to campaigns</a>
@@ -111,7 +111,25 @@
             <svg class="h-4 w-4 flex-shrink-0 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z"/>
             </svg>
-            <p class="text-[13px] font-bold text-amber-900">Campaign still needs a template, a list, a verified domain, and an active provider before it can be sent.</p>
+            <p class="text-[13px] font-bold text-amber-900"
+               th:text="${sharedSenderAvailable} ? 'Campaign still needs at least a template and a list before it can be sent with the OpenMailer shared sender.' : 'Campaign still needs a template, a list, a verified domain, and an active provider before it can be sent.'">Campaign still needs setup before it can be sent.</p>
+        </div>
+    </div>
+
+    <div th:if="${sharedSenderAvailable}"
+         class="cpf2 rounded-[20px] border border-slate-200/80 bg-white/75 px-5 py-4">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+                <p class="text-[13px] font-bold text-slate-900">OpenMailer shared sender is available on your free plan.</p>
+                <p class="mt-1 text-[13px] leading-6 text-slate-600">
+                    You can send up to <span class="font-semibold" th:text="${sharedSenderLimit}">10</span> emails using
+                    <span class="font-semibold" th:text="${sharedSenderEmail}">no-reply@example.com</span>.
+                    Leave both domain and provider empty to use it.
+                </p>
+            </div>
+            <div class="rounded-full bg-slate-900 px-4 py-2 text-[12px] font-bold text-white">
+                Remaining: <span th:text="${sharedSenderRemaining}">0</span>
+            </div>
         </div>
     </div>
 
@@ -173,6 +191,9 @@
                         <div>
                             <label for="fromEmail" class="mb-2 block text-sm font-semibold text-slate-700">From email <span class="text-rose-500">*</span></label>
                             <input id="fromEmail" th:field="*{fromEmail}" type="email" required class="app-input" placeholder="ava@example.com">
+                            <p th:if="${sharedSenderAvailable}" class="mt-2 text-[12px] leading-5 text-slate-500">
+                                If you use the OpenMailer shared sender, this address will be used as the reply-to unless you set a separate reply-to email.
+                            </p>
                             <p th:if="${#fields.hasErrors('fromEmail')}" th:errors="*{fromEmail}" class="mt-2 text-sm text-rose-700">From email error</p>
                         </div>
                         <div class="md:col-span-2">
@@ -236,19 +257,28 @@
                             <p th:if="${#fields.hasErrors('segmentId')}" th:errors="*{segmentId}" class="mt-2 text-sm text-rose-700">Segment error</p>
                         </div>
                         <div>
-                            <label for="domainId" class="mb-2 block text-sm font-semibold text-slate-700">Verified domain <span class="text-rose-500">*</span></label>
-                            <select id="domainId" th:field="*{domainId}" required class="app-select">
-                                <option value="">Select verified domain</option>
+                            <label for="domainId" class="mb-2 block text-sm font-semibold text-slate-700">
+                                Verified domain
+                                <span th:unless="${sharedSenderAvailable}" class="text-rose-500">*</span>
+                            </label>
+                            <select id="domainId" th:field="*{domainId}" class="app-select">
+                                <option value="" th:text="${sharedSenderAvailable} ? 'Use OpenMailer shared sender' : 'Select verified domain'">Select verified domain</option>
                                 <option th:each="domain : ${domainOptions}" th:value="${domain.id}" th:text="${domain.domainName}">Domain</option>
                             </select>
                             <p th:if="${#fields.hasErrors('domainId')}" th:errors="*{domainId}" class="mt-2 text-sm text-rose-700">Domain error</p>
                         </div>
                         <div class="md:col-span-2">
-                            <label for="providerId" class="mb-2 block text-sm font-semibold text-slate-700">Active provider <span class="text-rose-500">*</span></label>
-                            <select id="providerId" th:field="*{providerId}" required class="app-select">
-                                <option value="">Select provider</option>
+                            <label for="providerId" class="mb-2 block text-sm font-semibold text-slate-700">
+                                Active provider
+                                <span th:unless="${sharedSenderAvailable}" class="text-rose-500">*</span>
+                            </label>
+                            <select id="providerId" th:field="*{providerId}" class="app-select">
+                                <option value="" th:text="${sharedSenderAvailable} ? 'Use OpenMailer shared sender' : 'Select provider'">Select provider</option>
                                 <option th:each="provider : ${providerOptions}" th:value="${provider.id}" th:text="${provider.providerName}">Provider</option>
                             </select>
+                            <p th:if="${sharedSenderAvailable}" class="mt-2 text-[12px] leading-5 text-slate-500">
+                                Leave both domain and provider empty to use the shared sender. If you pick one, you must pick both.
+                            </p>
                             <p th:if="${#fields.hasErrors('providerId')}" th:errors="*{providerId}" class="mt-2 text-sm text-rose-700">Provider error</p>
                         </div>
                     </div>

@@ -15,6 +15,7 @@ import com.openmailer.openmailer.repository.EmailTemplateRepository;
 import com.openmailer.openmailer.repository.SegmentRepository;
 import com.openmailer.openmailer.security.CustomUserDetails;
 import com.openmailer.openmailer.service.campaign.CampaignAudienceService;
+import com.openmailer.openmailer.service.campaign.CampaignDeliveryPolicyService;
 import com.openmailer.openmailer.service.campaign.CampaignSendingService;
 import com.openmailer.openmailer.service.campaign.CampaignService;
 import jakarta.validation.Valid;
@@ -50,6 +51,7 @@ public class CampaignsController {
     private static final DateTimeFormatter DATE_TIME_INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
     private final CampaignService campaignService;
     private final CampaignAudienceService audienceService;
+    private final CampaignDeliveryPolicyService deliveryPolicyService;
     private final CampaignSendingService campaignSendingService;
     private final EmailTemplateRepository templateRepository;
     private final ContactListRepository listRepository;
@@ -60,6 +62,7 @@ public class CampaignsController {
     public CampaignsController(
         CampaignService campaignService,
         CampaignAudienceService audienceService,
+        CampaignDeliveryPolicyService deliveryPolicyService,
         CampaignSendingService campaignSendingService,
         EmailTemplateRepository templateRepository,
         ContactListRepository listRepository,
@@ -69,6 +72,7 @@ public class CampaignsController {
     ) {
         this.campaignService = campaignService;
         this.audienceService = audienceService;
+        this.deliveryPolicyService = deliveryPolicyService;
         this.campaignSendingService = campaignSendingService;
         this.templateRepository = templateRepository;
         this.listRepository = listRepository;
@@ -183,6 +187,10 @@ public class CampaignsController {
         model.addAttribute("suggestedScheduledAt", suggestedScheduleTime.format(DATE_TIME_INPUT_FORMAT));
         model.addAttribute("actionStateMessage", actionStateMessage(view.status()));
         model.addAttribute("audiencePreflight", audienceService.evaluate(campaign));
+        model.addAttribute("sharedSenderMode", deliveryPolicyService.usesSharedSender(campaign));
+        model.addAttribute("sharedSenderEmail", deliveryPolicyService.getSharedSenderEmail());
+        model.addAttribute("sharedSenderRemaining", deliveryPolicyService.getSharedSenderRemaining(userDetails.getUser()));
+        model.addAttribute("sharedSenderLimit", deliveryPolicyService.getSharedSenderLimit());
 
         return "campaigns/view";
     }
@@ -306,13 +314,18 @@ public class CampaignsController {
         List<Segment> segments = segmentRepository.findByUserId(userId);
         List<Domain> domains = domainRepository.findByUserIdAndStatus(userId, "VERIFIED");
         List<EmailProvider> providers = providerRepository.findByUserIdAndIsActive(userId, true);
+        User user = userDetails.getUser();
 
         model.addAttribute("templateOptions", templates);
         model.addAttribute("listOptions", lists);
         model.addAttribute("segmentOptions", segments);
         model.addAttribute("domainOptions", domains);
         model.addAttribute("providerOptions", providers);
-        model.addAttribute("campaignDependenciesReady", !templates.isEmpty() && !lists.isEmpty() && !domains.isEmpty() && !providers.isEmpty());
+        model.addAttribute("campaignDependenciesReady", deliveryPolicyService.dependenciesReady(user, !templates.isEmpty(), !lists.isEmpty(), !domains.isEmpty(), !providers.isEmpty()));
+        model.addAttribute("sharedSenderAvailable", deliveryPolicyService.canUseSharedSender(user));
+        model.addAttribute("sharedSenderEmail", deliveryPolicyService.getSharedSenderEmail());
+        model.addAttribute("sharedSenderRemaining", deliveryPolicyService.getSharedSenderRemaining(user));
+        model.addAttribute("sharedSenderLimit", deliveryPolicyService.getSharedSenderLimit());
     }
 
     private boolean matchesSearch(CampaignSummaryView campaign, String search) {
@@ -367,8 +380,8 @@ public class CampaignsController {
             defaultText(campaign.getFromEmail(), "Not configured"),
             defaultText(campaign.getReplyToEmail(), "Not configured"),
             campaign.getTemplate() != null ? campaign.getTemplate().getName() : "No template selected",
-            campaign.getProvider() != null ? campaign.getProvider().getProviderName() : "No provider selected",
-            campaign.getDomain() != null ? campaign.getDomain().getDomainName() : "No domain selected",
+            campaign.getProvider() != null ? campaign.getProvider().getProviderName() : "OpenMailer shared sender",
+            campaign.getDomain() != null ? campaign.getDomain().getDomainName() : "OpenMailer shared sender",
             campaign.getContactList() != null ? campaign.getContactList().getName() : "No list selected",
             campaign.getSegment() != null ? campaign.getSegment().getName() : "No segment selected",
             formatRate(campaign.getOpenRate()),
@@ -401,14 +414,21 @@ public class CampaignsController {
     }
 
     private EmailCampaign toEntity(CampaignForm form, User user, String userId) {
+        deliveryPolicyService.validateDraftConfiguration(user, form.domainId, form.providerId);
+
         EmailTemplate template = templateRepository.findByIdAndUserId(form.templateId, userId)
             .orElseThrow(() -> new ValidationException("Selected template is invalid.", "templateId"));
         ContactList list = listRepository.findByIdAndUser_Id(form.listId, userId)
             .orElseThrow(() -> new ValidationException("Selected contact list is invalid.", "listId"));
-        Domain domain = domainRepository.findByIdAndUserId(form.domainId, userId)
-            .orElseThrow(() -> new ValidationException("Selected domain is invalid.", "domainId"));
-        EmailProvider provider = providerRepository.findByIdAndUserId(form.providerId, userId)
-            .orElseThrow(() -> new ValidationException("Selected provider is invalid.", "providerId"));
+        Domain domain = null;
+        EmailProvider provider = null;
+        boolean sharedSenderMode = deliveryPolicyService.usesSharedSender(form.domainId, form.providerId);
+        if (!sharedSenderMode) {
+            domain = domainRepository.findByIdAndUserId(form.domainId, userId)
+                .orElseThrow(() -> new ValidationException("Selected domain is invalid.", "domainId"));
+            provider = providerRepository.findByIdAndUserId(form.providerId, userId)
+                .orElseThrow(() -> new ValidationException("Selected provider is invalid.", "providerId"));
+        }
         Segment segment = blank(form.segmentId)
             ? null
             : segmentRepository.findByIdAndUserId(form.segmentId, userId)
@@ -422,8 +442,8 @@ public class CampaignsController {
         campaign.setSubjectLine(form.subjectLine.trim());
         campaign.setPreviewText(blank(form.previewText) ? null : form.previewText.trim());
         campaign.setFromName(form.fromName.trim());
-        campaign.setFromEmail(form.fromEmail.trim());
-        campaign.setReplyToEmail(blank(form.replyToEmail) ? null : form.replyToEmail.trim());
+        campaign.setFromEmail(sharedSenderMode ? deliveryPolicyService.getSharedSenderEmail() : form.fromEmail.trim());
+        campaign.setReplyToEmail(resolveReplyTo(form, user, sharedSenderMode));
         campaign.setDomain(domain);
         campaign.setProvider(provider);
         campaign.setTrackOpens(form.trackOpens);
@@ -457,6 +477,9 @@ public class CampaignsController {
         if (preflight.isZeroAudience()) {
             throw new ValidationException("This campaign has no reachable subscribed recipients. Review the selected list before sending.");
         }
+        if (deliveryPolicyService.usesSharedSender(campaign)) {
+            deliveryPolicyService.validateSharedSenderQuota(campaign.getCreatedBy(), preflight.getReachableRecipients());
+        }
     }
 
     private void populateFormMetadata(Model model, String pageTitle, String mode) {
@@ -484,6 +507,16 @@ public class CampaignsController {
 
     private boolean blank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private String resolveReplyTo(CampaignForm form, User user, boolean sharedSenderMode) {
+        if (!blank(form.replyToEmail)) {
+            return form.replyToEmail.trim();
+        }
+        if (sharedSenderMode && !blank(form.fromEmail)) {
+            return form.fromEmail.trim();
+        }
+        return null;
     }
 
     private int safeInt(Integer value) {
@@ -584,9 +617,7 @@ public class CampaignsController {
         @Email(message = "Enter a valid from email address.")
         private String fromEmail;
         private String replyToEmail;
-        @NotBlank(message = "Select a verified domain.")
         private String domainId;
-        @NotBlank(message = "Select an active provider.")
         private String providerId;
         private boolean trackOpens = true;
         private boolean trackClicks = true;

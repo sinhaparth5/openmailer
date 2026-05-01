@@ -1,7 +1,9 @@
 package com.openmailer.openmailer.service.campaign;
 
+import com.openmailer.openmailer.exception.ValidationException;
 import com.openmailer.openmailer.model.*;
 import com.openmailer.openmailer.repository.ContactRepository;
+import com.openmailer.openmailer.repository.UserRepository;
 import com.openmailer.openmailer.service.contact.ContactListMembershipService;
 import com.openmailer.openmailer.service.email.EmailSender;
 import com.openmailer.openmailer.service.email.EmailSender.EmailSendRequest;
@@ -41,8 +43,22 @@ public class CampaignSendingService {
     private final ContactRepository contactRepository;
     private final ContactListMembershipService membershipService;
     private final CampaignAudienceService audienceService;
+    private final CampaignDeliveryPolicyService deliveryPolicyService;
     private final TemplateRendererService templateRenderer;
     private final ProviderFactory providerFactory;
+    private final UserRepository userRepository;
+
+    @Value("${spring.mail.host:}")
+    private String sharedSmtpHost;
+
+    @Value("${spring.mail.port:587}")
+    private String sharedSmtpPort;
+
+    @Value("${spring.mail.username:}")
+    private String sharedSmtpUsername;
+
+    @Value("${spring.mail.password:}")
+    private String sharedSmtpPassword;
 
     @Autowired
     public CampaignSendingService(
@@ -53,8 +69,10 @@ public class CampaignSendingService {
             ContactRepository contactRepository,
             ContactListMembershipService membershipService,
             CampaignAudienceService audienceService,
+            CampaignDeliveryPolicyService deliveryPolicyService,
             TemplateRendererService templateRenderer,
-            ProviderFactory providerFactory) {
+            ProviderFactory providerFactory,
+            UserRepository userRepository) {
         this.campaignService = campaignService;
         this.recipientService = recipientService;
         this.linkService = linkService;
@@ -62,8 +80,10 @@ public class CampaignSendingService {
         this.contactRepository = contactRepository;
         this.membershipService = membershipService;
         this.audienceService = audienceService;
+        this.deliveryPolicyService = deliveryPolicyService;
         this.templateRenderer = templateRenderer;
         this.providerFactory = providerFactory;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -78,9 +98,10 @@ public class CampaignSendingService {
 
         try {
             EmailCampaign campaign = campaignService.findById(campaignId);
+            boolean sharedSenderMode = deliveryPolicyService.usesSharedSender(campaign);
 
             // Validate campaign
-            if (campaign.getProvider() == null) {
+            if (!sharedSenderMode && campaign.getProvider() == null) {
                 throw new IllegalStateException("Campaign has no email provider configured");
             }
             if (campaign.getTemplate() == null) {
@@ -105,6 +126,10 @@ public class CampaignSendingService {
 
             log.info("Found {} contacts for campaign {}", contacts.size(), campaignId);
 
+            if (sharedSenderMode) {
+                deliveryPolicyService.validateSharedSenderQuota(campaign.getCreatedBy(), contacts.size());
+            }
+
             // Update total recipients
             campaign.setTotalRecipients(contacts.size());
             campaignService.updateCampaign(campaignId, campaign.getUserId(), campaign);
@@ -113,10 +138,16 @@ public class CampaignSendingService {
             List<CampaignRecipient> recipients = createRecipientRecords(campaign, contacts);
 
             // Create email sender
-            EmailSender emailSender = providerFactory.createProvider(campaign.getProvider());
+            EmailSender emailSender = sharedSenderMode
+                ? providerFactory.createProvider(createSharedSenderProvider(campaign.getCreatedBy()))
+                : providerFactory.createProvider(campaign.getProvider());
 
             // Send emails with rate limiting
             sendEmailsToRecipients(campaign, recipients, emailSender);
+
+            if (sharedSenderMode && campaign.getSentCount() != null && campaign.getSentCount() > 0) {
+                incrementSharedSenderUsage(campaign.getCreatedBy().getId(), campaign.getSentCount());
+            }
 
             // Update campaign statistics
             updateCampaignStatistics(campaign);
@@ -242,6 +273,7 @@ public class CampaignSendingService {
     private boolean sendEmailToRecipient(EmailCampaign campaign, CampaignRecipient recipient, EmailSender emailSender) {
         try {
             Contact contact = recipient.getContact();
+            boolean sharedSenderMode = deliveryPolicyService.usesSharedSender(campaign);
 
             // Render template for this contact
             String htmlBody = templateRenderer.render(campaign.getTemplate().getHtmlContent(), contact);
@@ -263,9 +295,9 @@ public class CampaignSendingService {
             // Build email request
             EmailSendRequest request = new EmailSendRequest();
             request.setTo(contact.getEmail());
-            request.setFrom(campaign.getFromEmail());
+            request.setFrom(sharedSenderMode ? deliveryPolicyService.getSharedSenderEmail() : campaign.getFromEmail());
             request.setFromName(campaign.getFromName());
-            request.setReplyTo(campaign.getReplyToEmail());
+            request.setReplyTo(sharedSenderMode ? fallbackReplyTo(campaign) : campaign.getReplyToEmail());
             request.setSubject(subject);
             request.setHtmlBody(htmlBody);
             request.setTextBody(textBody);
@@ -358,6 +390,48 @@ public class CampaignSendingService {
         campaign.setBounceRate(bounceRate);
 
         campaignService.updateCampaign(campaign.getId(), campaign.getUserId(), campaign);
+    }
+
+    private EmailProvider createSharedSenderProvider(User user) {
+        if (sharedSmtpHost == null || sharedSmtpHost.isBlank()
+            || sharedSmtpUsername == null || sharedSmtpUsername.isBlank()
+            || sharedSmtpPassword == null || sharedSmtpPassword.isBlank()) {
+            throw new ValidationException("OpenMailer shared sender is not configured on this server.");
+        }
+
+        EmailProvider provider = new EmailProvider();
+        provider.setId("shared-sender");
+        provider.setProviderName("OpenMailer Shared Sender");
+        provider.setProviderType(ProviderType.SMTP);
+        provider.setIsActive(true);
+        provider.setUser(user);
+
+        Map<String, String> config = new HashMap<>();
+        config.put("host", sharedSmtpHost);
+        config.put("port", sharedSmtpPort);
+        config.put("username", sharedSmtpUsername);
+        config.put("password", sharedSmtpPassword);
+        config.put("encryption", "TLS");
+        provider.setConfigurationMap(config);
+        return provider;
+    }
+
+    private String fallbackReplyTo(EmailCampaign campaign) {
+        if (campaign.getReplyToEmail() != null && !campaign.getReplyToEmail().isBlank()) {
+            return campaign.getReplyToEmail();
+        }
+        if (campaign.getCreatedBy() != null && campaign.getCreatedBy().getEmail() != null && !campaign.getCreatedBy().getEmail().isBlank()) {
+            return campaign.getCreatedBy().getEmail();
+        }
+        return null;
+    }
+
+    private void incrementSharedSenderUsage(String userId, int sentCount) {
+        userRepository.findById(userId).ifPresent(user -> {
+            int current = user.getMonthlyEmailsSent() != null ? user.getMonthlyEmailsSent() : 0;
+            user.setMonthlyEmailsSent(current + sentCount);
+            userRepository.save(user);
+        });
     }
 
     /**

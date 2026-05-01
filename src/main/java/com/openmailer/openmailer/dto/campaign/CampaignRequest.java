@@ -1,7 +1,6 @@
 package com.openmailer.openmailer.dto.campaign;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 /**
  * Request DTO for creating/updating campaigns
@@ -11,10 +10,10 @@ public class CampaignRequest {
     @NotBlank(message = "Campaign name is required")
     private String name;
 
-    @NotNull(message = "Template ID is required")
+    @NotBlank(message = "Template ID is required")
     private String templateId;
 
-    @NotNull(message = "List ID is required")
+    @NotBlank(message = "List ID is required")
     private String listId;
 
     private String segmentId;
@@ -32,10 +31,8 @@ public class CampaignRequest {
 
     private String replyToEmail;
 
-    @NotNull(message = "Domain ID is required")
     private String domainId;
 
-    @NotNull(message = "Provider ID is required")
     private String providerId;
 
     private Boolean trackOpens = true;

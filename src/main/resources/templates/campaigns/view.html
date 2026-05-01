@@ -134,6 +134,13 @@
                             <dt class="text-sm font-medium text-slate-500">Domain</dt>
                             <dd class="mt-2 text-sm text-slate-900" th:text="${campaign.domainName}">Domain</dd>
                         </div>
+                        <div th:if="${sharedSenderMode}" class="rounded-[18px] border border-slate-200/80 bg-slate-50 px-4 py-4">
+                            <dt class="text-sm font-medium text-slate-500">Shared sender</dt>
+                            <dd class="mt-2 text-sm leading-6 text-slate-900">
+                                This campaign will send through <span class="font-semibold" th:text="${sharedSenderEmail}">no-reply@example.com</span>.
+                                Remaining free-plan shared-sender emails: <span class="font-semibold" th:text="${sharedSenderRemaining}">0</span> of <span class="font-semibold" th:text="${sharedSenderLimit}">10</span>.
+                            </dd>
+                        </div>
                         <div>
                             <dt class="text-sm font-medium text-slate-500">Audience</dt>
                             <dd class="mt-2 text-sm text-slate-900" th:text="${campaign.audienceName}">Audience</dd>
